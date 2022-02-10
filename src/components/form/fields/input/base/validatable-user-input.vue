@@ -10,9 +10,10 @@
 
 <script lang="ts" setup>
 import { EmitEvents } from '@/components/types';
+import { ShowValidationErrors } from '@/composables/provide-inject-symbols';
 import { BaseValidation, ValidationMethod, FieldData, ValidatedFieldData } from '@/composables/types';
 import { useUserInputValidation } from '@/composables/validate-user-input';
-import { reactive } from 'vue';
+import { inject, reactive, ref } from 'vue';
 
 const emit = defineEmits<{
     (event: EmitEvents.UPDATED, data: ValidatedFieldData): void;
@@ -32,9 +33,11 @@ const props = defineProps({
     showAllErrors: {
         type: Boolean,
         required: false,
-        default: true
+        default: false
     }
 });
+
+const showValidationErrors = inject(ShowValidationErrors, ref(false));
 
 const state: ValidatedFieldData = reactive({
     name: null,
@@ -64,6 +67,6 @@ const validate = (data: FieldData): void => {
 };
 
 const showError = (name: string) => {
-    return !state.valid && !!state.failed.length && (props.showAllErrors ? state.failed.includes(name) : state.failed[0] === name);
+    return !state.valid && !!state.failed.length && !!showValidationErrors.value && (props.showAllErrors ? state.failed.includes(name) : state.failed[0] === name);
 };
 </script>
