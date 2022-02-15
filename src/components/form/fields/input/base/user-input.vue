@@ -1,5 +1,16 @@
 <template>
-    <component :is="textarea ? 'textarea' : 'input'" class="user-input" :class="{ focused }" :id="name" :name="name" :value="model" @blur="blur" @focus="focus" @input="model = $event.target.value" />
+    <component
+        :is="textarea ? 'textarea' : 'input'"
+        class="user-input"
+        :class="{ focused }"
+        :id="name"
+        :name="name"
+        :value="model"
+        @blur="blur"
+        @focus="focus"
+        @keypress="preventDisallowedCharacters"
+        @input="filterDisallowedCharacters"
+    />
 </template>
 
 <script lang="ts" setup>
@@ -23,6 +34,11 @@ const props = defineProps({
         type: Boolean,
         required: false,
         default: false
+    },
+    allowedCharacters: {
+        type: String,
+        required: false,
+        default: null
     }
 });
 
@@ -37,10 +53,29 @@ const model = computed({
     get: () => state.value,
     set: (value: string) => {
         state.value = value.trim();
-
         emit(EmitEvents.UPDATED, state);
     }
 });
+
+const regex = new RegExp(props.allowedCharacters, 'g');
+
+const preventDisallowedCharacters = (event: KeyboardEvent): void => {
+    if (!props.allowedCharacters || event.key.match(regex)) {
+        return;
+    }
+
+    event.preventDefault();
+};
+
+const filterDisallowedCharacters = (event: Event): void => {
+    if (!props.allowedCharacters) {
+        model.value = (<HTMLInputElement>event.target).value;
+        return;
+    }
+
+    const filtered = (<HTMLInputElement>event.target).value.match(regex) || [];
+    model.value = filtered.join('');
+};
 
 const focus = (): void => {
     focused.value = true;

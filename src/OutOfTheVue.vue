@@ -20,8 +20,10 @@
                             </template>
                         </prepend-append>
 
-                        <message tag="label" for="test2">Hello world</message>
-                        <counter :limit="5" :current="field.value" for="test2" tag="label" />
+                        <label for="test2" class="information">
+                            <message>Hello world</message>
+                            <counter :limit="5" :current="field.value" />
+                        </label>
                     </template>
 
                     <template #max-length>
@@ -40,13 +42,18 @@
             </template>
         </debounceable-user-input>
     </div>
+
+    <div>
+        <text-field name="myTextField"></text-field>
+    </div>
 </template>
 
 <script lang="ts" setup>
-import UserInput from '@/components/form/fields/input/base/user-input.vue';
 import PrependAppend from '@/components/form/fields/additions/layout/prepend-append.vue';
 import Counter from '@/components/form/fields/additions/counter.vue';
 import Message from '@/components/form/fields/additions/message.vue';
+import TextField from '@/components/form/fields/input/text-field.vue';
+import UserInput from '@/components/form/fields/input/base/user-input.vue';
 import ValidatableUserInput from '@/components/form/fields/input/base/validatable-user-input.vue';
 import { BaseValidation, ValidatedFieldData, ValidationMethod } from '@/composables/types';
 import DebounceableUserInput from '@/components/form/fields/input/base/debounceable-user-input.vue';
@@ -107,5 +114,11 @@ body {
     grid-row-gap: 1em;
     width: 100%;
     max-width: 50em;
+}
+
+.information {
+    display: flex;
+    justify-content: space-between;
+    padding-top: 0.25em;
 }
 </style>

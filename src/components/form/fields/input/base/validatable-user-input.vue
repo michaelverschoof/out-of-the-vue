@@ -23,12 +23,12 @@ const props = defineProps({
     validations: {
         type: Array as () => BaseValidation[],
         required: false,
-        default: null
+        default: []
     },
     customValidations: {
         type: Object as () => ValidationMethod[],
         required: false,
-        default: null
+        default: []
     },
     showAllErrors: {
         type: Boolean,
@@ -67,6 +67,8 @@ const validate = (data: FieldData): void => {
 };
 
 const showError = (name: string) => {
-    return !state.valid && !!state.failed.length && !!showValidationErrors.value && (props.showAllErrors ? state.failed.includes(name) : state.failed[0] === name);
+    return (
+        !state.valid && !!state.failed.length && !!showValidationErrors.value && (props.showAllErrors ? state.failed.includes(name) : state.failed[0] === name)
+    );
 };
 </script>
