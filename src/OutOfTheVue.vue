@@ -1,89 +1,80 @@
 <template>
-    <img alt="Vue logo" src="./assets/logo.png" />
-
     <div>
-        <debounceable-user-input @updated="onUpdated">
-            <template #default="{ debounce }">
-                <validatable-user-input :validations="validations" :custom-validations="custom" @updated="debounce">
-                    <template #default="{ validate, error }">
-                        <prepend-append :class="{ error }">
-                            <template #prepend>
-                                <label for="test2">prepend label</label>
-                            </template>
-
-                            <template #default="{ focus, blur }">
-                                <user-input name="test2" @focused="focus" @blurred="blur" @updated="validate" @created="validate" />
-                            </template>
-
-                            <template #append>
-                                <label for="test2">append label</label>
-                            </template>
-                        </prepend-append>
-
-                        <label for="test2" class="information">
-                            <message>Hello world</message>
-                            <counter :limit="5" :current="field.value" />
-                        </label>
-                    </template>
-
-                    <template #max-length>
-                        <label for="test2">This field cannot be more than 5 characters long</label>
-                    </template>
-                    <template #min-length>
-                        <label for="test2">This field needs to be at least 2 characters long</label>
-                    </template>
-                    <template #required>
-                        <label for="test2">This field is required</label>
-                    </template>
-                    <template #custom>
-                        <label for="test2">This field is incorrect</label>
-                    </template>
-                </validatable-user-input>
+        <text-field name="myTextField" :typing-delay="1000" required @updated="onUpdated" :min-length="2" :max-length="4" :custom-validations="custom">
+            <template #label>
+                Some field label
             </template>
-        </debounceable-user-input>
+            <template #prepend>
+                prepend label
+            </template>
+            <template #append>
+                append label
+            </template>
+            <template #information>
+                Some info
+            </template>
+            <template #max-length>
+                This field cannot be more than 5 characters long
+            </template>
+            <template #min-length>
+                This field needs to be at least 2 characters long
+            </template>
+            <template #required>
+                This field is required
+            </template>
+            <template #custom>
+                This field is incorrect
+            </template>
+        </text-field>
     </div>
 
     <div>
-        <text-field name="myTextField"></text-field>
+        <number-field :typing-delay="1000" name="myNumberField" required @updated="onUpdated" :min="2" :max="500">
+            <template #label>
+                Some field label
+            </template>
+            <!--            <template #prepend>-->
+            <!--                prepend label-->
+            <!--            </template>-->
+            <!--            <template #append>-->
+            <!--                append label-->
+            <!--            </template>-->
+            <template #information>
+                Some info
+            </template>
+            <template #max-amount>
+                This field cannot be higher than 4
+            </template>
+            <template #min-amount>
+                This field needs to be at least 2
+            </template>
+            <template #required>
+                This field is required
+            </template>
+        </number-field>
     </div>
 </template>
 
 <script lang="ts" setup>
-import PrependAppend from '@/components/form/fields/additions/layout/prepend-append.vue';
-import Counter from '@/components/form/fields/additions/counter.vue';
-import Message from '@/components/form/fields/additions/message.vue';
-import TextField from '@/components/form/fields/input/text-field.vue';
-import UserInput from '@/components/form/fields/input/base/user-input.vue';
-import ValidatableUserInput from '@/components/form/fields/input/base/validatable-user-input.vue';
-import { BaseValidation, ValidatedFieldData, ValidationMethod } from '@/composables/types';
-import DebounceableUserInput from '@/components/form/fields/input/base/debounceable-user-input.vue';
-import { ref } from 'vue';
+import NumberField from '@/components/form/fields/input-field/number-field.vue';
+import TextField from '@/components/form/fields/input-field/text-field.vue';
+import { ShowValidationErrors } from '@/composables/provide-inject-symbols';
+import { ValidatedFieldData, ValidationMethod } from '@/composables/types';
+import { provide, ref } from 'vue';
 
-const field = ref({} as ValidatedFieldData);
+const field = ref([] as ValidatedFieldData[]);
+
+provide(ShowValidationErrors, ref(true));
 
 const onUpdated = (data: ValidatedFieldData): void => {
-    field.value = data;
+    field[data.name] = data;
 };
-
-const validations: BaseValidation[] = [
-    {
-        name: 'required'
-    },
-    {
-        name: 'min-length',
-        parameter: 2
-    },
-    {
-        name: 'max-length',
-        parameter: 5
-    }
-];
 
 const custom: ValidationMethod[] = [
     {
         name: 'custom',
         validator: (data) => {
-            return /^[0-9]*$/.test(data.value);
+            return /^[0-9]*$/.test(<string> data.value);
         }
     }
 ];
@@ -101,6 +92,7 @@ const custom: ValidationMethod[] = [
 body {
     display: flex;
     align-items: center;
+    min-height: 50vh;
     justify-content: center;
 }
 
@@ -109,16 +101,9 @@ body {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     color: #35495e;
-    padding-top: 5em;
     display: grid;
     grid-row-gap: 1em;
     width: 100%;
-    max-width: 50em;
-}
-
-.information {
-    display: flex;
-    justify-content: space-between;
-    padding-top: 0.25em;
+    max-width: 25em;
 }
 </style>

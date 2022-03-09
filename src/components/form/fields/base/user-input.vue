@@ -16,7 +16,7 @@
 <script lang="ts" setup>
 import { EmitEvents } from '@/components/types';
 import { FieldData } from '@/composables/types';
-import { computed, reactive, ref } from 'vue';
+import { computed, reactive, ref, watch } from 'vue';
 
 const emit = defineEmits<{
     (event: EmitEvents.BLURRED): void;
@@ -30,6 +30,11 @@ const props = defineProps({
         type: String,
         required: true
     },
+    value: {
+        type: String,
+        required: false,
+        default: null
+    },
     textarea: {
         type: Boolean,
         required: false,
@@ -39,15 +44,20 @@ const props = defineProps({
         type: String,
         required: false,
         default: null
+    },
+    allowedCharacterFormat: {
+        type: String,
+        required: false,
+        default: null
     }
 });
 
 const focused = ref(false);
 
-const state = reactive({
+const state = reactive<FieldData>({
     name: props.name,
-    value: null
-} as FieldData);
+    value: props.value ?? null
+});
 
 const model = computed({
     get: () => state.value,
@@ -57,23 +67,37 @@ const model = computed({
     }
 });
 
-const regex = new RegExp(props.allowedCharacters, 'g');
+watch(() => props.value, (received: string): void => {
+    if (received === model.value) {
+        return;
+    }
 
+    model.value = received;
+});
+
+/**
+ * Prevent characters other than provided to be entered
+ */
+const inputRegex = new RegExp(props.allowedCharacters, 'g');
 const preventDisallowedCharacters = (event: KeyboardEvent): void => {
-    if (!props.allowedCharacters || event.key.match(regex)) {
+    if (!props.allowedCharacters || event.key.match(inputRegex)) {
         return;
     }
 
     event.preventDefault();
 };
 
+/**
+ * Filter the value by the allowed character format
+ */
+const formatRegex = new RegExp(props.allowedCharacterFormat);
 const filterDisallowedCharacters = (event: Event): void => {
     if (!props.allowedCharacters) {
-        model.value = (<HTMLInputElement>event.target).value;
+        model.value = (<HTMLInputElement> event.target).value;
         return;
     }
 
-    const filtered = (<HTMLInputElement>event.target).value.match(regex) || [];
+    const filtered = (<HTMLInputElement> event.target).value.match(formatRegex) || [];
     model.value = filtered.join('');
 };
 
@@ -96,9 +120,10 @@ emit(EmitEvents.CREATED, state);
     color: inherit;
     font-family: inherit;
     font-size: 1em;
+    height: 100%;
     outline: none;
-    padding-top: 0.5em;
-    padding-bottom: 0.5em;
+    padding-left: 0.5em;
+    padding-right: 0.5em;
     width: 100%;
 }
 </style>

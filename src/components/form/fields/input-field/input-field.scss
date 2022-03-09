@@ -1,0 +1,41 @@
+.input-field {
+    display: block;
+
+    header.label,
+    footer.information,
+    :deep(strong.validation-error) {
+        font-size: 0.875em;
+        line-height: 2em;
+    }
+
+    main.input {
+        border: 1px solid #b9c4c8;
+        border-radius: .375em;
+        height: 3.375em;
+        overflow: hidden;
+        transition: border-color, box-shadow;
+        transition-duration: 200ms;
+        transition-timing-function: ease;
+
+        &.focused {
+            border-color: #41b883;
+            box-shadow: 0 0 .25em .125em rgba(65, 184, 131, 0.25);
+        }
+
+        &.error:not(.focused) {
+            border-color: #e00505;
+        }
+    }
+
+    footer.information {
+        display: flex;
+        justify-content: space-between;
+    }
+
+    :deep(strong.validation-error) {
+        color: #e00505;
+        display: inline-block;
+        font-style: italic;
+        font-weight: 400;
+    }
+}

@@ -5,31 +5,22 @@
 </template>
 
 <script lang="ts" setup>
-import { computed } from 'vue';
-
-const props = defineProps({
-    tag: {
-        type: String,
-        required: false,
-        default: 'span'
-    },
-    type: {
-        type: String as () => 'character' | 'word',
-        required: false,
-        default: 'character'
-    },
+defineProps({
     limit: {
         type: Number,
         required: true
     },
-    current: {
+    count: {
+        type: Number,
+        required: false,
+        default: null
+    },
+    tag: {
         type: String,
         required: false,
-        default: ''
+        default: 'span'
     }
 });
-
-const count = computed(() => props.current?.split(props.type === 'word' ? ' ' : '').length || 0);
 </script>
 
 <style lang="scss" scoped>

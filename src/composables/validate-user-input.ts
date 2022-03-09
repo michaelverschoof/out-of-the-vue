@@ -1,78 +1,48 @@
-import { BaseValidation, ValidationMethod, FieldData } from '@/composables/types';
+import { BaseValidationType, FieldData, ValidationMethod } from '@/composables/types';
 
-const registry: ValidationMethod[] = [
-    {
+type BaseValidationRegistry = {
+    [key in BaseValidationType]: ValidationMethod
+}
+
+/**
+ * Registry of pre-defined validation methods
+ */
+export const predefinedValidations: BaseValidationRegistry = {
+    'max-length': {
         name: 'max-length',
         validator: validateMaxLength
     },
-    {
+    'min-length': {
         name: 'min-length',
         validator: validateMinLength
     },
-    {
+    'required': {
         name: 'required',
         validator: validateRequired
+    },
+    'max-amount': {
+        name: 'max-amount',
+        validator: validateMaxAmount
+    },
+    'min-amount': {
+        name: 'min-amount',
+        validator: validateMinAmount
     }
-];
+};
 
 export const useUserInputValidation = () => {
     /**
-     * Validate the field data using the provided base validations and/or
+     * Validate the field data using the provided validations
+     *
      * @param data the emitted field data
-     * @param baseValidations list of registered internal validations
-     * @param customValidations list of custom validation methods
+     * @param validations list of validations
      * @returns list of names of failed validations
      */
-    const validate = (data: FieldData, baseValidations?: BaseValidation[], customValidations?: ValidationMethod[]): string[] => {
-        const failed: string[] = [];
-
-        if (baseValidations) {
-            failed.push(...processBaseValidations(data, baseValidations));
-        }
-
-        if (customValidations) {
-            failed.push(...processValidation(data, customValidations));
-        }
-
-        return failed;
-    };
-
-    /**
-     * Go through the list of provided validations and call the corresponding internal validations
-     * @param data the emitted field data
-     * @param baseValidations list of registered internal validations
-     * @returns list of names of failed validations
-     */
-    const processBaseValidations = (data: FieldData, baseValidations: BaseValidation[]): string[] => {
-        const validations: ValidationMethod[] = [];
-
-        // TODO Reduce?
-        for (const validation of baseValidations) {
-            const registered = registry.find((item) => item.name === validation.name);
-            if (!registered) {
-                continue;
-            }
-
-            validations.push({
-                name: validation.name,
-                validator: () => registered.validator(data, validation.parameter)
-            });
-        }
-
-        return processValidation(data, validations);
-    };
-
-    /**
-     * Go through the list of provided validations and call the validators
-     * @param data the emitted field data
-     * @param validations the validation methods to call
-     * @returns list of names of failed validations
-     */
-    const processValidation = (data: FieldData, validations: ValidationMethod[]): string[] => {
+    const validate = (data: FieldData, validations?: ValidationMethod[]): string[] => {
         const failed: string[] = [];
 
         for (const validation of validations) {
-            const result = validation.validator(data);
+            const result = validation.validator(data, ...(validation.parameters || []));
             if (result) {
                 continue;
             }
@@ -91,31 +61,54 @@ export const useUserInputValidation = () => {
 /**
  * Validate a required field
  *
- * @param value the value to validate
+ * @param data the value to validate
+ * @param required if the field is required
  * @returns true if the value is not empty or only whitespaces
  */
-function validateRequired(data: FieldData): boolean {
-    return !!data.value && !!data.value.trim();
+function validateRequired(data: FieldData, required: boolean): boolean {
+    return !required || (!!data.value);
 }
 
 /**
  * Validate the minimum length of a field
  *
- * @param value the value to validate
- * @param minLength the minimim length the value needs to have
+ * @param data the value to validate
+ * @param length the minimum length the value needs to have
  * @returns true if the value is larger or equal to the minimum length
  */
-function validateMinLength(data: FieldData, minLength: number): boolean {
-    return !!data.value && data.value.length >= minLength;
+function validateMinLength(data: FieldData, length: number): boolean {
+    return !length || ((!!<string> data.value) && (<string> data.value).length >= length);
 }
 
 /**
  * Validate the maximum length of a field
  *
- * @param value the value to validate
- * @param maxLength the maximum length the value may have
+ * @param data the value to validate
+ * @param length the maximum length the value may have
  * @returns true if the value is smaller or equal to the maximum length
  */
-function validateMaxLength(data: FieldData, maxLength: number): boolean {
-    return !!data.value && data.value.length <= maxLength;
+function validateMaxLength(data: FieldData, length: number): boolean {
+    return !length || ((!!<string> data.value) && (<string> data.value).length <= length);
+}
+
+/**
+ * Validate the minimum value of a numeric field
+ *
+ * @param data the value to validate
+ * @param amount the minimum amount the value needs to be
+ * @returns true if the value is larger or equal to the minimum amount
+ */
+function validateMinAmount(data: FieldData, amount: number): boolean {
+    return !amount || (data.value || 0) >= amount;
+}
+
+/**
+ * Validate the maximum value of a numeric field
+ *
+ * @param data the value to validate
+ * @param amount the maximum amount the value can be
+ * @returns true if the value is smaller or equal to the maximum amount
+ */
+function validateMaxAmount(data: FieldData, amount: number): boolean {
+    return !amount || (data.value || 0) <= amount;
 }

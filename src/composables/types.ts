@@ -1,11 +1,11 @@
-type BaseValidationType = 'required' | 'min-length' | 'max-length';
+export type BaseValidationType = 'required' | 'min-length' | 'max-length' | 'min-amount' | 'max-amount';
 
 /**
  * Field state emitted from all inputs
  */
 export interface FieldData {
     name: string;
-    value: string;
+    value: string | number;
 }
 
 /**
@@ -17,17 +17,12 @@ export interface ValidatedFieldData extends FieldData {
 }
 
 /**
- * Call data for internally registered validation methods
- */
-export interface BaseValidation {
-    name: BaseValidationType;
-    parameter?: string | number;
-}
-
-/**
  * Validation method structure used by internally registered validation methods and provided custom validations
  */
 export interface ValidationMethod {
     name: BaseValidationType | string;
-    validator: (data: FieldData, ...parameters: Array<string | number>) => boolean;
+    validator: (data: FieldData, ...parameters: ValidationMethodParameters) => boolean;
+    parameters?: ValidationMethodParameters;
 }
+
+type ValidationMethodParameters = Array<string | number | boolean>;

@@ -1,17 +1,17 @@
 <template>
     <slot v-bind="$attrs" :validate="validate" :error="!state.valid" />
 
-    <template v-for="validation of [...validations, ...customValidations]">
-        <div v-if="showError(validation.name)">
+    <template v-if="!state.valid" v-for="validation of validations">
+        <strong v-if="showError(validation.name)" class="validation-error">
             <slot :name="validation.name" />
-        </div>
+        </strong>
     </template>
 </template>
 
 <script lang="ts" setup>
 import { EmitEvents } from '@/components/types';
 import { ShowValidationErrors } from '@/composables/provide-inject-symbols';
-import { BaseValidation, ValidationMethod, FieldData, ValidatedFieldData } from '@/composables/types';
+import { FieldData, ValidatedFieldData, ValidationMethod } from '@/composables/types';
 import { useUserInputValidation } from '@/composables/validate-user-input';
 import { inject, reactive, ref } from 'vue';
 
@@ -21,12 +21,7 @@ const emit = defineEmits<{
 
 const props = defineProps({
     validations: {
-        type: Array as () => BaseValidation[],
-        required: false,
-        default: []
-    },
-    customValidations: {
-        type: Object as () => ValidationMethod[],
+        type: Array as () => ValidationMethod[],
         required: false,
         default: []
     },
@@ -58,10 +53,9 @@ const validate = (data: FieldData): void => {
         return emit(EmitEvents.UPDATED, state);
     }
 
-    const failedValidations = validateInput(data, props.validations, props.customValidations);
+    const failedValidations = validateInput(data, props.validations);
     state.valid = !failedValidations.length;
     state.failed = failedValidations;
-    console.log(state.failed);
 
     return emit(EmitEvents.UPDATED, state);
 };
