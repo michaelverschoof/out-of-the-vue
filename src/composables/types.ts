@@ -8,6 +8,14 @@ export interface FieldData {
     value: string | number;
 }
 
+export interface StringFieldData extends FieldData {
+    value: string;
+}
+
+export interface NumberFieldData extends FieldData {
+    value: number;
+}
+
 /**
  * Extended field state emitted from validatable inputs
  */

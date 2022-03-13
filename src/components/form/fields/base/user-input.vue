@@ -8,21 +8,22 @@
         :value="model"
         @blur="blur"
         @focus="focus"
+        @input="filterInputData"
         @keypress="preventDisallowedCharacters"
-        @input="filterDisallowedCharacters"
+        @paste="filterPasteData"
     />
 </template>
 
 <script lang="ts" setup>
 import { EmitEvents } from '@/components/types';
-import { FieldData } from '@/composables/types';
+import { StringFieldData } from '@/composables/types';
 import { computed, reactive, ref, watch } from 'vue';
 
 const emit = defineEmits<{
     (event: EmitEvents.BLURRED): void;
     (event: EmitEvents.FOCUSED): void;
-    (event: EmitEvents.CREATED, data: FieldData): void;
-    (event: EmitEvents.UPDATED, data: FieldData): void;
+    (event: EmitEvents.CREATED, data: StringFieldData): void;
+    (event: EmitEvents.UPDATED, data: StringFieldData): void;
 }>();
 
 const props = defineProps({
@@ -44,17 +45,12 @@ const props = defineProps({
         type: String,
         required: false,
         default: null
-    },
-    allowedCharacterFormat: {
-        type: String,
-        required: false,
-        default: null
     }
 });
 
-const focused = ref(false);
+const focused = ref<boolean>(false);
 
-const state = reactive<FieldData>({
+const state = reactive<StringFieldData>({
     name: props.name,
     value: props.value ?? null
 });
@@ -72,16 +68,20 @@ watch(() => props.value, (received: string): void => {
         return;
     }
 
-    model.value = received;
+    model.value = filter(received);
 });
 
 /**
- * Prevent characters other than provided to be entered
+ * The regex containing the allowed characters
  */
-const inputRegex = new RegExp(props.allowedCharacters, 'g');
-const preventDisallowedCharacters = (event: KeyboardEvent): void => {
-    if (!props.allowedCharacters || event.key.match(inputRegex)) {
-        return;
+const inputRegex = !!props.allowedCharacters ? new RegExp(props.allowedCharacters, 'g') : null;
+
+/**
+ * Prevent characters other than the allowed to be entered
+ */
+const preventDisallowedCharacters = (event: KeyboardEvent): string => {
+    if (!inputRegex || event.key.match(inputRegex)) {
+        return event.key;
     }
 
     event.preventDefault();
@@ -90,15 +90,17 @@ const preventDisallowedCharacters = (event: KeyboardEvent): void => {
 /**
  * Filter the value by the allowed character format
  */
-const formatRegex = new RegExp(props.allowedCharacterFormat);
-const filterDisallowedCharacters = (event: Event): void => {
-    if (!props.allowedCharacters) {
-        model.value = (<HTMLInputElement> event.target).value;
-        return;
-    }
+const filterPasteData = (event: ClipboardEvent): void => {
+    const data = event.clipboardData;
+    data.setData('text', filter(data.getData('text')));
+};
 
-    const filtered = (<HTMLInputElement> event.target).value.match(formatRegex) || [];
-    model.value = filtered.join('');
+const filterInputData = (event: Event): void => {
+    model.value = filter((<HTMLInputElement> event.target).value);
+};
+
+const filter = (value: string): string => {
+    return inputRegex ? (value.match(inputRegex) || []).join('') : value;
 };
 
 const focus = (): void => {

@@ -21,7 +21,6 @@
                                     :name="name"
                                     :value="value"
                                     :allowed-characters="allowed"
-                                    :allowed-character-format="format"
                                     @focused="$emit(EmitEvents.FOCUSED)"
                                     @blurred="$emit(EmitEvents.BLURRED)"
                                     @updated="debounce"
@@ -58,7 +57,7 @@ import ValidatableInput from '@/components/form/fields/base/validatable-input.vu
 import { EmitEvents } from '@/components/types';
 import { FieldData, ValidatedFieldData, ValidationMethod } from '@/composables/types';
 import { predefinedValidations } from '@/composables/validate-user-input';
-import { computed, ref } from 'vue';
+import { ref } from 'vue';
 
 const emit = defineEmits<{ (event: EmitEvents.UPDATED, data: FieldData | ValidatedFieldData): void; }>();
 
@@ -114,16 +113,16 @@ const validations: ValidationMethod[] = [ // TODO Rename to something else
 ];
 
 const allowed = '[0-9,.-]';
-const format = computed(() => props.allowNegative ? '^-?[0-9]+[0-9,.]*$' : '^[0-9]+[0-9,.]*$');
+// const format = computed(() => props.allowNegative ? '^-?[0-9]+[0-9,.]*$' : '^[0-9]+[0-9,.]*$');
 
 const parse = (data: FieldData, validate: (data: FieldData) => void) => {
     console.log(data.value);
 
     // TODO parse number properly
-    data.value = parseFloat(<string> data.value) || null;
-
-    console.log(data.value);
-    validate(data);
+    // data.value = parseFloat(<string> data.value) || null;
+    //
+    // console.log(data.value);
+    // validate(data);
 };
 
 const updated = (data: ValidatedFieldData): void => {

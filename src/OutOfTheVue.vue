@@ -53,9 +53,21 @@
             </template>
         </number-field>
     </div>
+
+    <div>
+        <numeric-input
+            :name="'name'"
+            :value="null"
+            :allow-decimals="true"
+            :allow-negative="true"
+            @updated="foo"
+            @created="foo"
+        />
+    </div>
 </template>
 
 <script lang="ts" setup>
+import NumericInput from '@/components/form/fields/base/numeric-input.vue';
 import NumberField from '@/components/form/fields/input-field/number-field.vue';
 import TextField from '@/components/form/fields/input-field/text-field.vue';
 import { ShowValidationErrors } from '@/composables/provide-inject-symbols';
@@ -78,6 +90,10 @@ const custom: ValidationMethod[] = [
         }
     }
 ];
+
+const foo = (data) => {
+    console.log(data);
+};
 </script>
 
 <style>
