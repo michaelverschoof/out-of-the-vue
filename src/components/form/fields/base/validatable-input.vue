@@ -1,7 +1,7 @@
 <template>
-    <slot v-bind="$attrs" :validate="validate" :error="!state.valid" />
+    <slot v-bind="$attrs" :validate="validate" :invalid="!state.valid" :showing="showingValidity" :show-validity="showValidity" />
 
-    <template v-if="!state.valid && showValidations" v-for="validation of validations">
+    <template v-if="!state.valid && showingValidity" v-for="validation of validations">
         <strong v-if="show(validation.name)" class="validation-error">
             <slot :name="validation.name" />
         </strong>
@@ -12,7 +12,7 @@
 import { EmitEvents } from '@/components/types';
 import { FieldData, ValidatedFieldData, ValidationMethod } from '@/composables/types';
 import { useUserInputValidation } from '@/composables/validate-user-input';
-import { reactive } from 'vue';
+import { reactive, ref } from 'vue';
 
 const emit = defineEmits<{ (event: EmitEvents.UPDATED, data: ValidatedFieldData): void; }>();
 
@@ -21,11 +21,6 @@ const props = defineProps({
         type: Array as () => ValidationMethod[],
         required: false,
         default: []
-    },
-    showValidations: {
-        type: Boolean,
-        required: false,
-        default: false
     },
     showAllValidations: {
         type: Boolean,
@@ -41,6 +36,8 @@ const state = reactive<ValidatedFieldData>({
     failed: []
 });
 
+const showingValidity = ref(false);
+
 const { validate: validateInput } = useUserInputValidation();
 
 const validate = (data: FieldData): void => {
@@ -50,6 +47,7 @@ const validate = (data: FieldData): void => {
     if (!props.validations || !props.validations.length) {
         state.valid = true;
         state.failed = null;
+        showingValidity.value = false;
         return emit(EmitEvents.UPDATED, state);
     }
 
@@ -58,6 +56,11 @@ const validate = (data: FieldData): void => {
     state.failed = failedValidations;
 
     return emit(EmitEvents.UPDATED, state);
+};
+
+// TODO: Can we trigger this better?
+const showValidity = () => {
+    showingValidity.value = !state.valid;
 };
 
 const show = (name: string): boolean => !!state.failed.length && (props.showAllValidations ? state.failed.includes(name) : state.failed[0] === name);

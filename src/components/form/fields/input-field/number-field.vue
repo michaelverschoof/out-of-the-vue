@@ -4,16 +4,14 @@
         <debounceable-input :delay="typingDelay" @updated="debounced">
             <template #default="{ debounce }">
 
-                <validatable-input :validations="validations" :show-validations="!!state.immediate && !state.valid"
-                                   @updated="(data) => updated(data, debounce)"
-                >
-                    <template #default="{ validate, error }">
+                <validatable-input :validations="validations" @updated="debounce">
+                    <template #default="{ validate, invalid, showing, showValidity }">
 
                         <header v-if="$slots.label" class="label">
                             <slot name="label" />
                         </header>
 
-                        <main class="input" :class="{ focused: focus, error: !!state.immediate && !state.valid }">
+                        <main class="input" :class="{ focused, invalid: invalid && showing }">
                             <prepend-append>
                                 <template #prepend>
                                     <slot name="prepend" />
@@ -24,8 +22,8 @@
                                     :value="value"
                                     :allow-decimals="allowDecimals"
                                     :allow-negative="allowNegative"
-                                    @focused="focused"
-                                    @blurred="blurred"
+                                    @focused="focused = true"
+                                    @blurred="focused = false; showValidity();"
                                     @updated="validate"
                                     @created="validate"
                                 />
@@ -36,7 +34,7 @@
                             </prepend-append>
                         </main>
 
-                        <footer v-if="$slots.information && !(!!state.immediate && !state.valid)" class="information">
+                        <footer v-if="$slots.information && !(invalid && showing)" class="information">
                             <slot name="information" />
                         </footer>
                     </template>
@@ -60,7 +58,7 @@ import ValidatableInput from '@/components/form/fields/base/validatable-input.vu
 import { EmitEvents } from '@/components/types';
 import { ValidatedFieldData, ValidationMethod } from '@/composables/types';
 import { predefinedValidations } from '@/composables/validate-user-input';
-import { reactive, ref } from 'vue';
+import { ref } from 'vue';
 
 const emit = defineEmits<{ (event: EmitEvents.UPDATED, data: ValidatedFieldData): void; }>();
 
@@ -111,7 +109,7 @@ const props = defineProps({
     }
 });
 
-const focus = ref(false);
+const focused = ref(false);
 
 const validations: ValidationMethod[] = [ // TODO Rename to something else
     { ...predefinedValidations['required'], parameters: [ props.required ] },
@@ -120,32 +118,8 @@ const validations: ValidationMethod[] = [ // TODO Rename to something else
     ...props.customValidations
 ];
 
-const state = reactive({
-    valid: true,
-    immediate: false
-});
-
-const updated = (data: ValidatedFieldData, debounce: (data: ValidatedFieldData) => void): void => {
-    state.valid = !!data.valid;
-
-    if (state.valid) {
-        state.immediate = false;
-    }
-
-    debounce(data);
-};
-
 const debounced = (data: ValidatedFieldData): void => {
     emit(EmitEvents.UPDATED, data);
-};
-
-const focused = (): void => {
-    focus.value = true;
-};
-
-const blurred = (): void => {
-    focus.value = false;
-    state.immediate = !state.valid;
 };
 </script>
 

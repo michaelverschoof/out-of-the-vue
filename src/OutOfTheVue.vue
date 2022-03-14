@@ -53,10 +53,6 @@
             </template>
         </number-field>
     </div>
-
-    <div>
-        hi {{ field['myNumberField'] }}
-    </div>
 </template>
 
 <script lang="ts" setup>
@@ -68,7 +64,6 @@ import { reactive } from 'vue';
 const field = reactive([] as ValidatedFieldData[]);
 
 const onUpdated = (data: ValidatedFieldData): void => {
-    // console.log(data);
     field[data.name] = data;
 };
 

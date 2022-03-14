@@ -17,17 +17,17 @@
         transition-duration: 200ms;
         transition-timing-function: ease;
 
-        &.error {
+        &.invalid {
             border-color: #e00505;
         }
 
         &.focused {
-            &:not(.error) {
+            &:not(.invalid) {
                 border-color: #41b883;
                 box-shadow: 0 0 .25em .125em rgba(65, 184, 131, 0.25);
             }
 
-            &.error {
+            &.invalid {
                 box-shadow: 0 0 .25em .125em rgba(224, 5, 5, 0.25);
             }
         }
