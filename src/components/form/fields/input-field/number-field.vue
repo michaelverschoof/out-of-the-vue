@@ -1,30 +1,33 @@
 <template>
-    <label class="text-field input-field">
+    <label class="number-field input-field">
 
-        <validatable-input :validations="validations" @updated="updated">
-            <template #default="{ validate, error }">
+        <debounceable-input :delay="typingDelay" @updated="debounced">
+            <template #default="{ debounce }">
 
-                <debounceable-input :delay="typingDelay" @updated="(data) => parse(data, validate)">
-                    <template #default="{ debounce }">
+                <validatable-input :validations="validations" :show-validations="!!state.immediate && !state.valid"
+                                   @updated="(data) => updated(data, debounce)"
+                >
+                    <template #default="{ validate, error }">
 
                         <header v-if="$slots.label" class="label">
                             <slot name="label" />
                         </header>
 
-                        <main class="input" :class="{ focused, error }">
+                        <main class="input" :class="{ focused: focus, error: !!state.immediate && !state.valid }">
                             <prepend-append>
                                 <template #prepend>
                                     <slot name="prepend" />
                                 </template>
 
-                                <user-input
+                                <numeric-input
                                     :name="name"
                                     :value="value"
-                                    :allowed-characters="allowed"
-                                    @focused="$emit(EmitEvents.FOCUSED)"
-                                    @blurred="$emit(EmitEvents.BLURRED)"
-                                    @updated="debounce"
-                                    @created="debounce"
+                                    :allow-decimals="allowDecimals"
+                                    :allow-negative="allowNegative"
+                                    @focused="focused"
+                                    @blurred="blurred"
+                                    @updated="validate"
+                                    @created="validate"
                                 />
 
                                 <template #append>
@@ -33,18 +36,18 @@
                             </prepend-append>
                         </main>
 
-                        <footer v-if="$slots.information && !error" class="information">
+                        <footer v-if="$slots.information && !(!!state.immediate && !state.valid)" class="information">
                             <slot name="information" />
                         </footer>
-
                     </template>
-                </debounceable-input>
-            </template>
 
-            <template v-for="validation of validations" #[validation.name]>
-                <slot :name="validation.name" />
+                    <template v-for="validation of validations" #[validation.name]>
+                        <slot :name="validation.name" />
+                    </template>
+                </validatable-input>
+
             </template>
-        </validatable-input>
+        </debounceable-input>
 
     </label>
 </template>
@@ -52,14 +55,14 @@
 <script lang="ts" setup>
 import PrependAppend from '@/components/form/fields/additions/layout/prepend-append.vue';
 import DebounceableInput from '@/components/form/fields/base/debounceable-input.vue';
-import UserInput from '@/components/form/fields/base/user-input.vue';
+import NumericInput from '@/components/form/fields/base/numeric-input.vue';
 import ValidatableInput from '@/components/form/fields/base/validatable-input.vue';
 import { EmitEvents } from '@/components/types';
-import { FieldData, ValidatedFieldData, ValidationMethod } from '@/composables/types';
+import { ValidatedFieldData, ValidationMethod } from '@/composables/types';
 import { predefinedValidations } from '@/composables/validate-user-input';
-import { ref } from 'vue';
+import { reactive, ref } from 'vue';
 
-const emit = defineEmits<{ (event: EmitEvents.UPDATED, data: FieldData | ValidatedFieldData): void; }>();
+const emit = defineEmits<{ (event: EmitEvents.UPDATED, data: ValidatedFieldData): void; }>();
 
 const props = defineProps({
     name: {
@@ -71,15 +74,20 @@ const props = defineProps({
         required: false,
         default: null
     },
-    allowNegative: {
-        type: Boolean,
-        required: false,
-        default: true
-    },
     typingDelay: { // TODO rename to something better
         type: Number,
         required: false,
         default: null
+    },
+    allowDecimals: {
+        type: Boolean,
+        required: false,
+        default: true
+    },
+    allowNegative: {
+        type: Boolean,
+        required: false,
+        default: true
     },
     required: { // TODO Move this and below to an importable file
         type: Boolean,
@@ -103,7 +111,7 @@ const props = defineProps({
     }
 });
 
-const focused = ref(false);
+const focus = ref(false);
 
 const validations: ValidationMethod[] = [ // TODO Rename to something else
     { ...predefinedValidations['required'], parameters: [ props.required ] },
@@ -112,21 +120,32 @@ const validations: ValidationMethod[] = [ // TODO Rename to something else
     ...props.customValidations
 ];
 
-const allowed = '[0-9,.-]';
-// const format = computed(() => props.allowNegative ? '^-?[0-9]+[0-9,.]*$' : '^[0-9]+[0-9,.]*$');
+const state = reactive({
+    valid: true,
+    immediate: false
+});
 
-const parse = (data: FieldData, validate: (data: FieldData) => void) => {
-    console.log(data.value);
+const updated = (data: ValidatedFieldData, debounce: (data: ValidatedFieldData) => void): void => {
+    state.valid = !!data.valid;
 
-    // TODO parse number properly
-    // data.value = parseFloat(<string> data.value) || null;
-    //
-    // console.log(data.value);
-    // validate(data);
+    if (state.valid) {
+        state.immediate = false;
+    }
+
+    debounce(data);
 };
 
-const updated = (data: ValidatedFieldData): void => {
+const debounced = (data: ValidatedFieldData): void => {
     emit(EmitEvents.UPDATED, data);
+};
+
+const focused = (): void => {
+    focus.value = true;
+};
+
+const blurred = (): void => {
+    focus.value = false;
+    state.immediate = !state.valid;
 };
 </script>
 

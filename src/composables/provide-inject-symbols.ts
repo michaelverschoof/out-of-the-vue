@@ -4,4 +4,3 @@
  * @see https://v3.vuejs.org/guide/component-provide-inject.html
  */
 
-export const ShowValidationErrors = Symbol();

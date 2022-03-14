@@ -55,30 +55,20 @@
     </div>
 
     <div>
-        <numeric-input
-            :name="'name'"
-            :value="null"
-            :allow-decimals="true"
-            :allow-negative="true"
-            @updated="foo"
-            @created="foo"
-        />
+        hi {{ field['myNumberField'] }}
     </div>
 </template>
 
 <script lang="ts" setup>
-import NumericInput from '@/components/form/fields/base/numeric-input.vue';
 import NumberField from '@/components/form/fields/input-field/number-field.vue';
 import TextField from '@/components/form/fields/input-field/text-field.vue';
-import { ShowValidationErrors } from '@/composables/provide-inject-symbols';
 import { ValidatedFieldData, ValidationMethod } from '@/composables/types';
-import { provide, ref } from 'vue';
+import { reactive } from 'vue';
 
-const field = ref([] as ValidatedFieldData[]);
-
-provide(ShowValidationErrors, ref(true));
+const field = reactive([] as ValidatedFieldData[]);
 
 const onUpdated = (data: ValidatedFieldData): void => {
+    // console.log(data);
     field[data.name] = data;
 };
 
@@ -90,10 +80,6 @@ const custom: ValidationMethod[] = [
         }
     }
 ];
-
-const foo = (data) => {
-    console.log(data);
-};
 </script>
 
 <style>

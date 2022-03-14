@@ -1,8 +1,8 @@
 <template>
     <slot v-bind="$attrs" :validate="validate" :error="!state.valid" />
 
-    <template v-if="!state.valid" v-for="validation of validations">
-        <strong v-if="showError(validation.name)" class="validation-error">
+    <template v-if="!state.valid && showValidations" v-for="validation of validations">
+        <strong v-if="show(validation.name)" class="validation-error">
             <slot :name="validation.name" />
         </strong>
     </template>
@@ -10,14 +10,11 @@
 
 <script lang="ts" setup>
 import { EmitEvents } from '@/components/types';
-import { ShowValidationErrors } from '@/composables/provide-inject-symbols';
 import { FieldData, ValidatedFieldData, ValidationMethod } from '@/composables/types';
 import { useUserInputValidation } from '@/composables/validate-user-input';
-import { inject, reactive, ref } from 'vue';
+import { reactive } from 'vue';
 
-const emit = defineEmits<{
-    (event: EmitEvents.UPDATED, data: ValidatedFieldData): void;
-}>();
+const emit = defineEmits<{ (event: EmitEvents.UPDATED, data: ValidatedFieldData): void; }>();
 
 const props = defineProps({
     validations: {
@@ -25,16 +22,19 @@ const props = defineProps({
         required: false,
         default: []
     },
-    showAllErrors: {
+    showValidations: {
+        type: Boolean,
+        required: false,
+        default: false
+    },
+    showAllValidations: {
         type: Boolean,
         required: false,
         default: false
     }
 });
 
-const showValidationErrors = inject(ShowValidationErrors, ref(false));
-
-const state: ValidatedFieldData = reactive({
+const state = reactive<ValidatedFieldData>({
     name: null,
     value: null,
     valid: false,
@@ -60,9 +60,5 @@ const validate = (data: FieldData): void => {
     return emit(EmitEvents.UPDATED, state);
 };
 
-const showError = (name: string) => {
-    return (
-        !state.valid && !!state.failed.length && !!showValidationErrors.value && (props.showAllErrors ? state.failed.includes(name) : state.failed[0] === name)
-    );
-};
+const show = (name: string): boolean => !!state.failed.length && (props.showAllValidations ? state.failed.includes(name) : state.failed[0] === name);
 </script>

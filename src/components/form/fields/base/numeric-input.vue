@@ -1,7 +1,7 @@
 <template>
     <user-input
         :name="name"
-        :value="value"
+        :value="displayValue"
         :allowed-characters="regex"
         @focused="$emit(EmitEvents.FOCUSED)"
         @blurred="$emit(EmitEvents.BLURRED)"
@@ -14,9 +14,14 @@
 import UserInput from '@/components/form/fields/base/user-input.vue';
 import { EmitEvents } from '@/components/types';
 import { NumberFieldData, StringFieldData } from '@/composables/types';
-import { computed, reactive } from 'vue';
+import { computed, reactive, ref } from 'vue';
 
-const emit = defineEmits([ EmitEvents.CREATED, EmitEvents.UPDATED ]);
+const emit = defineEmits<{
+    (event: EmitEvents.BLURRED): void;
+    (event: EmitEvents.FOCUSED): void;
+    (event: EmitEvents.CREATED, data: NumberFieldData): void;
+    (event: EmitEvents.UPDATED, data: NumberFieldData): void;
+}>();
 
 const props = defineProps({
     name: {
@@ -40,17 +45,20 @@ const props = defineProps({
     }
 });
 
-// TODO: Improve
 const regex = computed(() => {
     let reg = '0-9';
+
     if (props.allowDecimals) {
         reg += '.,';
     }
     if (props.allowNegative) {
         reg += '-';
     }
-    return reg;
+
+    return `[${ reg }]`;
 });
+
+const displayValue = ref<string>(props.value?.toString() ?? null); // TODO add decimal separator and use that
 
 const state = reactive<NumberFieldData>({
     name: props.name,
@@ -58,15 +66,14 @@ const state = reactive<NumberFieldData>({
 });
 
 const parse = (data: StringFieldData): number => {
-    if (!data.value || !data.value.trim()) {
+    let filtered = data.value?.trim();
+    if (!filtered) {
         return null;
     }
 
-    let filtered = '';
-
     if (props.allowDecimals) {
-        // Replace all commas with dots and remove all but the last
-        filtered = data.value.trim().replace(',', '.').replace(/[.](?=.*[.])/g, '');
+        // Filter all decimal signs except the last
+        filtered = data.value.replace(/[.,](?=.*[.,])/g, '');
     }
 
     if (props.allowNegative) {
@@ -74,23 +81,20 @@ const parse = (data: StringFieldData): number => {
         filtered = filtered[0] + filtered.slice(1).replace('-', '');
     }
 
+    // Set the filtered value for the text input field
+    displayValue.value = filtered;
+
     // Parse it to a number and return it with null as a fallback in case of NaN (which should not happen)
-    return Number(filtered) || null;
+    state.value = Number(filtered.replace(',', '.')) || null;
 };
 
 const created = (data: StringFieldData): void => {
-    state.value = parse(data);
-    console.log(state.value);
+    parse(data);
     emit(EmitEvents.CREATED, state);
 };
 
 const updated = (data: StringFieldData): void => {
-    state.value = parse(data);
-    console.log(state.value);
-    emit(EmitEvents.CREATED, state);
+    parse(data);
+    emit(EmitEvents.UPDATED, state);
 };
 </script>
-
-<style scoped>
-
-</style>
