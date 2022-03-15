@@ -9,24 +9,17 @@
 </template>
 
 <script lang="ts" setup>
+import { OptionalProps } from '@/components/props.types';
 import { EmitEvents } from '@/components/types';
-import { FieldData, ValidatedFieldData, ValidationMethod } from '@/composables/types';
+import { FieldData, ValidatedFieldData } from '@/composables/types';
 import { useUserInputValidation } from '@/composables/validate-user-input';
 import { reactive, ref } from 'vue';
 
 const emit = defineEmits<{ (event: EmitEvents.UPDATED, data: ValidatedFieldData): void; }>();
 
 const props = defineProps({
-    validations: {
-        type: Array as () => ValidationMethod[],
-        required: false,
-        default: []
-    },
-    showAllValidations: {
-        type: Boolean,
-        required: false,
-        default: false
-    }
+    validations: OptionalProps.validations,
+    showAllValidations: OptionalProps.booleanFalse
 });
 
 const state = reactive<ValidatedFieldData>({

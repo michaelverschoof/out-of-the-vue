@@ -14,7 +14,7 @@
         height: 3.375em;
         overflow: hidden;
         transition: border-color, box-shadow;
-        transition-duration: 200ms;
+        transition-duration: 300ms;
         transition-timing-function: ease;
 
         &.invalid {
@@ -33,14 +33,14 @@
         }
     }
 
-    footer.information {
+    footer.information,
+    :deep(strong.validation-error) {
         display: flex;
         justify-content: space-between;
     }
 
     :deep(strong.validation-error) {
         color: #e00505;
-        display: inline-block;
         font-style: italic;
         font-weight: 400;
     }

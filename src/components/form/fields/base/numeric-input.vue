@@ -1,8 +1,10 @@
 <template>
     <user-input
-        :name="name"
-        :value="displayValue"
         :allowed-characters="regex"
+        :inputmode="allowDecimals ? 'decimal' : 'numeric'"
+        :name="name"
+        :pattern="regex"
+        :value="displayValue"
         @focused="$emit(EmitEvents.FOCUSED)"
         @blurred="$emit(EmitEvents.BLURRED)"
         @updated="updated"
@@ -12,6 +14,7 @@
 
 <script lang="ts" setup>
 import UserInput from '@/components/form/fields/base/user-input.vue';
+import { OptionalProps, RequiredProps } from '@/components/props.types';
 import { EmitEvents } from '@/components/types';
 import { NumberFieldData, StringFieldData } from '@/composables/types';
 import { computed, reactive, ref } from 'vue';
@@ -24,25 +27,10 @@ const emit = defineEmits<{
 }>();
 
 const props = defineProps({
-    name: {
-        type: String,
-        required: true
-    },
-    value: {
-        type: Number,
-        required: false,
-        default: null
-    },
-    allowDecimals: {
-        type: Boolean,
-        required: false,
-        default: true
-    },
-    allowNegative: {
-        type: Boolean,
-        required: false,
-        default: true
-    }
+    name: RequiredProps.string,
+    value: OptionalProps.number,
+    allowDecimals: OptionalProps.booleanTrue,
+    allowNegative: OptionalProps.booleanTrue
 });
 
 const regex = computed(() => {

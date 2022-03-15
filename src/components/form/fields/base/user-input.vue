@@ -15,6 +15,7 @@
 </template>
 
 <script lang="ts" setup>
+import { OptionalProps, RequiredProps } from '@/components/props.types';
 import { EmitEvents } from '@/components/types';
 import { StringFieldData } from '@/composables/types';
 import { computed, reactive, ref, watch } from 'vue';
@@ -27,25 +28,10 @@ const emit = defineEmits<{
 }>();
 
 const props = defineProps({
-    name: {
-        type: String,
-        required: true
-    },
-    value: {
-        type: String,
-        required: false,
-        default: null
-    },
-    textarea: {
-        type: Boolean,
-        required: false,
-        default: false
-    },
-    allowedCharacters: {
-        type: String,
-        required: false,
-        default: null
-    }
+    name: RequiredProps.string,
+    allowedCharacters: OptionalProps.string,
+    value: OptionalProps.string,
+    textarea: OptionalProps.booleanFalse
 });
 
 const focused = ref<boolean>(false);

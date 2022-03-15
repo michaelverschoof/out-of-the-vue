@@ -1,10 +1,10 @@
 <template>
-    <label class="number-field input-field">
+    <label class="number-field input-field" :class="$attrs.class">
 
         <debounceable-input :delay="typingDelay" @updated="debounced">
             <template #default="{ debounce }">
 
-                <validatable-input :validations="validations" @updated="debounce">
+                <validatable-input :validations="validationMethods" @updated="debounce">
                     <template #default="{ validate, invalid, showing, showValidity }">
 
                         <header v-if="$slots.label" class="label">
@@ -18,6 +18,7 @@
                                 </template>
 
                                 <numeric-input
+                                    v-bind="filterAttrs($attrs, ['class'])"
                                     :name="name"
                                     :value="value"
                                     :allow-decimals="allowDecimals"
@@ -39,7 +40,7 @@
                         </footer>
                     </template>
 
-                    <template v-for="validation of validations" #[validation.name]>
+                    <template v-for="validation of validationMethods" #[validation.name]>
                         <slot :name="validation.name" />
                     </template>
                 </validatable-input>
@@ -55,71 +56,44 @@ import PrependAppend from '@/components/form/fields/additions/layout/prepend-app
 import DebounceableInput from '@/components/form/fields/base/debounceable-input.vue';
 import NumericInput from '@/components/form/fields/base/numeric-input.vue';
 import ValidatableInput from '@/components/form/fields/base/validatable-input.vue';
+import { OptionalProps, RequiredProps } from '@/components/props.types';
 import { EmitEvents } from '@/components/types';
 import { ValidatedFieldData, ValidationMethod } from '@/composables/types';
 import { predefinedValidations } from '@/composables/validate-user-input';
+import { filterAttrs } from '@/util/attrs';
 import { ref } from 'vue';
 
 const emit = defineEmits<{ (event: EmitEvents.UPDATED, data: ValidatedFieldData): void; }>();
 
 const props = defineProps({
-    name: {
-        type: String,
-        required: true
-    },
-    value: {
-        type: Number,
-        required: false,
-        default: null
-    },
-    typingDelay: { // TODO rename to something better
-        type: Number,
-        required: false,
-        default: null
-    },
-    allowDecimals: {
-        type: Boolean,
-        required: false,
-        default: true
-    },
-    allowNegative: {
-        type: Boolean,
-        required: false,
-        default: true
-    },
-    required: { // TODO Move this and below to an importable file
-        type: Boolean,
-        required: false,
-        default: false
-    },
-    min: {
-        type: Number,
-        required: false,
-        default: null
-    },
-    max: {
-        type: Number,
-        required: false,
-        default: null
-    },
-    customValidations: {
-        type: Array as () => ValidationMethod[],
-        required: false,
-        default: []
-    }
+    name: RequiredProps.string,
+    value: OptionalProps.number,
+    typingDelay: OptionalProps.number, // TODO rename to something better,
+    allowDecimals: OptionalProps.booleanTrue,
+    allowNegative: OptionalProps.booleanTrue,
+    required: OptionalProps.booleanFalse,
+    min: OptionalProps.number,
+    max: OptionalProps.number,
+    validations: OptionalProps.validations
 });
 
 const focused = ref(false);
 
-const validations: ValidationMethod[] = [ // TODO Rename to something else
+const validationMethods: ValidationMethod[] = [
     { ...predefinedValidations['required'], parameters: [ props.required ] },
     { ...predefinedValidations['min-amount'], parameters: [ props.min ] },
     { ...predefinedValidations['max-amount'], parameters: [ props.max ] },
-    ...props.customValidations
+    ...props.validations
 ];
 
 const debounced = (data: ValidatedFieldData): void => {
     emit(EmitEvents.UPDATED, data);
+};
+</script>
+
+<script lang="ts">
+export default {
+    inheritAttrs: false
 };
 </script>
 

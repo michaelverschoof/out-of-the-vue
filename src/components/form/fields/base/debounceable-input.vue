@@ -3,21 +3,16 @@
 </template>
 
 <script lang="ts" setup>
+import { OptionalProps } from '@/components/props.types';
 import { EmitEvents } from '@/components/types';
-import { FieldData, ValidatedFieldData } from '@/composables/types';
 import { useUserInputDebouncing } from '@/composables/debounce-user-input';
+import { FieldData, ValidatedFieldData } from '@/composables/types';
 
 const emit = defineEmits<{
     (event: EmitEvents.UPDATED, data: FieldData | ValidatedFieldData): void;
 }>();
 
-const props = defineProps({
-    delay: {
-        type: Number,
-        required: false,
-        default: null
-    }
-});
+const props = defineProps({ delay: OptionalProps.number });
 
 const { debounce: debounceInput } = useUserInputDebouncing();
 

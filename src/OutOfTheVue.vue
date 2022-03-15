@@ -1,6 +1,6 @@
 <template>
     <div>
-        <text-field name="myTextField" :typing-delay="1000" required @updated="onUpdated" :min-length="2" :max-length="4" :custom-validations="custom">
+        <text-field name="myTextField" :typing-delay="1000" required @updated="onUpdated" :min-length="2" :max-length="4" :validations="custom">
             <template #label>
                 Some field label
             </template>
@@ -33,12 +33,6 @@
             <template #label>
                 Some field label
             </template>
-            <!--            <template #prepend>-->
-            <!--                prepend label-->
-            <!--            </template>-->
-            <!--            <template #append>-->
-            <!--                append label-->
-            <!--            </template>-->
             <template #information>
                 Some info
             </template>
@@ -102,5 +96,6 @@ body {
     grid-row-gap: 1em;
     width: 100%;
     max-width: 25em;
+    padding: 1em;
 }
 </style>
