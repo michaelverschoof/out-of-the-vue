@@ -10,12 +10,11 @@
 
 <script lang="ts" setup>
 import { OptionalProps } from '@/components/props.types';
-import { EmitEvents } from '@/components/types';
 import { FieldData, ValidatedFieldData } from '@/composables/types';
 import { useUserInputValidation } from '@/composables/validate-user-input';
 import { reactive, ref } from 'vue';
 
-const emit = defineEmits<{ (event: EmitEvents.UPDATED, data: ValidatedFieldData): void; }>();
+const emit = defineEmits<{ (event: 'updated', data: ValidatedFieldData): void; }>();
 
 const props = defineProps({
     validations: OptionalProps.validations,
@@ -41,14 +40,14 @@ const validate = (data: FieldData): void => {
         state.valid = true;
         state.failed = null;
         showingValidity.value = false;
-        return emit(EmitEvents.UPDATED, state);
+        return emit('updated', state);
     }
 
     const failedValidations = validateInput(data, props.validations);
     state.valid = !failedValidations.length;
     state.failed = failedValidations;
 
-    return emit(EmitEvents.UPDATED, state);
+    return emit('updated', state);
 };
 
 // TODO: Can we trigger this better?

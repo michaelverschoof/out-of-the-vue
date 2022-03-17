@@ -5,8 +5,6 @@
         :name="name"
         :pattern="regex"
         :value="displayValue"
-        @focused="$emit(EmitEvents.FOCUSED)"
-        @blurred="$emit(EmitEvents.BLURRED)"
         @updated="updated"
         @created="created"
     />
@@ -15,15 +13,12 @@
 <script lang="ts" setup>
 import UserInput from '@/components/form/fields/base/user-input.vue';
 import { OptionalProps, RequiredProps } from '@/components/props.types';
-import { EmitEvents } from '@/components/types';
 import { NumberFieldData, StringFieldData } from '@/composables/types';
 import { computed, reactive, ref } from 'vue';
 
 const emit = defineEmits<{
-    (event: EmitEvents.BLURRED): void;
-    (event: EmitEvents.FOCUSED): void;
-    (event: EmitEvents.CREATED, data: NumberFieldData): void;
-    (event: EmitEvents.UPDATED, data: NumberFieldData): void;
+    (event: 'created', data: NumberFieldData): void;
+    (event: 'updated', data: NumberFieldData): void;
 }>();
 
 const props = defineProps({
@@ -78,11 +73,11 @@ const parse = (data: StringFieldData): number => {
 
 const created = (data: StringFieldData): void => {
     parse(data);
-    emit(EmitEvents.CREATED, state);
+    emit('created', state);
 };
 
 const updated = (data: StringFieldData): void => {
     parse(data);
-    emit(EmitEvents.UPDATED, state);
+    emit('updated', state);
 };
 </script>

@@ -16,15 +16,14 @@
 
 <script lang="ts" setup>
 import { OptionalProps, RequiredProps } from '@/components/props.types';
-import { EmitEvents } from '@/components/types';
 import { StringFieldData } from '@/composables/types';
 import { computed, reactive, ref, watch } from 'vue';
 
 const emit = defineEmits<{
-    (event: EmitEvents.BLURRED): void;
-    (event: EmitEvents.FOCUSED): void;
-    (event: EmitEvents.CREATED, data: StringFieldData): void;
-    (event: EmitEvents.UPDATED, data: StringFieldData): void;
+    (event: 'blurred'): void;
+    (event: 'focused'): void;
+    (event: 'created', data: StringFieldData): void;
+    (event: 'updated', data: StringFieldData): void;
 }>();
 
 const props = defineProps({
@@ -45,7 +44,7 @@ const model = computed({
     get: () => state.value,
     set: (value: string) => {
         state.value = value.trim();
-        emit(EmitEvents.UPDATED, state);
+        emit('updated', state);
     }
 });
 
@@ -91,15 +90,15 @@ const filter = (value: string): string => {
 
 const focus = (): void => {
     focused.value = true;
-    emit(EmitEvents.FOCUSED);
+    emit('focused');
 };
 
 const blur = (): void => {
     focused.value = false;
-    emit(EmitEvents.BLURRED);
+    emit('blurred');
 };
 
-emit(EmitEvents.CREATED, state);
+emit('created', state);
 </script>
 
 <style lang="scss" scoped>
