@@ -66,7 +66,7 @@ export const useUserInputValidation = () => {
  * @returns true if the value is not empty or only whitespaces
  */
 function validateRequired(data: FieldData, required: boolean): boolean {
-    return !required || (!!data.value);
+    return !required || (!!data.value || data.value === 0);
 }
 
 /**

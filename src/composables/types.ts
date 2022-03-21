@@ -5,7 +5,7 @@ export type BaseValidationType = 'required' | 'min-length' | 'max-length' | 'min
  */
 export interface FieldData {
     name: string;
-    value: string | number;
+    value: string | number | number[];
 }
 
 export interface StringFieldData extends FieldData {

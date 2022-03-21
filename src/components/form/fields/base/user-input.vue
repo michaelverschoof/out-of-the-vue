@@ -1,5 +1,6 @@
 <template>
     <component
+        ref="element"
         :is="textarea ? 'textarea' : 'input'"
         class="user-input"
         :class="{ focused }"
@@ -17,7 +18,8 @@
 <script lang="ts" setup>
 import { OptionalProps, RequiredProps } from '@/components/props.types';
 import { StringFieldData } from '@/composables/types';
-import { computed, reactive, ref, watch } from 'vue';
+import { useUserInput } from '@/composables/user-input';
+import { computed, onMounted, reactive, ref, watch } from 'vue';
 
 const emit = defineEmits<{
     (event: 'blurred'): void;
@@ -30,9 +32,11 @@ const props = defineProps({
     name: RequiredProps.string,
     allowedCharacters: OptionalProps.string,
     value: OptionalProps.string,
-    textarea: OptionalProps.booleanFalse
+    textarea: OptionalProps.booleanFalse,
+    focusing: OptionalProps.booleanFalse
 });
 
+const element = ref<HTMLInputElement | HTMLTextAreaElement>(null);
 const focused = ref<boolean>(false);
 
 const state = reactive<StringFieldData>({
@@ -43,7 +47,7 @@ const state = reactive<StringFieldData>({
 const model = computed({
     get: () => state.value,
     set: (value: string) => {
-        state.value = value.trim();
+        state.value = value?.trim() ?? null;
         emit('updated', state);
     }
 });
@@ -54,6 +58,10 @@ watch(() => props.value, (received: string): void => {
     }
 
     model.value = filter(received);
+});
+
+watch(() => props.focusing, (received: boolean) => {
+    !received ? element.value.blur() : element.value.focus();
 });
 
 /**
@@ -84,8 +92,9 @@ const filterInputData = (event: Event): void => {
     model.value = filter((<HTMLInputElement> event.target).value);
 };
 
+const { filter: filterData } = useUserInput();
 const filter = (value: string): string => {
-    return inputRegex ? (value.match(inputRegex) || []).join('') : value;
+    return value ? filterData(value, inputRegex) : null;
 };
 
 const focus = (): void => {
@@ -97,6 +106,13 @@ const blur = (): void => {
     focused.value = false;
     emit('blurred');
 };
+
+onMounted(() => {
+    if (!props.focusing) {
+        return;
+    }
+    element.value.focus();
+});
 
 emit('created', state);
 </script>

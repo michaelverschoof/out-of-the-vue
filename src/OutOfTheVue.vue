@@ -1,35 +1,20 @@
 <template>
     <div>
-        <text-field name="myTextField" :typing-delay="1000" required @updated="onUpdated" :min-length="2" :max-length="4" :validations="custom">
+        <one-time-code-field name="myOneTimeCode" required @updated="onUpdated" focus>
             <template #label>
                 Some field label
-            </template>
-            <template #prepend>
-                prepend label
-            </template>
-            <template #append>
-                append label
             </template>
             <template #information>
                 Some info
             </template>
-            <template #max-length>
-                This field cannot be more than 5 characters long
-            </template>
-            <template #min-length>
-                This field needs to be at least 2 characters long
-            </template>
             <template #required>
                 This field is required
             </template>
-            <template #custom>
-                This field is incorrect
-            </template>
-        </text-field>
+        </one-time-code-field>
     </div>
 
     <div>
-        <number-field :typing-delay="1000" name="myNumberField" required @updated="onUpdated" :min="2" :max="500">
+        <number-field :typing-delay="1000" name="myNumberField" required @updated="onUpdated" :min="2" :max="500" maxlength="3">
             <template #label>
                 Some field label
             </template>
@@ -37,7 +22,7 @@
                 Some info
             </template>
             <template #max-amount>
-                This field cannot be higher than 4
+                This field cannot be higher than 500
             </template>
             <template #min-amount>
                 This field needs to be at least 2
@@ -51,8 +36,8 @@
 
 <script lang="ts" setup>
 import NumberField from '@/components/form/fields/input-field/number-field.vue';
-import TextField from '@/components/form/fields/input-field/text-field.vue';
-import { ValidatedFieldData, ValidationMethod } from '@/composables/types';
+import OneTimeCodeField from '@/components/form/fields/input-field/one-time-code-field.vue';
+import { ValidatedFieldData } from '@/composables/types';
 import { reactive } from 'vue';
 
 const field = reactive([] as ValidatedFieldData[]);
@@ -60,15 +45,6 @@ const field = reactive([] as ValidatedFieldData[]);
 const onUpdated = (data: ValidatedFieldData): void => {
     field[data.name] = data;
 };
-
-const custom: ValidationMethod[] = [
-    {
-        name: 'custom',
-        validator: (data) => {
-            return /^[0-9]*$/.test(<string> data.value);
-        }
-    }
-];
 </script>
 
 <style>

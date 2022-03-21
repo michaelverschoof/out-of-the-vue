@@ -4,7 +4,7 @@
         :inputmode="allowDecimals ? 'decimal' : 'numeric'"
         :name="name"
         :pattern="regex"
-        :value="displayValue"
+        :value="display"
         @updated="updated"
         @created="created"
     />
@@ -14,7 +14,7 @@
 import UserInput from '@/components/form/fields/base/user-input.vue';
 import { OptionalProps, RequiredProps } from '@/components/props.types';
 import { NumberFieldData, StringFieldData } from '@/composables/types';
-import { computed, reactive, ref } from 'vue';
+import { computed, reactive, ref, watch } from 'vue';
 
 const emit = defineEmits<{
     (event: 'created', data: NumberFieldData): void;
@@ -41,16 +41,26 @@ const regex = computed(() => {
     return `[${ reg }]`;
 });
 
-const displayValue = ref<string>(props.value?.toString() ?? null); // TODO add decimal separator and use that
+const display = ref<string>(props.value?.toString() ?? null); // TODO add decimal separator and use that
 
 const state = reactive<NumberFieldData>({
     name: props.name,
     value: props.value ?? null
 });
 
+watch(() => props.value, (received: number): void => {
+    if (received === state.value) {
+        return;
+    }
+
+    state.value = received;
+    display.value = state.value?.toString();
+});
+
 const parse = (data: StringFieldData): number => {
     let filtered = data.value?.trim();
     if (!filtered) {
+        state.value = null;
         return null;
     }
 
@@ -65,10 +75,11 @@ const parse = (data: StringFieldData): number => {
     }
 
     // Set the filtered value for the text input field
-    displayValue.value = filtered;
+    display.value = filtered;
 
     // Parse it to a number and return it with null as a fallback in case of NaN (which should not happen)
-    state.value = Number(filtered.replace(',', '.')) || null;
+    const numeric = Number(filtered.replace(',', '.'));
+    state.value = !isNaN(numeric) ? numeric : null;
 };
 
 const created = (data: StringFieldData): void => {
