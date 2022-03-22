@@ -1,14 +1,14 @@
 <template>
     <component
-        ref="element"
         :is="textarea ? 'textarea' : 'input'"
+        :id="name"
+        ref="element"
         class="user-input"
         :class="{ focused }"
-        :id="name"
         :name="name"
         :value="model"
-        @blur="blur"
-        @focus="focus"
+        @blur="blurElement"
+        @focus="focusElement"
         @input="filterInputData"
         @keypress="preventDisallowedCharacters"
         @paste="filterPasteData"
@@ -17,7 +17,7 @@
 
 <script lang="ts" setup>
 import { OptionalProps, RequiredProps } from '@/components/props.types';
-import { StringFieldData } from '@/composables/types';
+import { InputTransformType, StringFieldData } from '@/composables/types';
 import { useUserInput } from '@/composables/user-input';
 import { computed, onMounted, reactive, ref, watch } from 'vue';
 
@@ -30,10 +30,15 @@ const emit = defineEmits<{
 
 const props = defineProps({
     name: RequiredProps.string,
-    allowedCharacters: OptionalProps.string,
     value: OptionalProps.string,
     textarea: OptionalProps.booleanFalse,
-    focusing: OptionalProps.booleanFalse
+    focus: OptionalProps.booleanFalse,
+    allowedCharacters: OptionalProps.string,
+    transformInput: {
+        type: String as () => InputTransformType,
+        required: false,
+        default: null
+    }
 });
 
 const element = ref<HTMLInputElement | HTMLTextAreaElement>(null);
@@ -57,10 +62,14 @@ watch(() => props.value, (received: string): void => {
         return;
     }
 
-    model.value = filter(received);
+    model.value = filterAndTransform(received);
 });
 
-watch(() => props.focusing, (received: boolean) => {
+watch(() => props.focus, (received: boolean) => {
+    if (!element.value) {
+        return;
+    }
+
     !received ? element.value.blur() : element.value.focus();
 });
 
@@ -81,34 +90,42 @@ const preventDisallowedCharacters = (event: KeyboardEvent): string => {
 };
 
 /**
- * Filter the value by the allowed character format
+ * Filter the pasted value by the allowed character format
  */
 const filterPasteData = (event: ClipboardEvent): void => {
     const data = event.clipboardData;
-    data.setData('text', filter(data.getData('text')));
+    data.setData('text', filterAndTransform(data.getData('text')));
 };
 
+/**
+ * Filter the user's inputted value by the allowed character format
+ */
 const filterInputData = (event: Event): void => {
-    model.value = filter((<HTMLInputElement> event.target).value);
+    model.value = filterAndTransform((<HTMLInputElement> event.target).value);
 };
 
-const { filter: filterData } = useUserInput();
-const filter = (value: string): string => {
-    return value ? filterData(value, inputRegex) : null;
+const { filter, transform } = useUserInput();
+const filterAndTransform = (value: string): string => {
+    const filtered = filter(value, inputRegex);
+    if (!props.transformInput) {
+        return filtered;
+    }
+
+    return transform(filtered, props.transformInput);
 };
 
-const focus = (): void => {
+const focusElement = (): void => {
     focused.value = true;
     emit('focused');
 };
 
-const blur = (): void => {
+const blurElement = (): void => {
     focused.value = false;
     emit('blurred');
 };
 
 onMounted(() => {
-    if (!props.focusing) {
+    if (!props.focus) {
         return;
     }
     element.value.focus();

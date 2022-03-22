@@ -13,17 +13,18 @@
                         <validatable-input :validations="inputValidations" @updated="(data) => { inputValidated(index, data); validateState(state) }">
                             <template #default="{ validate, invalid }">
 
-                                <numeric-input
+                                <user-input
                                     class="input"
                                     maxlength="1"
+                                    :allowed-characters="allowedCharacters"
                                     :class="{ invalid: invalid && showing }"
-                                    :focusing="index === focusedElement"
+                                    :focus="index === focusedElement"
                                     :name="`${name}-${index}`"
                                     :value="state.value[index]"
-                                    :allow-decimals="false"
-                                    :allow-negative="false"
-                                    @updated="validate"
+                                    transform-input="uppercase"
+                                    @focused="focusedElement = index"
                                     @created="validate"
+                                    @updated="validate"
                                 />
 
                             </template>
@@ -46,31 +47,37 @@
 </template>
 
 <script lang="ts" setup>
-import NumericInput from '@/components/form/fields/base/numeric-input.vue';
+import UserInput from '@/components/form/fields/base/user-input.vue';
 import ValidatableInput from '@/components/form/fields/base/validatable-input.vue';
 import { OptionalProps, RequiredProps } from '@/components/props.types';
 import { FieldData, ValidatedFieldData, ValidationMethod } from '@/composables/types';
 import { useUserInput } from '@/composables/user-input';
 import { predefinedValidations } from '@/composables/validate-user-input';
-import { reactive, ref } from 'vue';
+import { computed, reactive, ref, watch } from 'vue';
 
 // TODO Add key handling
-// TODO Add alpha and alphanumeric
 
 const emit = defineEmits<{ (event: 'updated', data: ValidatedFieldData): void; }>();
 
 const props = defineProps({
     name: RequiredProps.string,
-    value: OptionalProps.number,
+    value: OptionalProps.string,
     focus: OptionalProps.boolean,
     required: OptionalProps.booleanFalse,
     validations: OptionalProps.validations,
+    type: {
+        type: String as () => 'alpha' | 'numeric' | 'alphanumeric',
+        required: false,
+        default: 'alphanumeric'
+    },
     length: {
         type: Number,
         required: false,
         default: 6
     }
 });
+
+const allowedCharacters = `[${ props.type !== 'numeric' ? 'A-z' : '' }${ props.type !== 'alpha' ? '0-9' : '' }]`;
 
 const state = reactive<ValidatedFieldData>({
     name: props.name,
@@ -79,7 +86,19 @@ const state = reactive<ValidatedFieldData>({
     failed: []
 });
 
-const focusedElement = ref(props.focus ? 0 : null);
+/**
+ * The selected index determines which input field is focused
+ * When setting the value to null, the focused item will be determined by the first null value in the list
+ * When setting the value to -1, no element will be focused
+ */
+const selectedIndex = ref(props.focus ? 0 : -1);
+const focusedElement = computed({
+    get: () => selectedIndex.value ?? (<string[]> state.value).indexOf(null),
+    set: (index: number) => {
+
+        selectedIndex.value = index < props.length ? index : null;
+    }
+});
 
 const inputValidated = (index: number, data: ValidatedFieldData): void => {
     state.value[index] = data.value;
@@ -87,16 +106,21 @@ const inputValidated = (index: number, data: ValidatedFieldData): void => {
         return;
     }
 
-    focusedElement.value = index + 1;
+    focusedElement.value = null;
 };
 
 const fieldValidated = (data: ValidatedFieldData) => {
     state.valid = data.valid;
     state.failed = data.failed;
 
+    let emitValue: string | number = (<string[]> state.value).join('');
+    if (props.type === 'numeric') {
+        emitValue = Number(emitValue);
+    }
+
     const emitData: ValidatedFieldData = {
         name: state.name,
-        value: Number((<number[]> state.value).join('')),
+        value: emitValue,
         valid: state.valid,
         failed: state.failed
     };
@@ -112,7 +136,7 @@ const fieldBlurred = (event: FocusEvent, showValidity: () => void) => {
             return;
         }
 
-        focusedElement.value = null;
+        focusedElement.value = -1;
         showValidity();
     });
 };
@@ -130,26 +154,40 @@ const fieldValidations: ValidationMethod[] = [
                 return false;
             }
 
-            const value = <number[]> data.value;
+            const value = <string[]> data.value;
             return value.length === length && value.every(val => val !== null);
         }
     }
 ];
 
-const { filter } = useUserInput();
+watch(() => props.value, (received: string) => {
+    convertValueForState(received);
+});
+
 const filterPasteData = (event: ClipboardEvent): void => {
-    const data = event.clipboardData?.getData('text');
-    if (!data) {
+    const value = event.clipboardData?.getData('text');
+    if (!value) {
         return;
     }
 
-    // TODO improve
-    const filtered = filter(data, new RegExp('[0-9]', 'g')).slice(0, props.length);
-    const split = filtered.split('');
-    for (let i = 0; i < props.length; i++) {
-        state.value[i] = split[i] !== undefined ? Number(split[i]) : null;
-    }
+    convertValueForState(value);
 };
+
+const { filter } = useUserInput();
+const regex = new RegExp(allowedCharacters, 'g');
+
+function convertValueForState(value: string) {
+    const stateValue = [ ...new Array(props.length) ];
+    if (!value) {
+        state.value = stateValue.map(item => null);
+        return;
+    }
+
+    const filtered = filter(value, regex).slice(0, props.length).split('');
+    state.value = stateValue.map((item, index) => filtered[index] ?? null);
+
+    focusedElement.value = null;
+}
 </script>
 
 <style lang="scss" scoped>

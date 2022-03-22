@@ -1,11 +1,13 @@
 export type BaseValidationType = 'required' | 'min-length' | 'max-length' | 'min-amount' | 'max-amount';
 
+export type InputTransformType = 'uppercase' | 'lowercase';
+
 /**
  * Field state emitted from all inputs
  */
 export interface FieldData {
     name: string;
-    value: string | number | number[];
+    value: string | number | string[] | number[];
 }
 
 export interface StringFieldData extends FieldData {

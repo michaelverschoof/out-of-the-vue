@@ -4,7 +4,7 @@
         :inputmode="allowDecimals ? 'decimal' : 'numeric'"
         :name="name"
         :pattern="regex"
-        :value="display"
+        :value="model"
         @updated="updated"
         @created="created"
     />
@@ -41,7 +41,7 @@ const regex = computed(() => {
     return `[${ reg }]`;
 });
 
-const display = ref<string>(props.value?.toString() ?? null); // TODO add decimal separator and use that
+const model = ref<string>(props.value?.toString() ?? null); // TODO add decimal separator and use that
 
 const state = reactive<NumberFieldData>({
     name: props.name,
@@ -54,7 +54,7 @@ watch(() => props.value, (received: number): void => {
     }
 
     state.value = received;
-    display.value = state.value?.toString();
+    model.value = state.value?.toString();
 });
 
 const parse = (data: StringFieldData): number => {
@@ -75,7 +75,7 @@ const parse = (data: StringFieldData): number => {
     }
 
     // Set the filtered value for the text input field
-    display.value = filtered;
+    model.value = filtered;
 
     // Parse it to a number and return it with null as a fallback in case of NaN (which should not happen)
     const numeric = Number(filtered.replace(',', '.'));
