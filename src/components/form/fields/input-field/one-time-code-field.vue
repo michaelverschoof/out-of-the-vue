@@ -8,7 +8,7 @@
                     <slot name="label" />
                 </header>
 
-                <main @blur.capture="fieldBlurred($event, showValidity)">
+                <main ref="mainElement" @blur.capture="fieldBlurred(showValidity)">
                     <template v-for="(n, index) of length">
 
                         <validatable-input :validations="inputValidations" @updated="(data) => { inputValidated(index, data); validateState(state) }">
@@ -136,11 +136,10 @@ const fieldValidated = (data: ValidatedFieldData) => {
     emit('updated', emitData);
 };
 
-const fieldBlurred = (event: FocusEvent, showValidity: () => void) => {
-    const currentTarget = <HTMLElement> event.currentTarget;
-
+const mainElement = ref(null);
+const fieldBlurred = (showValidity: () => void) => {
     requestAnimationFrame(() => {
-        if (currentTarget.contains(document.activeElement)) {
+        if (mainElement.value.contains(document.activeElement)) {
             return;
         }
 
