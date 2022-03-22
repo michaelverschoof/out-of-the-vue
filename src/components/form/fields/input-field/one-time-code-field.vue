@@ -167,7 +167,7 @@ const regex = new RegExp(allowedCharacters, 'g');
 function convertValueForState(value: string) {
     const stateValue = [ ...new Array(props.length) ];
     if (!value) {
-        state.value = stateValue.map(item => null);
+        state.value = stateValue.map(() => null);
         return;
     }
 
