@@ -10,18 +10,20 @@
 
                 <main @blur.capture="fieldBlurred($event, showValidity)">
                     <template v-for="(n, index) of length">
+
                         <validatable-input :validations="inputValidations" @updated="(data) => { inputValidated(index, data); validateState(state) }">
                             <template #default="{ validate, invalid }">
 
                                 <user-input
                                     class="input"
                                     maxlength="1"
+                                    transform-input="uppercase"
                                     :allowed-characters="allowedCharacters"
                                     :class="{ invalid: invalid && showing }"
                                     :focus="index === focusedElement"
                                     :name="`${name}-${index}`"
                                     :value="state.value[index]"
-                                    transform-input="uppercase"
+                                    @keydown.delete.prevent="clearInput(index)"
                                     @focused="focusedElement = index"
                                     @created="validate"
                                     @updated="validate"
@@ -29,6 +31,7 @@
 
                             </template>
                         </validatable-input>
+
                     </template>
                 </main>
 
@@ -50,12 +53,10 @@
 import UserInput from '@/components/form/fields/base/user-input.vue';
 import ValidatableInput from '@/components/form/fields/base/validatable-input.vue';
 import { OptionalProps, RequiredProps } from '@/components/props.types';
-import { FieldData, ValidatedFieldData, ValidationMethod } from '@/composables/types';
+import { ValidatedFieldData, ValidationMethod } from '@/composables/types';
 import { useUserInput } from '@/composables/user-input';
 import { predefinedValidations } from '@/composables/validate-user-input';
 import { computed, reactive, ref, watch } from 'vue';
-
-// TODO Add key handling
 
 const emit = defineEmits<{ (event: 'updated', data: ValidatedFieldData): void; }>();
 
@@ -77,6 +78,14 @@ const props = defineProps({
     }
 });
 
+const inputValidations: ValidationMethod[] = [
+    { ...predefinedValidations['required'], parameters: [ props.required ] }
+];
+
+const fieldValidations: ValidationMethod[] = [
+    { ...predefinedValidations['required-array'], parameters: [ props.required, props.length ] }
+];
+
 const allowedCharacters = `[${ props.type !== 'numeric' ? 'A-z' : '' }${ props.type !== 'alpha' ? '0-9' : '' }]`;
 
 const state = reactive<ValidatedFieldData>({
@@ -95,7 +104,6 @@ const selectedIndex = ref(props.focus ? 0 : -1);
 const focusedElement = computed({
     get: () => selectedIndex.value ?? (<string[]> state.value).indexOf(null),
     set: (index: number) => {
-
         selectedIndex.value = index < props.length ? index : null;
     }
 });
@@ -129,7 +137,7 @@ const fieldValidated = (data: ValidatedFieldData) => {
 };
 
 const fieldBlurred = (event: FocusEvent, showValidity: () => void) => {
-    const currentTarget = event.currentTarget as HTMLElement;
+    const currentTarget = <HTMLElement> event.currentTarget;
 
     requestAnimationFrame(() => {
         if (currentTarget.contains(document.activeElement)) {
@@ -140,25 +148,6 @@ const fieldBlurred = (event: FocusEvent, showValidity: () => void) => {
         showValidity();
     });
 };
-
-const inputValidations: ValidationMethod[] = [
-    { ...predefinedValidations['required'], parameters: [ props.required ] }
-];
-
-const fieldValidations: ValidationMethod[] = [
-    {
-        name: 'required',
-        parameters: [ props.length ],
-        validator: (data: FieldData, length: number) => {
-            if (!data.value) {
-                return false;
-            }
-
-            const value = <string[]> data.value;
-            return value.length === length && value.every(val => val !== null);
-        }
-    }
-];
 
 watch(() => props.value, (received: string) => {
     convertValueForState(received);
@@ -188,6 +177,15 @@ function convertValueForState(value: string) {
 
     focusedElement.value = null;
 }
+
+const clearInput = (index: number) => {
+    state.value[index] = null;
+    if (index === 0) {
+        return;
+    }
+
+    focusedElement.value = index - 1;
+};
 </script>
 
 <style lang="scss" scoped>

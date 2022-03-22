@@ -20,6 +20,10 @@ export const predefinedValidations: BaseValidationRegistry = {
         name: 'required',
         validator: validateRequired
     },
+    'required-array': {
+        name: 'required',
+        validator: validateRequiredArray
+    },
     'max-amount': {
         name: 'max-amount',
         validator: validateMaxAmount
@@ -61,7 +65,7 @@ export const useUserInputValidation = () => {
 /**
  * Validate a required field
  *
- * @param data the value to validate
+ * @param data the field data to validate
  * @param required if the field is required
  * @returns true if the value is not empty or only whitespaces
  */
@@ -70,9 +74,22 @@ function validateRequired(data: FieldData, required: boolean): boolean {
 }
 
 /**
+ * Validate a required array
+ *
+ * @param data the field data to validate
+ * @param required if the field is required
+ * @param length the length that the array should be
+ * @returns true if the value is not empty, is the required length and contains non-null values
+ */
+function validateRequiredArray(data: FieldData, required: boolean, length: number): boolean {
+    const value = <(string | number)[]> data.value;
+    return !required || (!!value && value.length === length && value.every(val => val !== null));
+}
+
+/**
  * Validate the minimum length of a field
  *
- * @param data the value to validate
+ * @param data the field data to validate
  * @param length the minimum length the value needs to have
  * @returns true if the value is larger or equal to the minimum length
  */
@@ -83,7 +100,7 @@ function validateMinLength(data: FieldData, length: number): boolean {
 /**
  * Validate the maximum length of a field
  *
- * @param data the value to validate
+ * @param data the field data to validate
  * @param length the maximum length the value may have
  * @returns true if the value is smaller or equal to the maximum length
  */
@@ -94,7 +111,7 @@ function validateMaxLength(data: FieldData, length: number): boolean {
 /**
  * Validate the minimum value of a numeric field
  *
- * @param data the value to validate
+ * @param data the field data to validate
  * @param amount the minimum amount the value needs to be
  * @returns true if the value is larger or equal to the minimum amount
  */
@@ -105,7 +122,7 @@ function validateMinAmount(data: FieldData, amount: number): boolean {
 /**
  * Validate the maximum value of a numeric field
  *
- * @param data the value to validate
+ * @param data the field data to validate
  * @param amount the maximum amount the value can be
  * @returns true if the value is smaller or equal to the maximum amount
  */

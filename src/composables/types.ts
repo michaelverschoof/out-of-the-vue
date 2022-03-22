@@ -1,4 +1,4 @@
-export type BaseValidationType = 'required' | 'min-length' | 'max-length' | 'min-amount' | 'max-amount';
+export type BaseValidationType = 'required' | 'required-array' | 'min-length' | 'max-length' | 'min-amount' | 'max-amount';
 
 export type InputTransformType = 'uppercase' | 'lowercase';
 
