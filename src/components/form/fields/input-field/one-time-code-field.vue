@@ -179,12 +179,12 @@ function convertValueForState(value: string) {
 }
 
 const clearInput = (index: number) => {
-    state.value[index] = null;
-    if (index === 0) {
+    if (state.value[index] === null) {
+        focusedElement.value = index - 1;
         return;
     }
 
-    focusedElement.value = index - 1;
+    state.value[index] = null;
 };
 </script>
 
