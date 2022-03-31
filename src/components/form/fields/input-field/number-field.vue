@@ -97,5 +97,5 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@use "./input-field";
+@use "../input-field";
 </style>

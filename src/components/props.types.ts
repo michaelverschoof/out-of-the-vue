@@ -33,6 +33,11 @@ export const OptionalProps = {
         required: false,
         default: null
     },
+    stringArray: {
+        type: Array as () => string[],
+        required: false,
+        default: []
+    },
     validations: {
         type: Array as () => ValidationMethod[],
         required: false,

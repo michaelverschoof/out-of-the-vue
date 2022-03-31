@@ -39,7 +39,7 @@
                         </footer>
                     </template>
 
-                    <template v-for="validation of validations" #[validation.name]>
+                    <template v-for="validation of validationMethods" #[validation.name]>
                         <slot :name="validation.name" />
                     </template>
                 </validatable-input>
@@ -95,5 +95,5 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@use "./input-field";
+@use "../input-field";
 </style>

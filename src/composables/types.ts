@@ -1,4 +1,4 @@
-export type BaseValidationType = 'required' | 'required-array' | 'min-length' | 'max-length' | 'min-amount' | 'max-amount';
+export type BaseValidationType = 'required' | 'required-array' | 'min-length' | 'max-length' | 'min-amount' | 'max-amount' | 'min-array' | 'max-array';
 
 export type InputTransformType = 'uppercase' | 'lowercase';
 
@@ -16,6 +16,11 @@ export interface StringFieldData extends FieldData {
 
 export interface NumberFieldData extends FieldData {
     value: number;
+}
+
+export interface CheckableFieldData extends FieldData {
+    value: string;
+    checked: boolean;
 }
 
 /**

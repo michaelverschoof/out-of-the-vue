@@ -2,7 +2,7 @@
     <slot v-bind="$attrs" :validate="validate" :invalid="!state.valid" :showing="showingValidity" :show-validity="showValidity" />
 
     <template v-if="!state.valid && showingValidity" v-for="validation of validations">
-        <strong v-if="show(validation.name)" class="validation-error">
+        <strong v-if="$slots[validation.name] && show(validation.name)" class="validation-error">
             <slot :name="validation.name" />
         </strong>
     </template>
@@ -16,10 +16,7 @@ import { reactive, ref } from 'vue';
 
 const emit = defineEmits<{ (event: 'updated', data: ValidatedFieldData): void; }>();
 
-const props = defineProps({
-    validations: OptionalProps.validations,
-    showAllValidations: OptionalProps.booleanFalse
-});
+const props = defineProps({ validations: OptionalProps.validations });
 
 const state = reactive<ValidatedFieldData>({
     name: null,
@@ -55,5 +52,5 @@ const showValidity = () => {
     showingValidity.value = !state.valid;
 };
 
-const show = (name: string): boolean => !!state.failed.length && (props.showAllValidations ? state.failed.includes(name) : state.failed[0] === name);
+const show = (name: string): boolean => !state.valid && state.failed[0] === name;
 </script>

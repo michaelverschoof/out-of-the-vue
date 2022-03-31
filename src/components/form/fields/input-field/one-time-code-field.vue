@@ -1,5 +1,5 @@
 <template>
-    <label class="one-time-code-field input-field" @paste.capture.prevent="filterPasteData">
+    <fieldset class="one-time-code-field input-field" @paste.capture.prevent="filterPasteData">
 
         <validatable-input :validations="fieldValidations" @updated="fieldValidated">
             <template #default="{ validate: validateState, invalid: invalidState, showing, showValidity }">
@@ -8,8 +8,8 @@
                     <slot name="label" />
                 </header>
 
-                <main ref="mainElement" @blur.capture="fieldBlurred(showValidity)">
-                    <template v-for="(n, index) of length">
+                <main ref="main" @blur.capture="fieldBlurred(showValidity)">
+                    <template v-for="(number, index) of length">
 
                         <validatable-input :validations="inputValidations" @updated="(data) => { inputValidated(index, data); validateState(state) }">
                             <template #default="{ validate, invalid }">
@@ -46,14 +46,14 @@
             </template>
         </validatable-input>
 
-    </label>
+    </fieldset>
 </template>
 
 <script lang="ts" setup>
 import UserInput from '@/components/form/fields/base/user-input.vue';
 import ValidatableInput from '@/components/form/fields/base/validatable-input.vue';
 import { OptionalProps, RequiredProps } from '@/components/props.types';
-import { ValidatedFieldData, ValidationMethod } from '@/composables/types';
+import { FieldData, ValidatedFieldData, ValidationMethod } from '@/composables/types';
 import { useUserInput } from '@/composables/user-input';
 import { predefinedValidations } from '@/composables/validate-user-input';
 import { computed, reactive, ref, watch } from 'vue';
@@ -83,7 +83,14 @@ const inputValidations: ValidationMethod[] = [
 ];
 
 const fieldValidations: ValidationMethod[] = [
-    { ...predefinedValidations['required-array'], parameters: [ props.required, props.length ] }
+    {
+        name: 'required',
+        parameters: [ props.required, props.length ],
+        validator: (data: FieldData, required: boolean, length: number): boolean => {
+            const value = <(string | number)[]> data.value;
+            return !required || (!!value && value.length === length && value.every(val => val !== null));
+        }
+    }
 ];
 
 const allowedCharacters = `[${ props.type !== 'numeric' ? 'A-z' : '' }${ props.type !== 'alpha' ? '0-9' : '' }]`;
@@ -117,7 +124,7 @@ const inputValidated = (index: number, data: ValidatedFieldData): void => {
     focusedElement.value = null;
 };
 
-const fieldValidated = (data: ValidatedFieldData) => {
+const fieldValidated = (data: ValidatedFieldData): void => {
     state.valid = data.valid;
     state.failed = data.failed;
 
@@ -136,10 +143,10 @@ const fieldValidated = (data: ValidatedFieldData) => {
     emit('updated', emitData);
 };
 
-const mainElement = ref(null);
-const fieldBlurred = (showValidity: () => void) => {
+const main = ref(null);
+const fieldBlurred = (showValidity: () => void): void => {
     requestAnimationFrame(() => {
-        if (mainElement.value.contains(document.activeElement)) {
+        if (main.value.contains(document.activeElement)) {
             return;
         }
 
@@ -164,7 +171,7 @@ const filterPasteData = (event: ClipboardEvent): void => {
 const { filter } = useUserInput();
 const regex = new RegExp(allowedCharacters, 'g');
 
-function convertValueForState(value: string) {
+function convertValueForState(value: string): void {
     const stateValue = [ ...new Array(props.length) ];
     if (!value) {
         state.value = stateValue.map(() => null);
@@ -177,7 +184,7 @@ function convertValueForState(value: string) {
     focusedElement.value = null;
 }
 
-const clearInput = (index: number) => {
+const clearInput = (index: number): void => {
     if (state.value[index] === null) {
         focusedElement.value = index - 1;
         return;
@@ -188,11 +195,18 @@ const clearInput = (index: number) => {
 </script>
 
 <style lang="scss" scoped>
-@use "./input-field";
+@use "../input-field";
 
-.one-time-code-field main input.input {
-    font-size: 1.5em;
-    height: 2.25em;
-    text-align: center;
+.one-time-code-field {
+
+    main {
+        grid-template-columns: repeat(v-bind("props.length"), 1fr);
+
+        input.input {
+            font-size: 1.5em;
+            height: 2.25em;
+            text-align: center;
+        }
+    }
 }
 </style>

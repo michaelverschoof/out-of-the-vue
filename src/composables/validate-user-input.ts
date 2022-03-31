@@ -9,11 +9,11 @@ type BaseValidationRegistry = {
  */
 export const predefinedValidations: BaseValidationRegistry = {
     'max-length': {
-        name: 'max-length',
+        name: 'max',
         validator: validateMaxLength
     },
     'min-length': {
-        name: 'min-length',
+        name: 'min',
         validator: validateMinLength
     },
     'required': {
@@ -25,12 +25,20 @@ export const predefinedValidations: BaseValidationRegistry = {
         validator: validateRequiredArray
     },
     'max-amount': {
-        name: 'max-amount',
+        name: 'max',
         validator: validateMaxAmount
     },
     'min-amount': {
-        name: 'min-amount',
+        name: 'min',
         validator: validateMinAmount
+    },
+    'min-array': {
+        name: 'min',
+        validator: validateMinArray
+    },
+    'max-array': {
+        name: 'max',
+        validator: validateMaxArray
     }
 };
 
@@ -67,7 +75,7 @@ export const useUserInputValidation = () => {
  *
  * @param data the field data to validate
  * @param required if the field is required
- * @returns true if the value is not empty or only whitespaces
+ * @returns true if the value is not empty
  */
 function validateRequired(data: FieldData, required: boolean): boolean {
     return !required || (!!data.value || data.value === 0);
@@ -78,12 +86,11 @@ function validateRequired(data: FieldData, required: boolean): boolean {
  *
  * @param data the field data to validate
  * @param required if the field is required
- * @param length the length that the array should be
- * @returns true if the value is not empty, is the required length and contains non-null values
+ * @returns true if the value is not empty, and contains non-null values
  */
-function validateRequiredArray(data: FieldData, required: boolean, length: number): boolean {
+function validateRequiredArray(data: FieldData, required: boolean): boolean {
     const value = <(string | number)[]> data.value;
-    return !required || (!!value && value.length === length && value.every(val => val !== null));
+    return !required || (!!value && !!value.length && value.every(val => val !== null));
 }
 
 /**
@@ -113,7 +120,7 @@ function validateMaxLength(data: FieldData, length: number): boolean {
  *
  * @param data the field data to validate
  * @param amount the minimum amount the value needs to be
- * @returns true if the value is larger or equal to the minimum amount
+ * @returns true if the value is greater or equal to the minimum amount
  */
 function validateMinAmount(data: FieldData, amount: number): boolean {
     return !amount || (data.value || 0) >= amount;
@@ -128,4 +135,26 @@ function validateMinAmount(data: FieldData, amount: number): boolean {
  */
 function validateMaxAmount(data: FieldData, amount: number): boolean {
     return !amount || (data.value || 0) <= amount;
+}
+
+/**
+ * Validate the minimum amount of items in an array
+ *
+ * @param data the field data to validate
+ * @param amount the minimum amount of items required
+ * @returns true if the length is greater or equal to the minimum amount
+ */
+function validateMinArray(data: FieldData, amount: number): boolean {
+    return !amount || ((<(string | number)[]> data.value).length || 0) >= amount;
+}
+
+/**
+ * Validate the maximum amount of items in an array
+ *
+ * @param data the field data to validate
+ * @param amount the maximum amount of items allowed
+ * @returns true if the length is smaller or equal to the maximum amount
+ */
+function validateMaxArray(data: FieldData, amount: number): boolean {
+    return !amount || ((<(string | number)[]> data.value).length || 0) <= amount;
 }

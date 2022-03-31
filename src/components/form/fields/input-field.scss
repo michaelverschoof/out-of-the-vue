@@ -1,6 +1,8 @@
-.input-field {
+label.input-field {
     display: block;
+}
 
+.input-field {
     header.label,
     footer.information,
     :deep(strong.validation-error) {
@@ -9,9 +11,12 @@
     }
 
     main {
-        display: flex;
+        display: grid;
         column-gap: 0.5em;
+        row-gap: 0.5em;
+    }
 
+    main, fieldset {
         &.input,
         & .input {
             border: 1px solid #b9c4c8;
