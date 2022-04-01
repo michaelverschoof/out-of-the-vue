@@ -58,10 +58,7 @@ import { predefinedValidations } from '@/composables/validate-user-input';
 import { filter } from '@/util/slots';
 import { reactive, ref, useSlots } from 'vue';
 
-const emit = defineEmits<{
-    (event: 'created', data: ValidatedFieldData): void; // TODO emit or remove?
-    (event: 'updated', data: ValidatedFieldData): void;
-}>();
+const emit = defineEmits<{ (event: 'updated', data: ValidatedFieldData): void; }>();
 
 const props = defineProps({
     name: RequiredProps.string,
@@ -94,7 +91,7 @@ const options = filter(useSlots(), [ 'label', 'information', ...validationMethod
 
 const selectedItems = ref<Set<string>>(new Set(props.selected));
 
-const state = reactive({
+const state = reactive<ValidatedFieldData>({
     name: props.name,
     value: Array.from(selectedItems.value),
     valid: !props.required,
