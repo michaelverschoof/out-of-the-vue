@@ -3,6 +3,13 @@ export type BaseValidationType = 'required' | 'required-array' | 'min-length' | 
 export type InputTransformType = 'uppercase' | 'lowercase';
 
 /**
+ * Emit event types
+ */
+export type UpdateEmitType = 'created' | 'updated';
+export type FocusEmitType = 'focused' | 'blurred';
+export type ModalEmitType = 'opened' | 'closed';
+
+/**
  * Field state emitted from all inputs
  */
 export interface FieldData {
