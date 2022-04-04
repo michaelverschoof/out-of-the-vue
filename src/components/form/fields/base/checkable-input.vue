@@ -14,13 +14,10 @@
 
 <script lang="ts" setup>
 import { OptionalProps, RequiredProps } from '@/components/props.types';
-import { CheckableFieldData } from '@/composables/types';
+import { CheckableFieldData, UpdateEmitType } from '@/composables/types';
 import { computed, reactive, ref } from 'vue';
 
-const emit = defineEmits<{
-    (event: 'created', data: CheckableFieldData): void;
-    (event: 'updated', data: CheckableFieldData): void;
-}>();
+const emit = defineEmits<{ (event: UpdateEmitType, data: CheckableFieldData): void; }>();
 
 const props = defineProps({
     name: RequiredProps.string,

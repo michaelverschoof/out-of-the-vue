@@ -1,18 +1,18 @@
 <template>
-    <fieldset class="input-field">
+    <fieldset class="checkable-field input-field">
 
-        <validatable-input :validations="validationMethods" @updated="validated">
-            <template #default="{ validate, invalid, showing, showValidity }">
+        <validatable-input :validations="validationMethods" @created="initialized" @updated="validated">
+            <template #default="{ initialize, validate, invalid, showing, showValidity }">
 
                 <header v-if="$slots.label" class="label">
                     <slot name="label" />
                 </header>
 
-                <main ref="main" tabindex="0" @blur.capture="fieldBlurred(showValidity)">
+                <main ref="main" tabindex="-1" @blur.capture="fieldBlurred(showValidity)">
                     <template v-for="(item, key) of options" :key="key">
 
                         <label
-                            class="checkable-field"
+                            class="checkable-field-item"
                             :class="{ selected: selectedItems.has(key), disabled: disabled.includes(key) }"
                         >
                             <checkable-input
@@ -23,7 +23,7 @@
                                 :checked="selected.includes(key)"
                                 :disabled="disabled.includes(key)"
                                 tabindex="0"
-                                @created="(data) => { updated(data); validate(state); }"
+                                @created="(data) => { updated(data); initialize(state); }"
                                 @updated="(data) => { updated(data); validate(state); }"
                             />
 
@@ -53,12 +53,12 @@
 import CheckableInput from '@/components/form/fields/base/checkable-input.vue';
 import ValidatableInput from '@/components/form/fields/base/validatable-input.vue';
 import { OptionalProps, RequiredProps } from '@/components/props.types';
-import { CheckableFieldData, ValidatedFieldData, ValidationMethod } from '@/composables/types';
+import { CheckableFieldData, UpdateEmitType, ValidatedFieldData, ValidationMethod } from '@/composables/types';
 import { predefinedValidations } from '@/composables/validate-user-input';
 import { filter } from '@/util/slots';
 import { reactive, ref, useSlots } from 'vue';
 
-const emit = defineEmits<{ (event: 'updated', data: ValidatedFieldData): void; }>();
+const emit = defineEmits<{ (event: UpdateEmitType, data: ValidatedFieldData): void; }>();
 
 const props = defineProps({
     name: RequiredProps.string,
@@ -108,6 +108,13 @@ const updated = (data: CheckableFieldData): void => {
     state.value = Array.from(selectedItems.value);
 };
 
+const initialized = (data: ValidatedFieldData): void => {
+    state.valid = data.valid;
+    state.failed = data.failed;
+
+    emit('created', state);
+};
+
 const validated = (data: ValidatedFieldData): void => {
     state.valid = data.valid;
     state.failed = data.failed;
@@ -115,7 +122,7 @@ const validated = (data: ValidatedFieldData): void => {
     emit('updated', state);
 };
 
-const main = ref(null);
+const main = ref<HTMLElement>(null);
 const fieldBlurred = (showValidity: () => void) => {
     requestAnimationFrame(() => {
         if (main.value.contains(document.activeElement)) {
@@ -130,7 +137,7 @@ const fieldBlurred = (showValidity: () => void) => {
 <style lang="scss" scoped>
 @use "../input-field";
 
-.checkable-field {
+.checkable-field-item {
     align-items: center;
     border-radius: 0.375em;
     cursor: pointer;

@@ -1,8 +1,8 @@
 <template>
-    <slot v-bind="$attrs" :validate="validate" :invalid="!state.valid" :showing="showingValidity" :show-validity="showValidity" />
+    <slot v-bind="$attrs" :initialize="initialize" :validate="validate" :invalid="!state.valid" :showing="showing" :show-validity="showValidity" />
 
-    <template v-if="!state.valid && showingValidity" v-for="validation of validations">
-        <strong v-if="$slots[validation.name] && show(validation.name)" class="validation-error">
+    <template v-if="!state.valid && showing" v-for="validation of validations">
+        <strong v-if="$slots[validation.name] && state.failed[0] === validation.name" class="validation-error">
             <slot :name="validation.name" />
         </strong>
     </template>
@@ -10,11 +10,11 @@
 
 <script lang="ts" setup>
 import { OptionalProps } from '@/components/props.types';
-import { FieldData, ValidatedFieldData } from '@/composables/types';
+import { FieldData, UpdateEmitType, ValidatedFieldData } from '@/composables/types';
 import { useUserInputValidation } from '@/composables/validate-user-input';
 import { reactive, ref } from 'vue';
 
-const emit = defineEmits<{ (event: 'updated', data: ValidatedFieldData): void; }>();
+const emit = defineEmits<{ (event: UpdateEmitType, data: ValidatedFieldData): void; }>();
 
 const props = defineProps({ validations: OptionalProps.validations });
 
@@ -25,32 +25,38 @@ const state = reactive<ValidatedFieldData>({
     failed: []
 });
 
-const showingValidity = ref(false);
+const showing = ref(false);
 
 const { validate: validateInput } = useUserInputValidation();
 
+const initialize = (data: FieldData): void => {
+    return validateFieldData(data, 'created');
+};
+
 const validate = (data: FieldData): void => {
+    return validateFieldData(data, 'updated');
+};
+
+const validateFieldData = (data: FieldData, event: UpdateEmitType): void => {
     state.name = data.name;
     state.value = data.value;
 
     if (!props.validations || !props.validations.length) {
         state.valid = true;
         state.failed = null;
-        showingValidity.value = false;
-        return emit('updated', state);
+        showing.value = false;
+        return emit(event, state);
     }
 
     const failedValidations = validateInput(data, props.validations);
     state.valid = !failedValidations.length;
     state.failed = failedValidations;
 
-    return emit('updated', state);
+    return emit(event, state);
 };
 
 // TODO: Can we trigger this better?
 const showValidity = () => {
-    showingValidity.value = !state.valid;
+    showing.value = !state.valid;
 };
-
-const show = (name: string): boolean => !state.valid && state.failed[0] === name;
 </script>

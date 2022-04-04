@@ -8,7 +8,7 @@
                     <slot name="label" />
                 </header>
 
-                <main ref="main" @blur.capture="fieldBlurred(showValidity)">
+                <main ref="main" tabindex="-1" @blur.capture="fieldBlurred(showValidity)">
                     <template v-for="(number, index) of length">
 
                         <validatable-input :validations="inputValidations" @updated="(data) => { inputValidated(index, data); validateState(state) }">
@@ -53,12 +53,12 @@
 import UserInput from '@/components/form/fields/base/user-input.vue';
 import ValidatableInput from '@/components/form/fields/base/validatable-input.vue';
 import { OptionalProps, RequiredProps } from '@/components/props.types';
-import { FieldData, ValidatedFieldData, ValidationMethod } from '@/composables/types';
+import { FieldData, UpdateEmitType, ValidatedFieldData, ValidationMethod } from '@/composables/types';
 import { useUserInput } from '@/composables/user-input';
 import { predefinedValidations } from '@/composables/validate-user-input';
 import { computed, reactive, ref, watch } from 'vue';
 
-const emit = defineEmits<{ (event: 'updated', data: ValidatedFieldData): void; }>();
+const emit = defineEmits<{ (event: UpdateEmitType, data: ValidatedFieldData): void; }>();
 
 const props = defineProps({
     name: RequiredProps.string,
@@ -143,7 +143,7 @@ const fieldValidated = (data: ValidatedFieldData): void => {
     emit('updated', emitData);
 };
 
-const main = ref(null);
+const main = ref<HTMLElement>(null);
 const fieldBlurred = (showValidity: () => void): void => {
     requestAnimationFrame(() => {
         if (main.value.contains(document.activeElement)) {

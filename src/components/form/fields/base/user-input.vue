@@ -17,15 +17,13 @@
 
 <script lang="ts" setup>
 import { OptionalProps, RequiredProps } from '@/components/props.types';
-import { InputTransformType, StringFieldData } from '@/composables/types';
+import { FocusEmitType, InputTransformType, StringFieldData, UpdateEmitType } from '@/composables/types';
 import { useUserInput } from '@/composables/user-input';
 import { computed, onMounted, reactive, ref, watch } from 'vue';
 
 const emit = defineEmits<{
-    (event: 'blurred'): void;
-    (event: 'focused'): void;
-    (event: 'created', data: StringFieldData): void;
-    (event: 'updated', data: StringFieldData): void;
+    (event: FocusEmitType): void;
+    (event: UpdateEmitType, data: StringFieldData): void;
 }>();
 
 const props = defineProps({

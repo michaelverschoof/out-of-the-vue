@@ -13,13 +13,10 @@
 <script lang="ts" setup>
 import UserInput from '@/components/form/fields/base/user-input.vue';
 import { OptionalProps, RequiredProps } from '@/components/props.types';
-import { NumberFieldData, StringFieldData } from '@/composables/types';
+import { NumberFieldData, StringFieldData, UpdateEmitType } from '@/composables/types';
 import { computed, reactive, ref, watch } from 'vue';
 
-const emit = defineEmits<{
-    (event: 'created', data: NumberFieldData): void;
-    (event: 'updated', data: NumberFieldData): void;
-}>();
+const emit = defineEmits<{ (event: UpdateEmitType, data: NumberFieldData): void; }>();
 
 const props = defineProps({
     name: RequiredProps.string,

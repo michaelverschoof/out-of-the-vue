@@ -56,12 +56,12 @@ import DebounceableInput from '@/components/form/fields/base/debounceable-input.
 import UserInput from '@/components/form/fields/base/user-input.vue';
 import ValidatableInput from '@/components/form/fields/base/validatable-input.vue';
 import { OptionalProps, RequiredProps } from '@/components/props.types';
-import { ValidatedFieldData, ValidationMethod } from '@/composables/types';
+import { UpdateEmitType, ValidatedFieldData, ValidationMethod } from '@/composables/types';
 import { predefinedValidations } from '@/composables/validate-user-input';
 import { filterAttrs } from '@/util/attrs';
 import { ref } from 'vue';
 
-const emit = defineEmits<{ (event: 'updated', data: ValidatedFieldData): void; }>();
+const emit = defineEmits<{ (event: UpdateEmitType, data: ValidatedFieldData): void; }>();
 
 const props = defineProps({
     name: RequiredProps.string,

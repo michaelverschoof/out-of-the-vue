@@ -49,12 +49,33 @@
             <template #max>Too many</template>
         </checkable-field>
     </div>
+
+    <modal :opened="0">
+        <template #opener="{ open }">
+            <button @click="open">open</button>
+        </template>
+
+        <template #header>
+            Some header stuff
+        </template>
+
+        <template #default="{ close }">
+            <div style="height: 150vh; background: blue">
+                ff
+            </div>
+        </template>
+
+        <template #footer>
+            Some footer stuff
+        </template>
+    </modal>
 </template>
 
 <script lang="ts" setup>
 import CheckableField from '@/components/form/fields/checkable-field/checkable-field.vue';
 import NumberField from '@/components/form/fields/input-field/number-field.vue';
 import OneTimeCodeField from '@/components/form/fields/input-field/one-time-code-field.vue';
+import Modal from '@/components/modal.vue';
 import { ValidatedFieldData } from '@/composables/types';
 import { reactive } from 'vue';
 
@@ -96,13 +117,6 @@ body {
 fieldset {
     border: 0;
 
-    &:focus,
-    &:focus-visible {
-        outline: none;
-    }
-}
-
-*[tabindex="0"]:not(input) {
     &:focus,
     &:focus-visible {
         outline: none;

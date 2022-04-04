@@ -5,9 +5,9 @@
 <script lang="ts" setup>
 import { OptionalProps } from '@/components/props.types';
 import { useUserInputDebouncing } from '@/composables/debounce-user-input';
-import { FieldData, ValidatedFieldData } from '@/composables/types';
+import { FieldData, UpdateEmitType, ValidatedFieldData } from '@/composables/types';
 
-const emit = defineEmits<{ (event: 'updated', data: FieldData | ValidatedFieldData): void; }>();
+const emit = defineEmits<{ (event: UpdateEmitType, data: FieldData | ValidatedFieldData): void; }>();
 
 const props = defineProps({ delay: OptionalProps.number });
 
