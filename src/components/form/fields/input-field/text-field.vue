@@ -4,7 +4,7 @@
         <debounceable-input :delay="typingDelay" @updated="debounced">
             <template #default="{ debounce }">
 
-                <validatable-input :validations="validationMethods" @updated="debounce">
+                <validatable-input :validations="validationMethods" @created="initialized" @updated="debounce">
                     <template #default="{ validate, invalid, showing, showValidity }">
 
                         <header v-if="$slots.label" class="label">
@@ -69,8 +69,8 @@ const props = defineProps({
     typingDelay: OptionalProps.number, // TODO rename to something better
     allowedCharacters: OptionalProps.string,
     required: OptionalProps.booleanFalse,
-    minLength: OptionalProps.number, // TODO rename to min and max?
-    maxLength: OptionalProps.number,
+    min: OptionalProps.number,
+    max: OptionalProps.number,
     validations: OptionalProps.validations
 });
 
@@ -78,10 +78,14 @@ const focused = ref(false);
 
 const validationMethods: ValidationMethod[] = [
     { ...predefinedValidations['required'], parameters: [ props.required ] },
-    { ...predefinedValidations['min-length'], parameters: [ props.minLength ] },
-    { ...predefinedValidations['max-length'], parameters: [ props.maxLength ] },
+    { ...predefinedValidations['min-length'], parameters: [ props.min ] },
+    { ...predefinedValidations['max-length'], parameters: [ props.max ] },
     ...props.validations
 ];
+
+const initialized = (data: ValidatedFieldData): void => {
+    emit('created', data);
+};
 
 const debounced = (data: ValidatedFieldData): void => {
     emit('updated', data);

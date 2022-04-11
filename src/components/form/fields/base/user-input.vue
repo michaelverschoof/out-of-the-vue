@@ -11,7 +11,7 @@
         @focus="focusElement"
         @input="filterInputData"
         @keypress="preventDisallowedCharacters"
-        @paste="filterPasteData"
+        @paste.prevent="filterPasteData"
     />
 </template>
 
@@ -91,8 +91,7 @@ const preventDisallowedCharacters = (event: KeyboardEvent): string => {
  * Filter the pasted value by the allowed character format
  */
 const filterPasteData = (event: ClipboardEvent): void => {
-    const data = event.clipboardData;
-    data.setData('text', filterAndTransform(data.getData('text')));
+    model.value = filterAndTransform(event.clipboardData.getData('text'));
 };
 
 /**

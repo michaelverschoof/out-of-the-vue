@@ -21,7 +21,7 @@ const props = defineProps({ validations: OptionalProps.validations });
 const state = reactive<ValidatedFieldData>({
     name: null,
     value: null,
-    valid: false,
+    valid: !props.validations || !props.validations.length,
     failed: []
 });
 
@@ -43,12 +43,14 @@ const validateFieldData = (data: FieldData, event: UpdateEmitType): void => {
 
     if (!props.validations || !props.validations.length) {
         state.valid = true;
-        state.failed = null;
+        state.failed = [];
         showing.value = false;
+
         return emit(event, state);
     }
 
     const failedValidations = validateInput(data, props.validations);
+
     state.valid = !failedValidations.length;
     state.failed = failedValidations;
 

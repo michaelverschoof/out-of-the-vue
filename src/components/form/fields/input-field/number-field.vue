@@ -4,7 +4,7 @@
         <debounceable-input :delay="typingDelay" @updated="debounced">
             <template #default="{ debounce }">
 
-                <validatable-input :validations="validationMethods" @updated="debounce">
+                <validatable-input :validations="validationMethods" @created="initialized" @updated="debounce">
                     <template #default="{ validate, invalid, showing, showValidity }">
 
                         <header v-if="$slots.label" class="label">
@@ -84,6 +84,10 @@ const validationMethods: ValidationMethod[] = [
     { ...predefinedValidations['max-amount'], parameters: [ props.max ] },
     ...props.validations
 ];
+
+const initialized = (data: ValidatedFieldData): void => {
+    emit('created', data);
+};
 
 const debounced = (data: ValidatedFieldData): void => {
     emit('updated', data);
