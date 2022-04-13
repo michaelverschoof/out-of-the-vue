@@ -18,7 +18,7 @@
                                 </template>
 
                                 <user-input
-                                    v-bind="filterAttrs($attrs, ['class'])"
+                                    v-bind="filter($attrs, ['class'])"
                                     :name="name"
                                     :value="value"
                                     :allowed-characters="allowedCharacters"
@@ -58,7 +58,7 @@ import ValidatableInput from '@/components/form/fields/base/validatable-input.vu
 import { OptionalProps, RequiredProps } from '@/components/props.types';
 import { UpdateEmitType, ValidatedFieldData, ValidationMethod } from '@/composables/types';
 import { predefinedValidations } from '@/composables/validate-user-input';
-import { filterAttrs } from '@/util/attrs';
+import { filter } from '@/util/attrs';
 import { ref } from 'vue';
 
 const emit = defineEmits<{ (event: UpdateEmitType, data: ValidatedFieldData): void; }>();
