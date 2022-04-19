@@ -3,13 +3,14 @@ import { resolve } from 'path';
 import { defineConfig } from 'vitest/config';
 
 const src = resolve(__dirname, 'src');
-
-console.log(src);
+const snapshots = resolve(__dirname, 'snapshots');
 
 export default defineConfig({
     plugins: [ vue() ],
     resolve: {
         alias: { '@': src }
     },
-    test: {}
+    test: {
+        resolveSnapshotPath: (testPath, snapExtension) => `${ snapshots }/${ testPath }${ snapExtension }`
+    }
 });

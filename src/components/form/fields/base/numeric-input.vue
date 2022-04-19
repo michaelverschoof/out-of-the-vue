@@ -81,11 +81,11 @@ const parse = (data: StringFieldData): number => {
 
 const created = (data: StringFieldData): void => {
     parse(data);
-    emit('created', state);
+    emit('created', { ...state });
 };
 
 const updated = (data: StringFieldData): void => {
     parse(data);
-    emit('updated', state);
+    emit('updated', { ...state });
 };
 </script>
