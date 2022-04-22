@@ -20,7 +20,7 @@ beforeAll(() => {
 describe('Mounting component', () => {
 
     it('should mount the input component', async () => {
-        const { input, wrapper } = mountInput();
+        const { input, wrapper } = mountComponent();
 
         expect(input.exists()).toBeTruthy();
 
@@ -32,7 +32,7 @@ describe('Mounting component', () => {
     });
 
     it('should mount the input component without a value', async () => {
-        const { input, wrapper } = mountInput({ value: null });
+        const { input, wrapper } = mountComponent({ value: null });
 
         expect(input.exists()).toBeTruthy();
 
@@ -44,7 +44,7 @@ describe('Mounting component', () => {
     });
 
     it('should mount the input component with decimals not allowed', async () => {
-        const { input, wrapper } = mountInput({ allowDecimals: false, value: 123 });
+        const { input, wrapper } = mountComponent({ allowDecimals: false, value: 123 });
 
         expect(input.exists()).toBeTruthy();
         expect(input.element.attributes['inputmode']['value']).toBe('numeric');
@@ -60,7 +60,7 @@ describe('Mounting component', () => {
 describe('Updating input', () => {
 
     it('should update value from props', async () => {
-        const { input, wrapper } = mountInput();
+        const { input, wrapper } = mountComponent();
 
         await wrapper.setProps(Object.assign({}, numberProps, { value: 456.78 }));
         expect(input.element.value).toBe('456.78');
@@ -70,7 +70,7 @@ describe('Updating input', () => {
     });
 
     it('should update value from input', async () => {
-        const { input, wrapper } = mountInput();
+        const { input, wrapper } = mountComponent();
 
         await input.setValue('456.78');
         expect(input.element.value).toBe('456.78');
@@ -80,7 +80,7 @@ describe('Updating input', () => {
     });
 
     it('should not update value from props if equal to current value', async () => {
-        const { input, wrapper } = mountInput({ value: 123 });
+        const { input, wrapper } = mountComponent({ value: 123 });
 
         await input.setValue('456');
         expect(input.element.value).toBe('456');
@@ -96,7 +96,7 @@ describe('Updating input', () => {
     });
 
     it('should not update value from input if it is empty', async () => {
-        const { input, wrapper } = mountInput();
+        const { input, wrapper } = mountComponent();
 
         await input.setValue('   ');
         expect(input.element.value).toBe('');
@@ -106,7 +106,7 @@ describe('Updating input', () => {
     });
 });
 
-function mountInput(props: { [key: string]: any } = null): { wrapper: VueWrapper<any>, input: DOMWrapper<HTMLInputElement> } {
+function mountComponent(props: { [key: string]: any } = null): { wrapper: VueWrapper<any>, input: DOMWrapper<HTMLInputElement> } {
     const options = {
         props: Object.assign({}, numberProps, props || null)
     };
