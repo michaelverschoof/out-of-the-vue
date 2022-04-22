@@ -20,7 +20,6 @@ beforeAll(() => {
     expect(UserInput).toBeTruthy();
 });
 
-
 describe('Mounting components', () => {
 
     it('should mount the text component', async () => {
