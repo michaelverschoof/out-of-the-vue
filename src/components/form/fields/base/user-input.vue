@@ -63,12 +63,8 @@ watch(() => props.value, (received: string): void => {
     model.value = filterAndTransform(received);
 });
 
-watch(() => props.focus, (received: boolean) => {
-    if (!element.value) {
-        return;
-    }
-
-    !received ? element.value.blur() : element.value.focus();
+watch(() => props.focus, (received: boolean): void => {
+    !received ? element.value?.blur() : element.value?.focus();
 });
 
 /**

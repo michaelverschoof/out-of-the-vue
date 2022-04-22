@@ -1,6 +1,7 @@
 import CheckableInput from '@/components/form/fields/base/checkable-input.vue';
-import { DOMWrapper, mount } from '@vue/test-utils';
+import { DOMWrapper, mount, VueWrapper } from '@vue/test-utils';
 import { beforeAll, describe, expect, it } from 'vitest';
+import { emitted } from '../../../../../test/emits';
 
 /**
  * @vitest-environment happy-dom
@@ -22,99 +23,95 @@ beforeAll(() => {
 describe('Mounting components', () => {
 
     it('should mount the radio component', async () => {
-        const radio = mount(CheckableInput, {
-            props: radioProps
-        });
+        const { wrapper } = mountRadio();
 
-        await radio.vm.$nextTick();
-
-        const emitted = radio.emitted('created');
-        expect(emitted).toBeTruthy();
-        expect(emitted[0][0]).toEqual(props);
+        const emits = emitted(wrapper, 'created');
+        expect(emits[0][0]).toEqual(props);
     });
 
     it('should mount the checkbox component', async () => {
-        const checkbox = mount(CheckableInput, {
-            props: checkboxProps
-        });
+        const { wrapper } = mountCheckbox();
 
-        await checkbox.vm.$nextTick();
-
-        const emitted = checkbox.emitted('created');
-        expect(emitted).toBeTruthy();
-        expect(emitted[0][0]).toEqual(props);
+        const emits = emitted(wrapper, 'created');
+        expect(emits[0][0]).toEqual(props);
     });
 });
 
 describe('Ticking boxes', () => {
 
     it('should tick the radio component', async () => {
-        const radio = mount(CheckableInput, {
-            props: radioProps
-        });
+        const { input, wrapper } = mountRadio();
 
-        const input = radio.find('input[type="radio"]');
         await check(input);
+        expect(input.element.checked).toBeTruthy();
 
-        expect((<HTMLInputElement> input.element).checked).toBeTruthy();
-        expect(radio.emitted('updated')[0][0]).toEqual(Object.assign(props, { checked: true }));
+        const emits = emitted(wrapper, 'updated');
+        expect(emits[0][0].checked).toBeTruthy();
     });
 
     it('should deselect the radio component', async () => {
-        const radio = mount(CheckableInput, {
-            props: radioProps
-        });
+        const { input, wrapper } = mountRadio();
 
-        const input = radio.find('input[type="radio"]');
         await check(input);
-        await uncheck(input);
+        expect(input.element.checked).toBeTruthy();
 
-        expect((<HTMLInputElement> input.element).checked).toBeFalsy();
-        expect(radio.emitted('updated').length).toBe(2);
-        expect(radio.emitted('updated')[0][0].checked).toBeTruthy();
-        expect(radio.emitted('updated')[1][0].checked).toBeFalsy();
+        await uncheck(input);
+        expect(input.element.checked).toBeFalsy();
+
+        const emits = emitted(wrapper, 'updated', 2);
+        expect(emits[0][0].checked).toBeTruthy();
+        expect(emits[1][0].checked).toBeFalsy();
     });
 
     it('should reselect the radio component', async () => {
-        const radio = mount(CheckableInput, {
-            props: radioProps
-        });
+        const { input, wrapper } = mountRadio();
 
-        const input = radio.find('input[type="radio"]');
         await check(input);
-        await check(input, false);
+        expect(input.element.checked).toBeTruthy();
 
-        expect((<HTMLInputElement> input.element).checked).toBeTruthy();
-        expect(radio.emitted('updated').length).toBe(2);
-        expect(radio.emitted('updated')[0][0].checked).toBeTruthy();
-        expect(radio.emitted('updated')[1][0].checked).toBeTruthy();
+        await check(input, false);
+        expect(input.element.checked).toBeTruthy();
+
+        const emits = emitted(wrapper, 'updated', 2);
+        expect(emits[0][0].checked).toBeTruthy();
+        expect(emits[1][0].checked).toBeTruthy();
     });
 
     it('should tick the checkbox component', async () => {
-        const checkbox = mount(CheckableInput, {
-            props: checkboxProps
-        });
+        const { input, wrapper } = mountCheckbox();
 
-        const input = checkbox.find('input[type="checkbox"]');
         await check(input);
+        expect(input.element.checked).toBeTruthy();
 
-        expect((<HTMLInputElement> input.element).checked).toBeTruthy();
-        expect(checkbox.emitted('updated')[0][0]).toEqual(Object.assign(props, { checked: true }));
+        const emits = emitted(wrapper, 'updated');
+        expect(emits[0][0]).toEqual(Object.assign(props, { checked: true }));
     });
 
     it('should deselect the checkbox component', async () => {
-        const checkbox = mount(CheckableInput, {
-            props: checkboxProps
-        });
+        const { input, wrapper } = mountCheckbox();
 
-        const input = checkbox.find('input[type="checkbox"]');
         await check(input);
-        await uncheck(input);
+        expect(input.element.checked).toBeTruthy();
 
-        expect((<HTMLInputElement> input.element).checked).toBeFalsy();
-        expect(checkbox.emitted('updated').length).toBe(2);
-        expect(checkbox.emitted('updated')[0][0].checked).toBeTruthy();
-        expect(checkbox.emitted('updated')[1][0].checked).toBeFalsy();
+        await uncheck(input);
+        expect(input.element.checked).toBeFalsy();
+
+        const emits = emitted(wrapper, 'updated', 2);
+        expect(emits[0][0].checked).toBeTruthy();
+        expect(emits[1][0].checked).toBeFalsy();
+    });
+
+    it('should not reselect the checkbox component', async () => {
+        const { input, wrapper } = mountCheckbox();
+
+        await check(input);
+        expect(input.element.checked).toBeTruthy();
+
+        await check(input, false);
+        expect(input.element.checked).toBeTruthy();
+
+        const emits = emitted(wrapper, 'updated');
+        expect(emits[0][0].checked).toBeTruthy();
     });
 });
 
@@ -126,4 +123,26 @@ function check(input: DOMWrapper<Element>, triggerChange: boolean = true): Promi
 function uncheck(input: DOMWrapper<Element>): Promise<void> {
     (<HTMLInputElement> input.element).checked = false;
     return input.trigger('change');
+}
+
+function mountCheckbox(): { wrapper: VueWrapper<any>, input: DOMWrapper<HTMLInputElement> } {
+    const wrapper = mount(CheckableInput, {
+        props: checkboxProps
+    });
+
+    const input = wrapper.find('input');
+    expect(input.element.type).toBe('checkbox');
+
+    return { wrapper, input };
+}
+
+function mountRadio(): { wrapper: VueWrapper<any>, input: DOMWrapper<HTMLInputElement> } {
+    const wrapper = mount(CheckableInput, {
+        props: radioProps
+    });
+
+    const input = wrapper.find('input');
+    expect(input.element.type).toBe('radio');
+
+    return { wrapper, input };
 }
