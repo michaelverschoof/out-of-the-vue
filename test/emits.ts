@@ -8,10 +8,6 @@ export function emitted(wrapper: VueWrapper<any>, event: string = null, count: n
     }
 
     const emitted = wrapper.emitted(event);
-    if (!emitted) {
-        return null;
-    }
-
     expect(emitted).toBeTruthy();
     expect(emitted[0]).toBeTruthy();
     expect(emitted.length).toBe(count);

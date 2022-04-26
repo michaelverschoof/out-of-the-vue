@@ -9,6 +9,7 @@ import { afterEach, beforeAll, expect, it, vi } from 'vitest';
  */
 
 const data = { name: 'test', value: 'foo' };
+const stringedData = JSON.stringify(data).replace(/"/g, '\'');
 
 vi.useFakeTimers();
 
@@ -26,9 +27,9 @@ it('should mount the component', async () => {
 });
 
 it('should trigger debounce', async () => {
-    const { wrapper } = mountComponent();
+    const { element, wrapper } = mountComponent();
 
-    await wrapper.find('div').trigger('click');
+    await element.trigger('debounce');
     expect(wrapper.emitted('updated')).toBeFalsy();
 
     vi.advanceTimersToNextTimer();
@@ -38,9 +39,9 @@ it('should trigger debounce', async () => {
 });
 
 it('should trigger debounce immediately without delay set', async () => {
-    const { wrapper } = mountComponent(0);
+    const { element, wrapper } = mountComponent(0);
 
-    await wrapper.find('div').trigger('click');
+    await element.trigger('debounce');
     const emits = emitted(wrapper, 'updated');
     expect(emits[0]).toEqual(data);
 });
@@ -49,7 +50,7 @@ function mountComponent(delay: number = 10): MountedComponent {
     const wrapper = mount(DebounceableInput, {
         slots: {
             default: `<template #default="{ debounce }">
-                        <div @click="debounce(${ JSON.stringify(data).replace(/"/g, '\'') })">Foo</div>
+                        <div @debounce="debounce(${ stringedData })">Foo</div>
                       </template>`
         },
         props: {
@@ -57,5 +58,7 @@ function mountComponent(delay: number = 10): MountedComponent {
         }
     });
 
-    return { wrapper };
+    const element = wrapper.find('div');
+
+    return { wrapper, element };
 }
