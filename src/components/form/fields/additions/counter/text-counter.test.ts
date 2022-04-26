@@ -1,7 +1,7 @@
 import TextCounter from '@/components/form/fields/additions/counter/text-counter.vue';
+import { MountedComponent } from '@test/types';
 import { DOMWrapper, mount } from '@vue/test-utils';
 import { beforeAll, describe, expect, it } from 'vitest';
-import { MountedComponent } from '../../../../../../test/types';
 
 /**
  * @vitest-environment happy-dom

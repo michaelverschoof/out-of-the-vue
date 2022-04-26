@@ -1,7 +1,7 @@
 import Counter from '@/components/form/fields/additions/counter/counter.vue';
+import { MountedComponent } from '@test/types';
 import { DOMWrapper, mount } from '@vue/test-utils';
 import { beforeAll, describe, expect, it } from 'vitest';
-import { MountedComponent } from '../../../../../../test/types';
 
 /**
  * @vitest-environment happy-dom

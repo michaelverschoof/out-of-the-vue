@@ -1,7 +1,7 @@
 import UserInput from '@/components/form/fields/base/user-input.vue';
+import { emitted } from '@test/emits';
 import { DOMWrapper, mount, VueWrapper } from '@vue/test-utils';
 import { beforeAll, describe, expect, it } from 'vitest';
-import { emitted } from '../../../../../test/emits';
 
 /**
  * @vitest-environment happy-dom

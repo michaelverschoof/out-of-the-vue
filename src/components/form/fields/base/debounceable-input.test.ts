@@ -1,8 +1,8 @@
 import DebounceableInput from '@/components/form/fields/base/debounceable-input.vue';
+import { emitted } from '@test/emits';
+import { MountedComponent } from '@test/types';
 import { mount } from '@vue/test-utils';
 import { afterEach, beforeAll, expect, it, vi } from 'vitest';
-import { emitted } from '../../../../../test/emits';
-import { MountedComponent } from '../../../../../test/types';
 
 /**
  * @vitest-environment happy-dom

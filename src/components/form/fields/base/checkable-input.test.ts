@@ -1,8 +1,8 @@
 import CheckableInput from '@/components/form/fields/base/checkable-input.vue';
 import { CheckableFieldData } from '@/composables/types';
+import { emitted } from '@test/emits';
 import { DOMWrapper, mount, VueWrapper } from '@vue/test-utils';
 import { beforeAll, describe, expect, it } from 'vitest';
-import { emitted } from '../../../../../test/emits';
 
 /**
  * @vitest-environment happy-dom

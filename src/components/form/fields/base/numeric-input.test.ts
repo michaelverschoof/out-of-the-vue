@@ -1,7 +1,7 @@
 import NumericInput from '@/components/form/fields/base/numeric-input.vue';
+import { emitted } from '@test/emits';
 import { DOMWrapper, mount, VueWrapper } from '@vue/test-utils';
 import { beforeAll, describe, expect, it } from 'vitest';
-import { emitted } from '../../../../../test/emits';
 
 /**
  * @vitest-environment happy-dom
