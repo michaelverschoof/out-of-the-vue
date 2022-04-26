@@ -25,7 +25,7 @@ describe('Mounting component', () => {
         expect(input.exists()).toBeTruthy();
 
         const emits = emitted(wrapper, 'created');
-        expect(emits[0][0]).toEqual({
+        expect(emits[0]).toEqual({
             name: numberProps.name,
             value: 123.45
         });
@@ -37,7 +37,7 @@ describe('Mounting component', () => {
         expect(input.exists()).toBeTruthy();
 
         const emits = emitted(wrapper, 'created');
-        expect(emits[0][0]).toEqual({
+        expect(emits[0]).toEqual({
             name: numberProps.name,
             value: null
         });
@@ -50,7 +50,7 @@ describe('Mounting component', () => {
         expect(input.element.attributes['inputmode']['value']).toBe('numeric');
 
         const emits = emitted(wrapper, 'created');
-        expect(emits[0][0]).toEqual({
+        expect(emits[0]).toEqual({
             name: numberProps.name,
             value: 123
         });
@@ -66,7 +66,7 @@ describe('Updating input', () => {
         expect(input.element.value).toBe('456.78');
 
         const emits = emitted(wrapper, 'updated');
-        expect(emits[0][0].value).toBe(456.78);
+        expect(emits[0].value).toBe(456.78);
     });
 
     it('should update value from input', async () => {
@@ -76,7 +76,7 @@ describe('Updating input', () => {
         expect(input.element.value).toBe('456.78');
 
         const emits = emitted(wrapper, 'updated');
-        expect(emits[0][0].value).toBe(456.78);
+        expect(emits[0].value).toBe(456.78);
     });
 
     it('should not update value from props if equal to current value', async () => {
@@ -89,10 +89,10 @@ describe('Updating input', () => {
         expect(input.element.value).toBe('456');
 
         const created = emitted(wrapper, 'created');
-        expect(created[0][0].value).toBe(123);
+        expect(created[0].value).toBe(123);
 
         const updated = emitted(wrapper, 'updated', 1);
-        expect(updated[0][0].value).toBe(456);
+        expect(updated[0].value).toBe(456);
     });
 
     it('should not update value from input if it is empty', async () => {
@@ -102,7 +102,7 @@ describe('Updating input', () => {
         expect(input.element.value).toBe('');
 
         const emits = emitted(wrapper, 'updated');
-        expect(emits[0][0].value).toBe(null);
+        expect(emits[0].value).toBe(null);
     });
 });
 

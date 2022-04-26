@@ -29,7 +29,7 @@ describe('Mounting components', () => {
         expect(wrapper.find('textarea').exists()).toBeFalsy();
 
         const emits = emitted(wrapper, 'created');
-        expect(emits[0][0]).toEqual({
+        expect(emits[0]).toEqual({
             name: props.name,
             value: props.value
         });
@@ -42,7 +42,7 @@ describe('Mounting components', () => {
         expect(wrapper.find('input').exists()).toBeFalsy();
 
         const emits = emitted(wrapper, 'created');
-        expect(emits[0][0]).toEqual({
+        expect(emits[0]).toEqual({
             name: props.name,
             value: props.value
         });
@@ -112,7 +112,7 @@ describe('Filtering input', () => {
         expect(input.element.value).toBe('foobar');
 
         const emits = emitted(wrapper, 'updated');
-        expect(emits[0][0].value).toBe('foobar');
+        expect(emits[0].value).toBe('foobar');
     });
 
     it('should not filter out characters if all matches', async () => {
@@ -122,7 +122,7 @@ describe('Filtering input', () => {
         expect(input.element.value).toBe('foo');
 
         const emits = emitted(wrapper, 'updated');
-        expect(emits[0][0].value).toBe('foo');
+        expect(emits[0].value).toBe('foo');
     });
 
     it('should filter out all characters if nothing matches', async () => {
@@ -132,7 +132,7 @@ describe('Filtering input', () => {
         expect(input.element.value).toBe('');
 
         const emits = emitted(wrapper, 'updated');
-        expect(emits[0][0].value).toBe('');
+        expect(emits[0].value).toBe('');
     });
 
     describe('When pasting values', () => {
@@ -144,7 +144,7 @@ describe('Filtering input', () => {
             expect(input.element.value).toBe('foobar');
 
             const emits = emitted(wrapper, 'updated');
-            expect(emits[0][0].value).toBe('foobar');
+            expect(emits[0].value).toBe('foobar');
         });
     });
 });
@@ -160,7 +160,7 @@ describe('Transforming input', () => {
             expect(input.element.value).toBe('FOOBAR');
 
             const emits = emitted(wrapper, 'updated');
-            expect(emits[0][0].value).toBe('FOOBAR');
+            expect(emits[0].value).toBe('FOOBAR');
         });
 
         it('should lowercase characters', async () => {
@@ -170,7 +170,7 @@ describe('Transforming input', () => {
             expect(input.element.value).toBe('foobar');
 
             const emits = emitted(wrapper, 'updated');
-            expect(emits[0][0].value).toBe('foobar');
+            expect(emits[0].value).toBe('foobar');
         });
 
         it('should not transform characters when no transform is provided', async () => {
@@ -180,7 +180,7 @@ describe('Transforming input', () => {
             expect(input.element.value).toBe('fooBAR');
 
             const emits = emitted(wrapper, 'updated');
-            expect(emits[0][0].value).toBe('fooBAR');
+            expect(emits[0].value).toBe('fooBAR');
         });
     });
 
@@ -193,7 +193,7 @@ describe('Transforming input', () => {
             expect(input.element.value).toBe('FOOBAR');
 
             const emits = emitted(wrapper, 'updated');
-            expect(emits[0][0].value).toBe('FOOBAR');
+            expect(emits[0].value).toBe('FOOBAR');
         });
     });
 });
@@ -207,7 +207,7 @@ describe('Updating input', () => {
         expect(input.element.value).toBe('something');
 
         const emits = emitted(wrapper, 'updated');
-        expect(emits[0][0].value).toBe('something');
+        expect(emits[0].value).toBe('something');
     });
 
     it('should not update value from props if equal to current value', async () => {
@@ -220,10 +220,10 @@ describe('Updating input', () => {
         expect(input.element.value).toBe('something');
 
         const created = emitted(wrapper, 'created');
-        expect(created[0][0].value).toBe('foo');
+        expect(created[0].value).toBe('foo');
 
         const updated = emitted(wrapper, 'updated', 1);
-        expect(updated[0][0].value).toBe('something');
+        expect(updated[0].value).toBe('something');
     });
 });
 

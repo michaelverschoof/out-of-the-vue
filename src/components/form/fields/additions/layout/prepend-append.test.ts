@@ -1,6 +1,7 @@
 import PrependAppend from '@/components/form/fields/additions/layout/prepend-append.vue';
-import { DOMWrapper, mount, VueWrapper } from '@vue/test-utils';
+import { DOMWrapper, mount } from '@vue/test-utils';
 import { beforeAll, describe, expect, it } from 'vitest';
+import { MountedComponent, ProvidedSlots } from '../../../../../../test/types';
 
 /**
  * @vitest-environment happy-dom
@@ -27,35 +28,35 @@ describe('Mounting component', () => {
 describe('Filling slots', () => {
 
     it('should have the prepend element', async () => {
-        const { wrapper } = mountComponent({ prepend: 'Bar' });
-        expect(wrapper.find('.prepend-append').exists()).toBeTruthy();
-        expect(wrapper.find('.prepend-append .prepend').exists()).toBeTruthy();
+        const { element } = mountComponent({ prepend: 'Bar' });
+
+        expect(element.exists()).toBeTruthy();
+        expect(element.find('.prepend').exists()).toBeTruthy();
     });
 
     it('should have the append element', async () => {
-        const { wrapper } = mountComponent({ append: 'Baz' });
-        expect(wrapper.find('.prepend-append').exists()).toBeTruthy();
-        expect(wrapper.find('.prepend-append .append').exists()).toBeTruthy();
+        const { element } = mountComponent({ append: 'Baz' });
+
+        expect(element.exists()).toBeTruthy();
+        expect(element.find('.append').exists()).toBeTruthy();
     });
 
     it('should have both elements', async () => {
-        const { wrapper } = mountComponent({ prepend: 'Bar', append: 'Baz' });
-        expect(wrapper.find('.prepend-append').exists()).toBeTruthy();
-        expect(wrapper.find('.prepend-append .prepend').exists()).toBeTruthy();
-        expect(wrapper.find('.prepend-append .append').exists()).toBeTruthy();
+        const { element } = mountComponent({ prepend: 'Bar', append: 'Baz' });
+        expect(element.exists()).toBeTruthy();
+        expect(element.find('.prepend').exists()).toBeTruthy();
+        expect(element.find('.append').exists()).toBeTruthy();
     });
 });
 
-type renderFunction = (type: symbol, props?: null, children?: string | number | boolean) => any;
-
-function mountComponent(slots?: { [name: string]: string | renderFunction }): { wrapper: VueWrapper<any>, prepend: DOMWrapper<HTMLSpanElement> } {
+function mountComponent(slots?: ProvidedSlots): MountedComponent {
     const defaultSlot = { default: 'Foo' };
 
     const wrapper = mount(PrependAppend, { slots: Object.assign(defaultSlot, slots) });
     if (!slots || !Object.keys(slots).some(name => [ 'prepend', 'append' ].includes(name))) {
-        return { wrapper, prepend: null };
+        return { wrapper, element: null };
     }
 
-    const prepend = wrapper.find('.prepend-append') as DOMWrapper<HTMLSpanElement>;
-    return { wrapper, prepend };
+    const element = wrapper.find('.prepend-append') as DOMWrapper<HTMLSpanElement>;
+    return { wrapper, element };
 }

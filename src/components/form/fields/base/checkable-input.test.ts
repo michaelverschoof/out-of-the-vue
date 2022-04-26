@@ -1,4 +1,5 @@
 import CheckableInput from '@/components/form/fields/base/checkable-input.vue';
+import { CheckableFieldData } from '@/composables/types';
 import { DOMWrapper, mount, VueWrapper } from '@vue/test-utils';
 import { beforeAll, describe, expect, it } from 'vitest';
 import { emitted } from '../../../../../test/emits';
@@ -26,14 +27,14 @@ describe('Mounting components', () => {
         const { wrapper } = mountRadio();
 
         const emits = emitted(wrapper, 'created');
-        expect(emits[0][0]).toEqual(props);
+        expect(emits[0]).toEqual(props);
     });
 
     it('should mount the checkbox component', async () => {
         const { wrapper } = mountCheckbox();
 
         const emits = emitted(wrapper, 'created');
-        expect(emits[0][0]).toEqual(props);
+        expect(emits[0]).toEqual(props);
     });
 });
 
@@ -45,8 +46,8 @@ describe('Ticking boxes', () => {
         await check(input);
         expect(input.element.checked).toBeTruthy();
 
-        const emits = emitted(wrapper, 'updated');
-        expect(emits[0][0].checked).toBeTruthy();
+        const emits = emitted(wrapper, 'updated') as CheckableFieldData[];
+        expect(emits[0].checked).toBeTruthy();
     });
 
     it('should deselect the radio component', async () => {
@@ -58,9 +59,9 @@ describe('Ticking boxes', () => {
         await uncheck(input);
         expect(input.element.checked).toBeFalsy();
 
-        const emits = emitted(wrapper, 'updated', 2);
-        expect(emits[0][0].checked).toBeTruthy();
-        expect(emits[1][0].checked).toBeFalsy();
+        const emits = emitted(wrapper, 'updated', 2) as CheckableFieldData[];
+        expect(emits[0].checked).toBeTruthy();
+        expect(emits[1].checked).toBeFalsy();
     });
 
     it('should reselect the radio component', async () => {
@@ -72,9 +73,9 @@ describe('Ticking boxes', () => {
         await check(input, false);
         expect(input.element.checked).toBeTruthy();
 
-        const emits = emitted(wrapper, 'updated', 2);
-        expect(emits[0][0].checked).toBeTruthy();
-        expect(emits[1][0].checked).toBeTruthy();
+        const emits = emitted(wrapper, 'updated', 2) as CheckableFieldData[];
+        expect(emits[0].checked).toBeTruthy();
+        expect(emits[1].checked).toBeTruthy();
     });
 
     it('should tick the checkbox component', async () => {
@@ -84,7 +85,7 @@ describe('Ticking boxes', () => {
         expect(input.element.checked).toBeTruthy();
 
         const emits = emitted(wrapper, 'updated');
-        expect(emits[0][0]).toEqual(Object.assign(props, { checked: true }));
+        expect(emits[0]).toEqual(Object.assign(props, { checked: true }));
     });
 
     it('should deselect the checkbox component', async () => {
@@ -96,9 +97,9 @@ describe('Ticking boxes', () => {
         await uncheck(input);
         expect(input.element.checked).toBeFalsy();
 
-        const emits = emitted(wrapper, 'updated', 2);
-        expect(emits[0][0].checked).toBeTruthy();
-        expect(emits[1][0].checked).toBeFalsy();
+        const emits = emitted(wrapper, 'updated', 2) as CheckableFieldData[];
+        expect(emits[0].checked).toBeTruthy();
+        expect(emits[1].checked).toBeFalsy();
     });
 
     it('should not reselect the checkbox component', async () => {
@@ -110,8 +111,8 @@ describe('Ticking boxes', () => {
         await check(input, false);
         expect(input.element.checked).toBeTruthy();
 
-        const emits = emitted(wrapper, 'updated');
-        expect(emits[0][0].checked).toBeTruthy();
+        const emits = emitted(wrapper, 'updated') as CheckableFieldData[];
+        expect(emits[0].checked).toBeTruthy();
     });
 });
 
