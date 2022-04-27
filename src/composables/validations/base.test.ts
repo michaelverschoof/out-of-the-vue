@@ -61,6 +61,10 @@ describe('Validate maximum length', () => {
         expect(maximum(data, length)).toBe(true);
     });
 
+    it('should validate if value is empty', () => {
+        expect(maximum(empty, 0)).toBe(true);
+    });
+
     it('should validate if amount is falsy', () => {
         expect(maximum(data, 0)).toBe(true);
         expect(maximum(empty, 0)).toBe(true);
@@ -72,6 +76,5 @@ describe('Validate maximum length', () => {
 
     it('should not validate if data is above the maximum', () => {
         expect(maximum(data, length - 1)).toBe(false);
-        expect(maximum(empty, 4)).toBe(false);
     });
 });

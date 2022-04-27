@@ -105,10 +105,6 @@ onUnmounted(() => {
         footer {
             flex-shrink: 0;
         }
-
-        main {
-            overflow-y: auto;
-        }
     }
 }
 

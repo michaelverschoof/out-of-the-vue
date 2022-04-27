@@ -20,7 +20,9 @@
 </template>
 
 <script lang="ts" setup>
-import { provided } from '@/util/slots';</script>
+import { provided } from '@/util/slots';
+//
+</script>
 
 <style lang="scss" scoped>
 .prepend-append {

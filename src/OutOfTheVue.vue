@@ -50,9 +50,9 @@
         </checkable-field>
     </div>
 
-    <modal :opened="0">
+    <modal>
         <template #opener="{ open }">
-            <button @click="open">open</button>
+            <button @click="open">open modal</button>
         </template>
 
         <template #header>
@@ -60,7 +60,7 @@
         </template>
 
         <template #default="{ close }">
-            <div style="height: 150vh; background: blue">
+            <div>
                 ff
             </div>
         </template>

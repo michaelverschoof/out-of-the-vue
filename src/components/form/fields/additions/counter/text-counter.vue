@@ -4,18 +4,12 @@
 
 <script lang="ts" setup>
 import Counter from '@/components/form/fields/additions/counter/counter.vue';
+import { OptionalProps, RequiredProps } from '@/components/props.types';
 import { computed } from 'vue';
 
 const props = defineProps({
-    limit: {
-        type: Number,
-        required: true
-    },
-    value: {
-        type: String,
-        required: false,
-        default: ''
-    },
+    limit: RequiredProps.number,
+    value: OptionalProps.string,
     tag: {
         type: String,
         required: false,

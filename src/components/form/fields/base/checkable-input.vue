@@ -41,7 +41,7 @@ const model = computed({
     get: () => state.checked,
     set: () => {
         state.checked = element.value.checked;
-        emit('updated', state);
+        emit('updated', { ...state });
     }
 });
 
@@ -50,8 +50,8 @@ const reselect = () => {
         return;
     }
 
-    emit('updated', state);
+    emit('updated', { ...state });
 };
 
-emit('created', state);
+emit('created', { ...state });
 </script>

@@ -20,7 +20,7 @@ export function required(data: FieldData, required: boolean = true): boolean {
  */
 export function minimum(data: FieldData, length: number): boolean {
     const value = getValue(data);
-    return !length || (!!value && value.length >= length);
+    return !length || value.length >= length;
 }
 
 /**
@@ -32,7 +32,7 @@ export function minimum(data: FieldData, length: number): boolean {
  */
 export function maximum(data: FieldData, length: number): boolean {
     const value = getValue(data);
-    return !length || (!!value && value.length <= length);
+    return !length || value.length <= length;
 }
 
 /**

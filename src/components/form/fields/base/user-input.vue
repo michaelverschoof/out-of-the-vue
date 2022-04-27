@@ -51,7 +51,7 @@ const model = computed({
     get: () => state.value,
     set: (value: string) => {
         state.value = value?.trim() ?? null;
-        emit('updated', state);
+        emit('updated', { ...state });
     }
 });
 
@@ -63,12 +63,8 @@ watch(() => props.value, (received: string): void => {
     model.value = filterAndTransform(received);
 });
 
-watch(() => props.focus, (received: boolean) => {
-    if (!element.value) {
-        return;
-    }
-
-    !received ? element.value.blur() : element.value.focus();
+watch(() => props.focus, (received: boolean): void => {
+    !received ? element.value?.blur() : element.value?.focus();
 });
 
 /**
@@ -128,7 +124,7 @@ onMounted(() => {
     element.value.focus();
 });
 
-emit('created', state);
+emit('created', { ...state });
 </script>
 
 <style lang="scss" scoped>
