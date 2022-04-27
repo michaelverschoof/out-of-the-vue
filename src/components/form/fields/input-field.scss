@@ -16,31 +16,11 @@ label.input-field {
         row-gap: 0.5em;
     }
 
-    main, fieldset {
+    main,
+    fieldset {
         &.input,
         & .input {
-            border: 1px solid #b9c4c8;
-            border-radius: .375em;
             height: 3.375em;
-            overflow: hidden;
-            transition: border-color, box-shadow;
-            transition-duration: 300ms;
-            transition-timing-function: ease;
-
-            &.invalid {
-                border-color: #e00505;
-            }
-
-            &.focused {
-                &:not(.invalid) {
-                    border-color: #41b883;
-                    box-shadow: 0 0 .25em .125em rgba(65, 184, 131, 0.25);
-                }
-
-                &.invalid {
-                    box-shadow: 0 0 .25em .125em rgba(224, 5, 5, 0.25);
-                }
-            }
         }
     }
 
@@ -48,11 +28,5 @@ label.input-field {
     :deep(strong.validation-error) {
         display: flex;
         justify-content: space-between;
-    }
-
-    :deep(strong.validation-error) {
-        color: #e00505;
-        font-style: italic;
-        font-weight: 400;
     }
 }
