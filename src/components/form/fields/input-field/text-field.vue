@@ -17,7 +17,7 @@
                                     <slot name="prepend" />
                                 </template>
 
-                                <user-input
+                                <text-input
                                     v-bind="filter($attrs, ['class'])"
                                     :name="name"
                                     :value="value"
@@ -53,7 +53,7 @@
 <script lang="ts" setup>
 import PrependAppend from '@/components/form/fields/additions/layout/prepend-append.vue';
 import DebounceableInput from '@/components/form/fields/base/debounceable-input.vue';
-import UserInput from '@/components/form/fields/base/user-input.vue';
+import TextInput from '@/components/form/fields/base/text-input.vue';
 import ValidatableInput from '@/components/form/fields/base/validatable-input.vue';
 import { OptionalProps, RequiredProps } from '@/components/props.types';
 import { UpdateEmitType, ValidatedFieldData, ValidationMethod } from '@/composables/types';

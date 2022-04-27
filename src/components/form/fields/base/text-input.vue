@@ -3,7 +3,7 @@
         :is="textarea ? 'textarea' : 'input'"
         :id="name"
         ref="element"
-        class="user-input"
+        class="text-input"
         :class="{ focused }"
         :name="name"
         :value="model"
@@ -128,7 +128,7 @@ emit('created', { ...state });
 </script>
 
 <style lang="scss" scoped>
-.user-input {
+.text-input {
     border: none;
     color: inherit;
     font-family: inherit;

@@ -1,5 +1,5 @@
 <template>
-    <user-input
+    <text-input
         :allowed-characters="regex"
         :inputmode="allowDecimals ? 'decimal' : 'numeric'"
         :name="name"
@@ -11,7 +11,7 @@
 </template>
 
 <script lang="ts" setup>
-import UserInput from '@/components/form/fields/base/user-input.vue';
+import TextInput from '@/components/form/fields/base/text-input.vue';
 import { OptionalProps, RequiredProps } from '@/components/props.types';
 import { NumberFieldData, StringFieldData, UpdateEmitType } from '@/composables/types';
 import { computed, reactive, ref, watch } from 'vue';
