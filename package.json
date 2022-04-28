@@ -1,20 +1,24 @@
 {
     "name": "out-of-the-vue",
     "author": "Michael Verschoof",
-    "version": "0.1.0-alpha",
-    "main": "./dist/out-of-the-vue-lib.umd.js",
-    "module": "./dist/out-of-the-vue-lib.es.js",
+    "version": "0.1.0-alpha.6",
+    "license": "MIT",
+    "files": [
+        "dist"
+    ],
+    "main": "./dist/out-of-the-vue.umd.js",
+    "module": "./dist/out-of-the-vue.es.js",
     "types": "./dist/types/index.d.ts",
     "exports": {
         ".": {
-            "import": "./dist/out-of-the-vue-lib.es.js",
-            "require": "./dist/out-of-the-vue-lib.umd.js"
-        }
+            "import": "./dist/out-of-the-vue.es.js",
+            "require": "./dist/out-of-the-vue.umd.js"
+        },
+        "./dist/style.css": "./dist/style.css"
     },
     "scripts": {
-        "build-lib": "vite build && vue-tsc --emitDeclarationOnly && mv dist/src dist/types",
         "serve": "vite",
-        "build": "vue-tsc --noEmit && vite build",
+        "build": "vite build && vue-tsc --emitDeclarationOnly --project tsconfig.build.json",
         "preview": "vite preview",
         "test": "vitest",
         "test-coverage": "vitest run --coverage"

@@ -22,7 +22,8 @@ export default defineConfig({
             output: {
                 globals: {
                     vue: 'Vue'
-                }
+                },
+                sourcemapExcludeSources: true
             }
         }
     },

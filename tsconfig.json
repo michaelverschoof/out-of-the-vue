@@ -3,6 +3,7 @@
         "baseUrl": ".",
         "outDir": "dist",
         "declaration": true,
+        "declarationDir": "dist/types",
         "module": "esnext",
         "moduleResolution": "node",
         "skipLibCheck": true,
@@ -15,9 +16,7 @@
             ]
         }
     },
-    "exclude": [
-        "**/*.test.ts",
-        "**/*.spec.ts",
-        "test"
+    "include": [
+        "src"
     ]
 }

@@ -1,7 +1,7 @@
-import { FocusEmitType, ModalEmitType, UpdateEmitType } from '@/composables/types';
+import { FocusEmitType, ModalEmitType, UpdateEmitType } from '../src/composables/types';
 
 /**
  * Types
  */
-export { FieldData, CheckableFieldData, NumberFieldData, StringFieldData, ValidatedFieldData, ValidationMethod } from '@/composables/types';
+export { FieldData, CheckableFieldData, NumberFieldData, StringFieldData, ValidatedFieldData, ValidationMethod } from '../src/composables/types';
 export type EmitType = UpdateEmitType | FocusEmitType | ModalEmitType;
