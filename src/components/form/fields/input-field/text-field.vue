@@ -18,7 +18,7 @@
                                 </template>
 
                                 <text-input
-                                    v-bind="filter($attrs, ['class'])"
+                                    v-bind="filter($attrs, ['class', 'onCreated', 'onUpdated'])"
                                     :name="name"
                                     :value="value"
                                     :allowed-characters="allowedCharacters"
@@ -89,12 +89,6 @@ const initialized = (data: ValidatedFieldData): void => {
 
 const debounced = (data: ValidatedFieldData): void => {
     emit('updated', data);
-};
-</script>
-
-<script lang="ts">
-export default {
-    inheritAttrs: false
 };
 </script>
 

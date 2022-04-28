@@ -18,7 +18,7 @@
                                 </template>
 
                                 <numeric-input
-                                    v-bind="filter($attrs, ['class'])"
+                                    v-bind="filter($attrs, ['class', 'onCreated', 'onUpdated'])"
                                     :name="name"
                                     :value="value"
                                     :allow-decimals="allowDecimals"

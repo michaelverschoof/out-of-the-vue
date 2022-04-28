@@ -2,7 +2,7 @@
     <slot v-bind="$attrs" :initialize="initialize" :validate="validate" :invalid="!state.valid" :showing="showing" :show-validity="showValidity" />
 
     <template v-if="!state.valid && showing" v-for="validation of validations">
-        <strong v-if="$slots[validation.name] && state.failed[0] === validation.name" class="validation-error">
+        <strong v-if="provided($slots[validation.name]) && state.failed[0] === validation.name" class="validation-error">
             <slot :name="validation.name" />
         </strong>
     </template>
@@ -12,6 +12,7 @@
 import { OptionalProps } from '@/components/props.types';
 import { FieldData, UpdateEmitType, ValidatedFieldData } from '@/composables/types';
 import { useUserInputValidation } from '@/composables/validate-user-input';
+import { provided } from '@/util/slots';
 import { reactive, ref } from 'vue';
 
 const emit = defineEmits<{ (event: UpdateEmitType, data: ValidatedFieldData): void; }>();

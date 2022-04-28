@@ -16,7 +16,7 @@ export const useUserInputDebouncing = () => {
 
         timer = setTimeout((() => {
             callback();
-        }) as TimerHandler, delay);
+        }) as TimerHandler, delay ?? DELAY);
     };
 
     return {
