@@ -1,5 +1,3 @@
-import { FocusEmitType, ModalEmitType, UpdateEmitType } from '@/composables/types';
-
 /**
  * Full components
  */
@@ -18,7 +16,6 @@ export { default as NumericInput } from '@/components/form/fields/base/numeric-i
 export { default as DebounceableInput } from '@/components/form/fields/base/debounceable-input.vue';
 export { default as ValidatableInput } from '@/components/form/fields/base/validatable-input.vue';
 
-
 /**
  * Base component additions
  */
@@ -27,15 +24,8 @@ export { default as TextCounter } from '@/components/form/fields/additions/count
 export { default as PrependAppend } from '@/components/form/fields/additions/layout/prepend-append.vue';
 
 /**
- * Types
- */
-export { FieldData, CheckableFieldData, NumberFieldData, StringFieldData, ValidatedFieldData, ValidationMethod } from '@/composables/types';
-export type EmitType = UpdateEmitType | FocusEmitType | ModalEmitType;
-
-/**
  * Composables
  */
 export { useUserInputDebouncing } from '@/composables/debounce-user-input';
 export { useUserInput } from '@/composables/user-input';
 export { predefinedValidations, useUserInputValidation } from '@/composables/validate-user-input';
-
