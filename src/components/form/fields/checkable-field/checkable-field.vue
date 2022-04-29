@@ -13,22 +13,22 @@
 
                         <label
                             class="checkable-field-item"
-                            :class="{ selected: selectedItems.has(key), disabled: disabled.includes(key) }"
+                            :class="{ selected: state.value.includes(key), disabled: disabled.includes(key) }"
                         >
                             <checkable-input
                                 :class="{ hidden: hideInput }"
                                 :name="`checkable-input-${ name }`"
                                 :value="key"
                                 :type="type"
-                                :checked="selected.includes(key)"
+                                :checked="state.value.includes(key)"
                                 :disabled="disabled.includes(key)"
                                 tabindex="0"
-                                @created="(data) => { updated(data); initialize(state); }"
+                                @created="(data) => { created(data); initialize(state); }"
                                 @updated="(data) => { updated(data); validate(state); }"
                             />
 
                             <span class="content">
-                                <slot :name="key" />
+                                <slot :name="key" :selected="state.value.includes(key)" />
                             </span>
                         </label>
 
@@ -98,13 +98,20 @@ const state = reactive<ValidatedFieldData>({
     failed: []
 });
 
+const created = (data: CheckableFieldData): void => {
+    if (props.type === 'radio' && !data.checked) {
+        return;
+    }
+
+    updated(data);
+};
+
 const updated = (data: CheckableFieldData): void => {
     if (props.type === 'radio') {
         selectedItems.value.clear();
     }
 
     data.checked ? selectedItems.value.add(data.value) : selectedItems.value.delete(data.value);
-
     state.value = Array.from(selectedItems.value);
 };
 
@@ -139,12 +146,11 @@ const fieldBlurred = (showValidity: () => void) => {
 
 .checkable-field-item {
     align-items: center;
-    border-radius: 0.375em;
+    border-radius: 0.5em;
     cursor: pointer;
     display: flex;
-    column-gap: 0.5em;
+    column-gap: 1em;
     min-height: 3.375em;
-    padding: 0.5em 1em;
 
     &.disabled {
         cursor: not-allowed;
