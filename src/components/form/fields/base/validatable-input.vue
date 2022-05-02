@@ -13,17 +13,41 @@ import { OptionalProps } from '@/components/props.types';
 import { FieldData, UpdateEmitType, ValidatedFieldData } from '@/composables/types';
 import { useUserInputValidation } from '@/composables/validate-user-input';
 import { provided } from '@/util/slots';
-import { reactive, ref } from 'vue';
+import { reactive, ref, watch } from 'vue';
 
 const emit = defineEmits<{ (event: UpdateEmitType, data: ValidatedFieldData): void; }>();
 
-const props = defineProps({ validations: OptionalProps.validations });
+const props = defineProps({
+    validations: OptionalProps.validations,
+    triggerValidation: OptionalProps.string
+});
 
 const state = reactive<ValidatedFieldData>({
     name: null,
     value: null,
     valid: !props.validations || !props.validations.length,
     failed: []
+});
+
+const triggeredValidation = ref(null);
+watch(() => props.triggerValidation, (received: string) => {
+    if (!received) {
+        state.failed = state.failed.filter(item => item !== triggeredValidation.value);
+        state.valid = !!state.failed.length;
+        showing.value = !state.valid;
+        return;
+    }
+
+    const validation = props.validations.find(validation => validation.name === received);
+    if (!validation) {
+        return;
+    }
+
+    state.valid = false;
+    showing.value = true;
+    if (!state.failed.includes(received)) {
+        state.failed.push(received);
+    }
 });
 
 const showing = ref(false);

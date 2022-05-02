@@ -214,6 +214,41 @@ describe('Show validity', () => {
     });
 });
 
+describe('Triggering validation externally', () => {
+
+    it('should show error', async () => {
+        const { wrapper } = mountComponent(null, validations);
+
+        await wrapper.setProps({ triggerValidation: 'required' });
+
+        expect(wrapper.find('strong.validation-error').exists()).toBeTruthy();
+        expect(wrapper.find('strong.validation-error').text()).toBe('required error');
+
+        expect(wrapper.emitted('updated')).toBeFalsy();
+    });
+
+    it('should hide error', async () => {
+        const { wrapper } = mountComponent(null, validations);
+
+        await wrapper.setProps({ triggerValidation: 'required' });
+
+        expect(wrapper.find('strong.validation-error').exists()).toBeTruthy();
+        expect(wrapper.find('strong.validation-error').text()).toBe('required error');
+
+        await wrapper.setProps({ triggerValidation: null });
+
+        expect(wrapper.find('strong.validation-error').exists()).toBeFalsy();
+    });
+
+    it('should return if no existing validation is provided', async () => {
+        const { wrapper } = mountComponent(null, validations);
+
+        await wrapper.setProps({ triggerValidation: 'foo' });
+
+        expect(wrapper.find('strong.validation-error').exists()).toBeFalsy();
+    });
+});
+
 function mountComponent(value?: string, validations?: ValidationMethod[]): MountedComponent {
     const testData = !!value || value === '' ? Object.assign({}, data, { value: value }) : data;
     const stringedData = JSON.stringify(testData).replace(/"/g, '\'');
@@ -228,8 +263,8 @@ function mountComponent(value?: string, validations?: ValidationMethod[]): Mount
                         >Foo</div>
                       </template>`,
             required: 'required error',
-            'min': 'min error',
-            'max': 'max error'
+            min: 'min error',
+            max: 'max error'
         },
         props: {
             validations: validations

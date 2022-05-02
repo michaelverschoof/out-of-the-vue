@@ -4,7 +4,7 @@
         <debounceable-input :delay="typingDelay" @updated="debounced">
             <template #default="{ debounce }">
 
-                <validatable-input :validations="validationMethods" @created="initialized" @updated="debounce">
+                <validatable-input :validations="validationMethods" :trigger-validation="triggerValidation" @created="initialized" @updated="debounce">
                     <template #default="{ validate, invalid, showing, showValidity }">
 
                         <header v-if="$slots.label" class="label">
@@ -71,7 +71,8 @@ const props = defineProps({
     required: OptionalProps.booleanFalse,
     min: OptionalProps.number,
     max: OptionalProps.number,
-    validations: OptionalProps.validations
+    validations: OptionalProps.validations,
+    triggerValidation: OptionalProps.string
 });
 
 const focused = ref(false);

@@ -1,7 +1,7 @@
 <template>
     <fieldset class="checkable-field input-field">
 
-        <validatable-input :validations="validationMethods" @created="initialized" @updated="validated">
+        <validatable-input :validations="validationMethods" :trigger-validation="triggerValidation" @created="initialized" @updated="validated">
             <template #default="{ initialize, validate, invalid, showing, showValidity }">
 
                 <header v-if="$slots.label" class="label">
@@ -68,6 +68,7 @@ const props = defineProps({
     min: OptionalProps.number,
     max: OptionalProps.number,
     validations: OptionalProps.validations,
+    triggerValidation: OptionalProps.string,
     hideInput: OptionalProps.booleanFalse,
     type: {
         type: String as () => 'radio' | 'checkbox',
@@ -132,7 +133,7 @@ const validated = (data: ValidatedFieldData): void => {
 const main = ref<HTMLElement>(null);
 const fieldBlurred = (showValidity: () => void) => {
     requestAnimationFrame(() => {
-        if (main.value.contains(document.activeElement)) {
+        if (!main.value || main.value.contains(document.activeElement)) {
             return;
         }
 
@@ -146,7 +147,6 @@ const fieldBlurred = (showValidity: () => void) => {
 
 .checkable-field-item {
     align-items: center;
-    border-radius: 0.5em;
     cursor: pointer;
     display: flex;
     column-gap: 1em;
