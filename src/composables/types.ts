@@ -10,6 +10,11 @@ export type FocusEmitType = 'focused' | 'blurred';
 export type ModalEmitType = 'opened' | 'closed';
 
 /**
+ * Provide / inject Symbols
+ */
+export const SubmittedSymbol = Symbol();
+
+/**
  * Field state emitted from all inputs
  */
 export interface FieldData {

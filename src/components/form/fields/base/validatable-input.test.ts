@@ -1,10 +1,11 @@
 import ValidatableInput from '@/components/form/fields/base/validatable-input.vue';
-import { ValidationMethod } from '@/composables/types';
+import { SubmittedSymbol, ValidationMethod } from '@/composables/types';
 import { predefinedValidations } from '@/composables/validate-user-input';
 import { emitted } from '@test/emits';
 import { MountedComponent } from '@test/types';
-import { mount } from '@vue/test-utils';
-import { beforeAll, describe, expect, it } from 'vitest';
+import { mount, MountingOptions } from '@vue/test-utils';
+import { afterEach, beforeAll, describe, expect, it } from 'vitest';
+import { ref } from 'vue';
 
 /**
  * @vitest-environment happy-dom
@@ -17,6 +18,8 @@ const validations = [
     { ...predefinedValidations['min-length'], parameters: [ 2 ] },
     { ...predefinedValidations['max-length'], parameters: [ 5 ] }
 ];
+
+let provided = ref(false);
 
 beforeAll(() => {
     expect(ValidatableInput).toBeTruthy();
@@ -216,44 +219,88 @@ describe('Show validity', () => {
 
 describe('Triggering validation externally', () => {
 
-    it('should show error', async () => {
-        const { wrapper } = mountComponent(null, validations);
+    describe('Triggering validation by prop', () => {
 
-        await wrapper.setProps({ triggerValidation: 'required' });
+        it('should show error', async () => {
+            const { wrapper } = mountComponent(null, validations);
 
-        expect(wrapper.find('strong.validation-error').exists()).toBeTruthy();
-        expect(wrapper.find('strong.validation-error').text()).toBe('required error');
+            await wrapper.setProps({ triggerValidation: 'required' });
 
-        expect(wrapper.emitted('updated')).toBeFalsy();
+            expect(wrapper.find('strong.validation-error').exists()).toBeTruthy();
+            expect(wrapper.find('strong.validation-error').text()).toBe('required error');
+
+            expect(wrapper.emitted('updated')).toBeFalsy();
+        });
+
+        it('should hide error', async () => {
+            const { wrapper } = mountComponent(null, validations);
+
+            await wrapper.setProps({ triggerValidation: 'required' });
+
+            expect(wrapper.find('strong.validation-error').exists()).toBeTruthy();
+            expect(wrapper.find('strong.validation-error').text()).toBe('required error');
+
+            await wrapper.setProps({ triggerValidation: null });
+
+            expect(wrapper.find('strong.validation-error').exists()).toBeFalsy();
+        });
+
+        it('should return if no existing validation is provided', async () => {
+            const { wrapper } = mountComponent(null, validations);
+
+            await wrapper.setProps({ triggerValidation: 'foo' });
+
+            expect(wrapper.find('strong.validation-error').exists()).toBeFalsy();
+        });
     });
 
-    it('should hide error', async () => {
-        const { wrapper } = mountComponent(null, validations);
+    describe('Triggering validation by provide', () => {
 
-        await wrapper.setProps({ triggerValidation: 'required' });
+        afterEach(() => {
+            provided.value = false;
+        });
 
-        expect(wrapper.find('strong.validation-error').exists()).toBeTruthy();
-        expect(wrapper.find('strong.validation-error').text()).toBe('required error');
+        it('should show error', async () => {
+            const { wrapper } = mountComponent(null, validations, true);
+            expect(wrapper.find('strong.validation-error').exists()).toBeFalsy();
 
-        await wrapper.setProps({ triggerValidation: null });
+            provided.value = true;
+            await wrapper.vm.$nextTick();
 
-        expect(wrapper.find('strong.validation-error').exists()).toBeFalsy();
-    });
+            expect(wrapper.find('strong.validation-error').exists()).toBeTruthy();
+            expect(wrapper.find('strong.validation-error').text()).toBe('required error');
+        });
 
-    it('should return if no existing validation is provided', async () => {
-        const { wrapper } = mountComponent(null, validations);
+        it('should hide error', async () => {
+            const { wrapper } = mountComponent(null, validations, true);
 
-        await wrapper.setProps({ triggerValidation: 'foo' });
+            provided.value = true;
+            await wrapper.vm.$nextTick();
 
-        expect(wrapper.find('strong.validation-error').exists()).toBeFalsy();
+            expect(wrapper.find('strong.validation-error').exists()).toBeTruthy();
+
+            provided.value = false;
+            await wrapper.vm.$nextTick();
+
+            expect(wrapper.find('strong.validation-error').exists()).toBeFalsy();
+        });
+
+        it('should return if no value is provided', async () => {
+            const { wrapper } = mountComponent(null, validations);
+
+            provided.value = true;
+            await wrapper.vm.$nextTick();
+
+            expect(wrapper.find('strong.validation-error').exists()).toBeFalsy();
+        });
     });
 });
 
-function mountComponent(value?: string, validations?: ValidationMethod[]): MountedComponent {
+function mountComponent(value?: string, validations?: ValidationMethod[], enableProvide?: boolean): MountedComponent {
     const testData = !!value || value === '' ? Object.assign({}, data, { value: value }) : data;
     const stringedData = JSON.stringify(testData).replace(/"/g, '\'');
 
-    const wrapper = mount(ValidatableInput, {
+    const options: MountingOptions<any> = {
         slots: {
             default: `<template #default="{ initialize, validate, invalid, showing, showValidity }">
                         <div :class="{ invalid, showing }"
@@ -269,7 +316,17 @@ function mountComponent(value?: string, validations?: ValidationMethod[]): Mount
         props: {
             validations: validations
         }
-    });
+    };
+
+    if (enableProvide) {
+        options.global = {
+            provide: {
+                [SubmittedSymbol]: provided
+            }
+        };
+    }
+
+    const wrapper = mount(ValidatableInput, options);
 
     const element = wrapper.find('div');
 

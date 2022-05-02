@@ -10,10 +10,10 @@
 
 <script lang="ts" setup>
 import { OptionalProps } from '@/components/props.types';
-import { FieldData, UpdateEmitType, ValidatedFieldData } from '@/composables/types';
+import { FieldData, SubmittedSymbol, UpdateEmitType, ValidatedFieldData } from '@/composables/types';
 import { useUserInputValidation } from '@/composables/validate-user-input';
 import { provided } from '@/util/slots';
-import { reactive, ref, watch } from 'vue';
+import { inject, reactive, ref, watch } from 'vue';
 
 const emit = defineEmits<{ (event: UpdateEmitType, data: ValidatedFieldData): void; }>();
 
@@ -29,7 +29,23 @@ const state = reactive<ValidatedFieldData>({
     failed: []
 });
 
+const triggeredSubmitValidation = inject(SubmittedSymbol, ref(false));
+
+watch(triggeredSubmitValidation, () => {
+    if (!triggeredSubmitValidation.value) {
+        showing.value = false;
+        return;
+    }
+
+    const failedValidations = validateInput(state, props.validations);
+    state.valid = !failedValidations.length;
+    state.failed = failedValidations;
+
+    showing.value = true;
+});
+
 const triggeredValidation = ref(null);
+
 watch(() => props.triggerValidation, (received: string) => {
     if (!received) {
         state.failed = state.failed.filter(item => item !== triggeredValidation.value);
