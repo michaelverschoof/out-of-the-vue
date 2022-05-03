@@ -56,7 +56,7 @@ import { OptionalProps, RequiredProps } from '@/components/props.types';
 import { CheckableFieldData, UpdateEmitType, ValidatedFieldData, ValidationMethod } from '@/composables/types';
 import { predefinedValidations } from '@/composables/validate-user-input';
 import { filter } from '@/util/slots';
-import { reactive, ref, useSlots } from 'vue';
+import { reactive, ref, useSlots, watch } from 'vue';
 
 const emit = defineEmits<{ (event: UpdateEmitType, data: ValidatedFieldData): void; }>();
 
@@ -97,6 +97,11 @@ const state = reactive<ValidatedFieldData>({
     value: Array.from(selectedItems.value),
     valid: !props.required,
     failed: []
+});
+
+watch(() => props.selected, (received: string[]) => {
+    selectedItems.value = new Set(received || []);
+    state.value = Array.from(selectedItems.value);
 });
 
 const created = (data: CheckableFieldData): void => {
