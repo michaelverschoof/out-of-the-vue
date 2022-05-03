@@ -1,5 +1,15 @@
 <template>
     <div>
+        <text-field name="fff" required @updated="onUpdated" :trigger-validation="trigger">
+            <template #label>test</template>
+
+            <template #append>test</template>
+        </text-field>
+    </div>
+
+    <button @click="toggle">trigger</button>
+
+    <div>
         <one-time-code-field name="myOneTimeCode" required @updated="onUpdated">
             <template #label>
                 Some field label
@@ -34,16 +44,16 @@
     </div>
 
     <div>
-        <checkable-field name="test" type="checkbox" required :min="2" :max="2">
+        <checkable-field name="test" type="checkbox" required :min="2" :max="2" :selected="['ddd']">
             <template #label>
                 Some field label
             </template>
             <template #information>
                 Some info
             </template>
-            <template #ddd>ddd</template>
-            <template #eee>eee</template>
-            <template #fff>fff</template>
+            <template #ddd>ddddd</template>
+            <template #eee>eeeee</template>
+            <template #fff>fffff</template>
             <template #required>This field is required</template>
             <template #min>Not enough</template>
             <template #max>Too many</template>
@@ -75,13 +85,30 @@
 import CheckableField from '@/components/form/fields/checkable-field/checkable-field.vue';
 import NumberField from '@/components/form/fields/input-field/number-field.vue';
 import OneTimeCodeField from '@/components/form/fields/input-field/one-time-code-field.vue';
+import TextField from '@/components/form/fields/input-field/text-field.vue';
 import Modal from '@/components/modal.vue';
-import { ValidatedFieldData } from '@/composables/types';
-import { reactive } from 'vue';
+import { SubmittedSymbol, ValidatedFieldData } from '@/composables/types';
+import { provide, reactive, ref } from 'vue';
+
+const test = ref(false);
+provide(SubmittedSymbol, test);
+
+const trigger = ref(null);
+const toggle = () => {
+    test.value = !test.value;
+
+    // if (!trigger.value) {
+    //     trigger.value = 'required';
+    //     return;
+    // }
+    //
+    // trigger.value = null;
+};
 
 const field = reactive([] as ValidatedFieldData[]);
 
 const onUpdated = (data: ValidatedFieldData): void => {
+    console.log(data);
     field[data.name] = data;
 };
 </script>

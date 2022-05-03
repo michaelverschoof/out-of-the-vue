@@ -50,6 +50,26 @@ describe('Ticking boxes', () => {
         expect(emits[0].checked).toBeTruthy();
     });
 
+    it('should tick the radio component on load', async () => {
+        const { input, wrapper } = mountRadio(true);
+
+        expect(input.element.checked).toBeTruthy();
+
+        const emits = emitted(wrapper, 'created') as CheckableFieldData[];
+        expect(emits[0].checked).toBeTruthy();
+    });
+
+    it('should tick the radio component on prop update', async () => {
+        const { input, wrapper } = mountRadio();
+
+        await wrapper.setProps({ checked: true });
+
+        expect(input.element.checked).toBeTruthy();
+
+        const emits = emitted(wrapper, 'updated') as CheckableFieldData[];
+        expect(emits[0].checked).toBeTruthy();
+    });
+
     it('should deselect the radio component', async () => {
         const { input, wrapper } = mountRadio();
 
@@ -86,6 +106,26 @@ describe('Ticking boxes', () => {
 
         const emits = emitted(wrapper, 'updated');
         expect(emits[0]).toEqual(Object.assign(props, { checked: true }));
+    });
+
+    it('should tick the checkbox component on load', async () => {
+        const { input, wrapper } = mountCheckbox(true);
+
+        expect(input.element.checked).toBeTruthy();
+
+        const emits = emitted(wrapper, 'created') as CheckableFieldData[];
+        expect(emits[0].checked).toBeTruthy();
+    });
+
+    it('should tick the checkbox component on prop update', async () => {
+        const { input, wrapper } = mountCheckbox();
+
+        await wrapper.setProps({ checked: true });
+
+        expect(input.element.checked).toBeTruthy();
+
+        const emits = emitted(wrapper, 'updated') as CheckableFieldData[];
+        expect(emits[0].checked).toBeTruthy();
     });
 
     it('should deselect the checkbox component', async () => {
@@ -126,9 +166,11 @@ function uncheck(input: DOMWrapper<Element>): Promise<void> {
     return input.trigger('change');
 }
 
-function mountCheckbox(): { wrapper: VueWrapper<any>, input: DOMWrapper<HTMLInputElement> } {
+function mountCheckbox(checked?: boolean): { wrapper: VueWrapper<any>, input: DOMWrapper<HTMLInputElement> } {
+    const props = !checked ? checkboxProps : Object.assign({}, checkboxProps, { checked: true });
+
     const wrapper = mount(CheckableInput, {
-        props: checkboxProps
+        props: props
     });
 
     const input = wrapper.find('input');
@@ -137,9 +179,11 @@ function mountCheckbox(): { wrapper: VueWrapper<any>, input: DOMWrapper<HTMLInpu
     return { wrapper, input };
 }
 
-function mountRadio(): { wrapper: VueWrapper<any>, input: DOMWrapper<HTMLInputElement> } {
+function mountRadio(checked?: boolean): { wrapper: VueWrapper<any>, input: DOMWrapper<HTMLInputElement> } {
+    const props = !checked ? radioProps : Object.assign({}, radioProps, { checked: true });
+
     const wrapper = mount(CheckableInput, {
-        props: radioProps
+        props: props
     });
 
     const input = wrapper.find('input');
