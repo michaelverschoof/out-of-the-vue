@@ -9,11 +9,11 @@
                 </header>
 
                 <main ref="main" tabindex="-1" @blur.capture="fieldBlurred(showValidity)">
-                    <template v-for="(item, key) of options" :key="key">
+                    <template v-for="(item, key) of $slots" :key="key">
 
-                        <label
-                            class="checkable-field-item"
-                            :class="{ selected: state.value.includes(key), disabled: disabled.includes(key) }"
+                        <label v-if="!nonOptionSlots.includes(key)"
+                               :class="{ selected: state.value.includes(key), disabled: disabled.includes(key) }"
+                               class="checkable-field-item"
                         >
                             <checkable-input
                                 :class="{ hidden: hideInput }"
@@ -55,8 +55,7 @@ import ValidatableInput from '@/components/form/fields/base/validatable-input.vu
 import { OptionalProps, RequiredProps } from '@/components/props.types';
 import { CheckableFieldData, UpdateEmitType, ValidatedFieldData, ValidationMethod } from '@/composables/types';
 import { predefinedValidations } from '@/composables/validate-user-input';
-import { filter } from '@/util/slots';
-import { reactive, ref, useSlots, watch } from 'vue';
+import { reactive, ref, watch } from 'vue';
 
 const emit = defineEmits<{ (event: UpdateEmitType, data: ValidatedFieldData): void; }>();
 
@@ -87,8 +86,6 @@ if (props.type !== 'radio') {
         { ...predefinedValidations['max-array'], parameters: [ props.max ] }
     );
 }
-
-const options = filter(useSlots(), [ 'label', 'information', ...validationMethods.map(method => method.name) ]);
 
 const selectedItems = ref<Set<string>>(new Set(props.selected));
 
@@ -145,6 +142,8 @@ const fieldBlurred = (showValidity: () => void) => {
         showValidity();
     });
 };
+
+const nonOptionSlots = [ 'label', 'information', ...validationMethods.map(method => method.name) ];
 </script>
 
 <style lang="scss" scoped>

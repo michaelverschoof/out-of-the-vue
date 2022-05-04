@@ -1,13 +1,11 @@
 <template>
     <div>
-        <text-field name="fff" required @updated="onUpdated" :trigger-validation="trigger">
+        <text-field name="fff" foo="bar" required @updated="onUpdated" class="ff">
             <template #label>test</template>
 
             <template #append>test</template>
         </text-field>
     </div>
-
-    <button @click="toggle">trigger</button>
 
     <div>
         <one-time-code-field name="myOneTimeCode" required @updated="onUpdated">
@@ -43,17 +41,20 @@
         </number-field>
     </div>
 
+    <button @click="toggle">trigger</button>
     <div>
-        <checkable-field name="test" type="checkbox" required :min="2" :max="2" :selected="['ddd']">
+        <checkable-field name="test" type="checkbox" class="foo" required :min="2" :max="2" :selected="['ddd']">
             <template #label>
                 Some field label
             </template>
             <template #information>
                 Some info
             </template>
-            <template #ddd>ddddd</template>
-            <template #eee>eeeee</template>
-            <template #fff>fffff</template>
+
+            <template v-for="item of items" #[item]>
+                {{ item }}
+            </template>
+
             <template #required>This field is required</template>
             <template #min>Not enough</template>
             <template #max>Too many</template>
@@ -93,9 +94,16 @@ import { provide, reactive, ref } from 'vue';
 const test = ref(false);
 provide(SubmittedSymbol, test);
 
-const trigger = ref(null);
+const items = ref([ 'ddd', 'eee', 'fff', 'ggg', 'hhh' ]);
+const trigger = ref(false);
 const toggle = () => {
-    test.value = !test.value;
+    if (!trigger) {
+        items.value = [ 'ddd', 'eee', 'fff', 'ggg', 'hhh' ];
+        return;
+    }
+
+    items.value = [ 'ddd', 'eee', 'fff' ];
+    // test.value = !test.value;
 
     // if (!trigger.value) {
     //     trigger.value = 'required';

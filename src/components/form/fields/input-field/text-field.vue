@@ -1,5 +1,5 @@
 <template>
-    <label class="text-field input-field" :class="$attrs.class">
+    <label class="text-field input-field" v-bind="include($attrs, ['class'])">
 
         <debounceable-input :delay="typingDelay" @updated="debounced">
             <template #default="{ debounce }">
@@ -18,7 +18,7 @@
                                 </template>
 
                                 <text-input
-                                    v-bind="filter($attrs, ['class', 'onCreated', 'onUpdated'])"
+                                    v-bind="exclude($attrs, ['class', 'onCreated', 'onUpdated'])"
                                     :name="name"
                                     :value="value"
                                     :allowed-characters="allowedCharacters"
@@ -58,7 +58,7 @@ import ValidatableInput from '@/components/form/fields/base/validatable-input.vu
 import { OptionalProps, RequiredProps } from '@/components/props.types';
 import { UpdateEmitType, ValidatedFieldData, ValidationMethod } from '@/composables/types';
 import { predefinedValidations } from '@/composables/validate-user-input';
-import { filter } from '@/util/attrs';
+import { exclude, include } from '@/util/attrs';
 import { ref } from 'vue';
 
 const emit = defineEmits<{ (event: UpdateEmitType, data: ValidatedFieldData): void; }>();
@@ -90,6 +90,12 @@ const initialized = (data: ValidatedFieldData): void => {
 
 const debounced = (data: ValidatedFieldData): void => {
     emit('updated', data);
+};
+</script>
+
+<script lang="ts">
+export default {
+    inheritAttrs: false
 };
 </script>
 
