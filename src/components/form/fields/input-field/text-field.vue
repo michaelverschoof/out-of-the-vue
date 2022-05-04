@@ -5,7 +5,7 @@
             <template #default="{ debounce }">
 
                 <validatable-input :validations="validationMethods" :trigger-validation="triggerValidation" @created="initialized" @updated="debounce">
-                    <template #default="{ validate, invalid, showing, showValidity }">
+                    <template #default="{ initialize, validate, invalid, showing, showValidity }">
 
                         <header v-if="$slots.label" class="label">
                             <slot name="label" />
@@ -24,8 +24,8 @@
                                     :allowed-characters="allowedCharacters"
                                     @focused="focused = true"
                                     @blurred="focused = false; showValidity();"
+                                    @created="initialize"
                                     @updated="validate"
-                                    @created="validate"
                                 />
 
                                 <template #append>
