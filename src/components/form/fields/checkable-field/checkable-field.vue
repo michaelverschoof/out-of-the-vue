@@ -55,7 +55,7 @@ import ValidatableInput from '@/components/form/fields/base/validatable-input.vu
 import { OptionalProps, RequiredProps } from '@/components/props.types';
 import { CheckableFieldData, UpdateEmitType, ValidatedFieldData, ValidationMethod } from '@/composables/types';
 import { predefinedValidations } from '@/composables/validate-user-input';
-import { reactive, ref, watch } from 'vue';
+import { onMounted, reactive, ref, watch } from 'vue';
 
 const emit = defineEmits<{ (event: UpdateEmitType, data: ValidatedFieldData): void; }>();
 
@@ -87,6 +87,8 @@ if (props.type !== 'radio') {
     );
 }
 
+const nonOptionSlots = [ 'label', 'information', ...validationMethods.map(method => method.name) ];
+
 const selectedItems = ref<Set<string>>(new Set(props.selected));
 
 const state = reactive<ValidatedFieldData>({
@@ -97,6 +99,10 @@ const state = reactive<ValidatedFieldData>({
 });
 
 watch(() => props.selected, (received: string[]) => {
+    if (received === state.value) {
+        return;
+    }
+
     selectedItems.value = new Set(received || []);
     state.value = Array.from(selectedItems.value);
 });
@@ -110,7 +116,7 @@ const created = (data: CheckableFieldData): void => {
 };
 
 const updated = (data: CheckableFieldData): void => {
-    if (props.type === 'radio') {
+    if (props.type === 'radio' && data.checked) {
         selectedItems.value.clear();
     }
 
@@ -121,8 +127,6 @@ const updated = (data: CheckableFieldData): void => {
 const initialized = (data: ValidatedFieldData): void => {
     state.valid = data.valid;
     state.failed = data.failed;
-
-    emit('created', state);
 };
 
 const validated = (data: ValidatedFieldData): void => {
@@ -143,7 +147,9 @@ const fieldBlurred = (showValidity: () => void) => {
     });
 };
 
-const nonOptionSlots = [ 'label', 'information', ...validationMethods.map(method => method.name) ];
+onMounted(() => {
+    emit('created', state);
+});
 </script>
 
 <style lang="scss" scoped>

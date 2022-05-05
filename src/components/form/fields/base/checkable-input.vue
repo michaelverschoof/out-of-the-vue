@@ -6,7 +6,7 @@
         :type="type"
         :id="`${name}-${value}`"
         :name="name"
-        :checked="state.checked"
+        :checked="checked"
         v-model="model"
         @click="reselect"
     />
@@ -46,8 +46,7 @@ const model = computed({
 });
 
 watch(() => props.checked, (received: boolean) => {
-    element.value.checked = received;
-    model.value = received;
+    state.checked = received;
 });
 
 const reselect = () => {
