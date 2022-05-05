@@ -89,7 +89,7 @@ if (props.type !== 'radio') {
 
 const nonOptionSlots = [ 'label', 'information', ...validationMethods.map(method => method.name) ];
 
-const selectedItems = ref<Set<string>>(new Set(props.selected));
+const selectedItems = ref<Set<string>>(filterSelected(props.selected));
 
 const state = reactive<ValidatedFieldData>({
     name: props.name,
@@ -103,9 +103,7 @@ watch(() => props.selected, (received: string[]) => {
         return;
     }
 
-    const value = (received || []).filter(item => item !== null && item !== undefined);
-
-    selectedItems.value = new Set(value);
+    selectedItems.value = filterSelected(received);
     state.value = Array.from(selectedItems.value);
 });
 
@@ -152,6 +150,10 @@ const fieldBlurred = (showValidity: () => void) => {
 onMounted(() => {
     emit('created', state);
 });
+
+function filterSelected(selected: string[]): Set<string> {
+    return new Set((selected || []).filter(item => item !== null && item !== undefined));
+}
 </script>
 
 <style lang="scss" scoped>
