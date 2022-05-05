@@ -103,7 +103,9 @@ watch(() => props.selected, (received: string[]) => {
         return;
     }
 
-    selectedItems.value = new Set(received || []);
+    const value = (received || []).filter(item => item !== null && item !== undefined);
+
+    selectedItems.value = new Set(value);
     state.value = Array.from(selectedItems.value);
 });
 
