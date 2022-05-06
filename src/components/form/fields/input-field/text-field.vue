@@ -75,7 +75,7 @@ const props = defineProps({
     triggerValidation: OptionalProps.string
 });
 
-const focused = ref(false);
+const focused = ref<boolean>(false);
 
 const validationMethods: ValidationMethod[] = [
     { ...predefinedValidations['required'], parameters: [ props.required ] },
