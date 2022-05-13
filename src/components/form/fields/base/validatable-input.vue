@@ -87,7 +87,7 @@ const validateFieldData = (data: FieldData, event: UpdateEmitType): void => {
         state.failed = [];
         showing.value = false;
 
-        return emit(event, state);
+        return emit(event, { ...state });
     }
 
     const failedValidations = validateInput(data, props.validations);
@@ -95,7 +95,7 @@ const validateFieldData = (data: FieldData, event: UpdateEmitType): void => {
     state.valid = !failedValidations.length;
     state.failed = failedValidations;
 
-    return emit(event, state);
+    return emit(event, { ...state });
 };
 
 // TODO: Can we trigger this better?

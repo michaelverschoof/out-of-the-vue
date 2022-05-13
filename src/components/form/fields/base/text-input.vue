@@ -118,13 +118,12 @@ const blurElement = (): void => {
 };
 
 onMounted(() => {
-    if (!props.focus) {
-        return;
+    if (props.focus) {
+        element.value.focus();
     }
-    element.value.focus();
-});
 
-emit('created', { ...state });
+    emit('created', { ...state });
+});
 </script>
 
 <style lang="scss" scoped>

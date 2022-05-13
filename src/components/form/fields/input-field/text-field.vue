@@ -85,11 +85,11 @@ const validationMethods: ValidationMethod[] = [
 ];
 
 const initialized = (data: ValidatedFieldData): void => {
-    emit('created', data);
+    emit('created', { ...data });
 };
 
 const debounced = (data: ValidatedFieldData): void => {
-    emit('updated', data);
+    emit('updated', { ...data });
 };
 </script>
 

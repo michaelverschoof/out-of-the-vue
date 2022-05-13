@@ -55,7 +55,7 @@ describe('Focusing components', () => {
 
         it('should focus natively', async () => {
             const { input, wrapper } = mountComponent(null, true);
-            input.element.focus();
+            await input.element.focus();
 
             expect(input.element).toBe(document.activeElement);
             emitted(wrapper, 'focused');
@@ -72,7 +72,7 @@ describe('Focusing components', () => {
             const { input, wrapper } = mountComponent(null, true);
             expect(input.element).not.toBe(document.activeElement);
 
-            await wrapper.setProps(Object.assign({}, textProps, { focus: true }));
+            await wrapper.setProps({ focus: true });
 
             expect(input.element).toBe(document.activeElement);
             emitted(wrapper, 'focused');
@@ -95,7 +95,7 @@ describe('Focusing components', () => {
             const { input, wrapper } = mountComponent({ focus: true }, true);
             expect(input.element).toBe(document.activeElement);
 
-            await wrapper.setProps(Object.assign({}, textProps, { focus: false }));
+            await wrapper.setProps({ focus: false });
             expect(input.element).not.toBe(document.activeElement);
 
             emitted(wrapper, 'blurred');
@@ -203,7 +203,7 @@ describe('Updating input', () => {
     it('should update value from props', async () => {
         const { input, wrapper } = mountComponent();
 
-        await wrapper.setProps(Object.assign({}, textProps, { value: 'something' }));
+        await wrapper.setProps({ value: 'something' });
         expect(input.element.value).toBe('something');
 
         const emits = emitted(wrapper, 'updated');
@@ -216,7 +216,7 @@ describe('Updating input', () => {
         await input.setValue('something');
         expect(input.element.value).toBe('something');
 
-        await wrapper.setProps(Object.assign({}, textProps, { value: 'something' }));
+        await wrapper.setProps({ value: 'something' });
         expect(input.element.value).toBe('something');
 
         const created = emitted(wrapper, 'created');

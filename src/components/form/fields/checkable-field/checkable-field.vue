@@ -137,7 +137,7 @@ const validated = (data: ValidatedFieldData): void => {
     state.valid = data.valid;
     state.failed = data.failed;
 
-    emit('updated', state);
+    emit('updated', { ...state });
 };
 
 const focusItem = (item: string): void => {
@@ -160,7 +160,7 @@ const fieldBlurred = (showValidity: () => void): void => {
 };
 
 onMounted(() => {
-    emit('created', state);
+    emit('created', { ...state });
 });
 
 function filterSelected(selected: string[]): string[] {
