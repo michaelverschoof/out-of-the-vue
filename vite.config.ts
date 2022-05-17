@@ -27,7 +27,5 @@ export default defineConfig({
             }
         }
     },
-    test: {
-        resolveSnapshotPath: (testPath, snapExtension) => `${ snapshots }/${ testPath }${ snapExtension }`
-    }
+    test: {}
 });

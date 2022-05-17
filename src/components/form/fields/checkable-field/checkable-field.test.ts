@@ -1,11 +1,12 @@
 import CheckableField from '@/components/form/fields/checkable-field/checkable-field.vue';
-import { ValidatedFieldData } from '@/composables/types';
+import { FieldData, ValidatedFieldData } from '@/composables/types';
 import { emitted } from '@test/emits';
 import { DOMWrapper, mount, VueWrapper } from '@vue/test-utils';
-import { beforeAll, describe, expect, it } from 'vitest';
+import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
 /**
- * @vitest-environment happy-dom
+ * @vitest-environment jsdom
+ * Used instead of happy-dom to get the `main.value.includes(document.activeElement)` working
  */
 
 const props = {
@@ -267,16 +268,20 @@ describe('Focusing items', () => {
     });
 });
 
-// TODO: test validations
-//     required: OptionalProps.booleanFalse,
-//     min: OptionalProps.number,
-//     max: OptionalProps.number,
-//     validations: OptionalProps.validations,
 describe('Validating field', () => {
 
-    it.todo('should show a validation error', async () => {
+    beforeEach(() => {
+        vi.spyOn(window, 'requestAnimationFrame').mockImplementation(
+            (callback: FrameRequestCallback): number => {
+                callback(100);
+                return 0;
+            }
+        );
+    });
+
+    it('should show a validation error', async () => {
         const wrapper = mount(CheckableField, {
-            props: Object.assign({}, radioProps, { required: true }),
+            props: Object.assign({}, checkboxProps, { required: true }),
             slots: Object.assign({}, slots, { required: 'required error' })
         });
 
@@ -285,19 +290,39 @@ describe('Validating field', () => {
 
         await check(item);
         await uncheck(item);
+
         expect(wrapper.find('strong.validation-error').exists()).toBeFalsy();
 
-        await item.find('input').trigger('focus');
-
-
-        await item.trigger('blur');
-
-        await item.find('input').trigger('blur');
-
-        console.log(wrapper.html());
+        await wrapper.find('main').trigger('blur');
 
         expect(wrapper.find('strong.validation-error').exists()).toBeTruthy();
         expect(wrapper.find('strong.validation-error').text()).toBe('required error');
+    });
+
+    it('should not show a validation error when focus is still inside the field', async () => {
+        const wrapper = mount(CheckableField, {
+            props: Object.assign({}, checkboxProps, { required: true }),
+            slots: Object.assign({}, slots, { required: 'required error' }),
+            attachTo: document.body
+        });
+
+        const items = wrapper.findAll('.checkable-field-item');
+        expect(wrapper.find('strong.validation-error').exists()).toBeFalsy();
+
+        await check(items[0]);
+        await uncheck(items[0]);
+
+        expect(wrapper.find('strong.validation-error').exists()).toBeFalsy();
+
+        const input = items[1].find('input');
+        await input.element.focus();
+        expect(input.element).toBe(document.activeElement);
+        expect(items[1].classes().includes('focused')).toBeTruthy();
+
+        await wrapper.find('main').trigger('blur');
+        expect(input.element).toBe(document.activeElement);
+
+        expect(wrapper.find('strong.validation-error').exists()).toBeFalsy();
     });
 
     it('should trigger validation via props', async () => {
@@ -310,6 +335,116 @@ describe('Validating field', () => {
 
         await wrapper.setProps({ triggerValidation: 'required' });
         expect(wrapper.find('strong.validation-error').exists()).toBeTruthy();
+    });
+
+    describe('Specific validations', () => {
+
+        it('should trigger min validation', async () => {
+            const wrapper = mount(CheckableField, {
+                props: Object.assign({}, checkboxProps, { min: 2 }),
+                slots: Object.assign({}, slots, { min: 'min error' })
+            });
+
+            const items = wrapper.findAll('.checkable-field-item');
+            expect(wrapper.find('strong.validation-error').exists()).toBeFalsy();
+
+            await check(items[0]);
+            await wrapper.find('main').trigger('blur');
+
+            expect(wrapper.find('strong.validation-error').exists()).toBeTruthy();
+            expect(wrapper.find('strong.validation-error').text()).toBe('min error');
+        });
+
+        it('should not trigger min validation', async () => {
+            const wrapper = mount(CheckableField, {
+                props: Object.assign({}, checkboxProps, { min: 2 }),
+                slots: Object.assign({}, slots, { min: 'min error' })
+            });
+
+            const items = wrapper.findAll('.checkable-field-item');
+            expect(wrapper.find('strong.validation-error').exists()).toBeFalsy();
+
+            await check(items[0]);
+            await check(items[2]);
+            await wrapper.find('main').trigger('blur');
+
+            expect(wrapper.find('strong.validation-error').exists()).toBeFalsy();
+        });
+
+        it('should trigger max validation', async () => {
+            const wrapper = mount(CheckableField, {
+                props: Object.assign({}, checkboxProps, { max: 2 }),
+                slots: Object.assign({}, slots, { max: 'max error' })
+            });
+
+            const items = wrapper.findAll('.checkable-field-item');
+            expect(wrapper.find('strong.validation-error').exists()).toBeFalsy();
+
+            await check(items[0]);
+            await check(items[1]);
+            await check(items[2]);
+            await wrapper.find('main').trigger('blur');
+
+            expect(wrapper.find('strong.validation-error').exists()).toBeTruthy();
+            expect(wrapper.find('strong.validation-error').text()).toBe('max error');
+        });
+
+        it('should not trigger max validation', async () => {
+            const wrapper = mount(CheckableField, {
+                props: Object.assign({}, checkboxProps, { max: 2 }),
+                slots: Object.assign({}, slots, { max: 'max error' })
+            });
+
+            const items = wrapper.findAll('.checkable-field-item');
+            expect(wrapper.find('strong.validation-error').exists()).toBeFalsy();
+
+            await check(items[0]);
+            await check(items[1]);
+            await wrapper.find('main').trigger('blur');
+
+            expect(wrapper.find('strong.validation-error').exists()).toBeFalsy();
+        });
+    });
+
+    describe('Custom validations', () => {
+        const validations = [
+            {
+                name: 'custom',
+                validator: (data: FieldData, find: string) => (<string[]> data.value).includes(find),
+                parameters: [ 'foo' ]
+            }
+        ];
+
+        it('should trigger custom validation', async () => {
+            const wrapper = mount(CheckableField, {
+                props: Object.assign({}, checkboxProps, { validations: validations }),
+                slots: Object.assign({}, slots, { custom: 'custom error' })
+            });
+
+            const items = wrapper.findAll('.checkable-field-item');
+            expect(wrapper.find('strong.validation-error').exists()).toBeFalsy();
+
+            await check(items[1]);
+            await wrapper.find('main').trigger('blur');
+
+            expect(wrapper.find('strong.validation-error').exists()).toBeTruthy();
+            expect(wrapper.find('strong.validation-error').text()).toBe('custom error');
+        });
+
+        it('should not trigger custom validation', async () => {
+            const wrapper = mount(CheckableField, {
+                props: Object.assign({}, checkboxProps, { validations: validations }),
+                slots: Object.assign({}, slots, { custom: 'custom error' })
+            });
+
+            const items = wrapper.findAll('.checkable-field-item');
+            expect(wrapper.find('strong.validation-error').exists()).toBeFalsy();
+
+            await check(items[0]);
+            await wrapper.find('main').trigger('blur');
+
+            expect(wrapper.find('strong.validation-error').exists()).toBeFalsy();
+        });
     });
 });
 

@@ -76,7 +76,8 @@ const inputRegex = !!props.allowedCharacters ? new RegExp(props.allowedCharacter
  * Prevent characters other than the allowed to be entered
  */
 const preventDisallowedCharacters = (event: KeyboardEvent): string => {
-    if (!inputRegex || event.key.match(inputRegex)) {
+    if (!inputRegex || !!event.key.match(inputRegex)) {
+        console.log(event.key);
         return event.key;
     }
 

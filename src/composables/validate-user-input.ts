@@ -54,18 +54,15 @@ export const useUserInputValidation = () => {
      * @returns list of names of failed validations
      */
     const validate = (data: FieldData, validations: ValidationMethod[] = []): string[] => {
-        const failed: string[] = [];
+        const failed: Set<string> = new Set();
 
         for (const validation of validations) {
             const result = validation.validator(data, ...(validation.parameters || []));
-            if (result) {
-                continue;
-            }
 
-            failed.push(validation.name);
+            !!result ? failed.delete(validation.name) : failed.add(validation.name);
         }
 
-        return failed;
+        return Array.from(failed);
     };
 
     return {

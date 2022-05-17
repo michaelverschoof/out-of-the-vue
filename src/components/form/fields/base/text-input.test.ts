@@ -1,7 +1,7 @@
 import TextInput from '@/components/form/fields/base/text-input.vue';
 import { emitted } from '@test/emits';
 import { DOMWrapper, mount, VueWrapper } from '@vue/test-utils';
-import { beforeAll, describe, expect, it } from 'vitest';
+import { beforeAll, describe, expect, it, vi } from 'vitest';
 
 /**
  * @vitest-environment happy-dom
@@ -227,14 +227,26 @@ describe('Updating input', () => {
     });
 });
 
-describe.todo('Preventing keyboard input', () => {
+describe('Preventing keyboard input', () => {
 
     it('should prevent characters not in the regex', async () => {
-        const { input, wrapper } = mountComponent({ allowedCharacters: '[A-z]' }, true);
+        const { wrapper } = mountComponent({ allowedCharacters: '[A-z]' }, true);
 
-        await wrapper.trigger('keypress', { key: 'a' });
+        const myEvent = new KeyboardEvent('keypress', { key: 'a' });
+        vi.spyOn(myEvent, 'preventDefault');
 
-        expect(input.element.value).toBe('a');
+        wrapper.find('input').element.dispatchEvent(myEvent);
+        expect(myEvent.preventDefault).not.toHaveBeenCalled();
+    });
+
+    it('should prevent characters not in the regex', async () => {
+        const { wrapper } = mountComponent({ allowedCharacters: '[A-z]' }, true);
+
+        const myEvent = new KeyboardEvent('keypress', { key: '9' });
+        vi.spyOn(myEvent, 'preventDefault');
+
+        wrapper.find('input').element.dispatchEvent(myEvent);
+        expect(myEvent.preventDefault).toHaveBeenCalled();
     });
 });
 
