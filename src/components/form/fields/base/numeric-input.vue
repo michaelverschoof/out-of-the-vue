@@ -1,5 +1,6 @@
 <template>
     <text-input
+        v-bind="exclude($attrs, ['class', 'onCreated', 'onUpdated'])"
         :allowed-characters="regex"
         :inputmode="allowDecimals ? 'decimal' : 'numeric'"
         :name="name"
@@ -14,6 +15,7 @@
 import TextInput from '@/components/form/fields/base/text-input.vue';
 import { OptionalProps, RequiredProps } from '@/components/props.types';
 import { NumberFieldData, StringFieldData, UpdateEmitType } from '@/composables/types';
+import { exclude } from '@/util/attrs';
 import { filter, parse } from '@/util/numbers';
 import { computed, reactive, ref, watch } from 'vue';
 
@@ -75,5 +77,11 @@ const created = (data: StringFieldData): void => {
 const updated = (data: StringFieldData): void => {
     parseNumber(data);
     emit('updated', { ...state });
+};
+</script>
+
+<script lang="ts">
+export default {
+    inheritAttrs: false
 };
 </script>
