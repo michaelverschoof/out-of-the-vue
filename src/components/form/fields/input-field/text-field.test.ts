@@ -1,4 +1,5 @@
 import TextField from '@/components/form/fields/input-field/text-field.vue';
+import { FieldData } from '@/composables/types';
 import { emitted } from '@test/emits';
 import { DOMWrapper, mount, VueWrapper } from '@vue/test-utils';
 import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
@@ -200,6 +201,122 @@ describe('Debouncing input', () => {
 
         const emits = emitted(wrapper, 'updated');
         expect(emits[0].value).toEqual('foo123bar');
+    });
+});
+
+describe('Validating field', () => {
+
+    it('should show a validation error', async () => {
+        const wrapper = mount(TextField, {
+            props: Object.assign({}, props, { required: true }),
+            slots: { required: 'required error' }
+        });
+
+        const input = wrapper.find('input');
+        expect(wrapper.find('strong.validation-error').exists()).toBeFalsy();
+
+        await input.trigger('blur');
+
+        expect(wrapper.find('strong.validation-error').exists()).toBeTruthy();
+        expect(wrapper.find('strong.validation-error').text()).toBe('required error');
+    });
+
+    it('should not show a validation error when focused', async () => {
+        const wrapper = mount(TextField, {
+            props: Object.assign({}, props, { required: true }),
+            slots: { required: 'required error' }
+        });
+
+        const input = wrapper.find('input');
+        await input.setValue('foo');
+        expect(wrapper.find('strong.validation-error').exists()).toBeFalsy();
+
+        await input.setValue('');
+        expect(wrapper.find('strong.validation-error').exists()).toBeFalsy();
+    });
+
+    it('should trigger validation via props', async () => {
+        const wrapper = mount(TextField, {
+            props: Object.assign({}, props, { required: true }),
+            slots: { required: 'required error' }
+        });
+
+        expect(wrapper.find('strong.validation-error').exists()).toBeFalsy();
+
+        await wrapper.setProps({ triggerValidation: 'required' });
+        expect(wrapper.find('strong.validation-error').exists()).toBeTruthy();
+    });
+
+    describe('Specific validations', () => {
+
+        it('should trigger min validation', async () => {
+            const wrapper = mount(TextField, {
+                props: Object.assign({}, props, { min: 2 }),
+                slots: { min: 'min error' }
+            });
+
+            const input = wrapper.find('input');
+
+            await input.setValue('f');
+            expect(wrapper.find('strong.validation-error').exists()).toBeFalsy();
+
+            await input.trigger('blur');
+            expect(wrapper.find('strong.validation-error').exists()).toBeTruthy();
+            expect(wrapper.find('strong.validation-error').text()).toBe('min error');
+
+            await input.setValue('foo');
+            await input.trigger('blur');
+            expect(wrapper.find('strong.validation-error').exists()).toBeFalsy();
+        });
+
+        it('should trigger max validation', async () => {
+            const wrapper = mount(TextField, {
+                props: Object.assign({}, props, { max: 2 }),
+                slots: { max: 'max error' }
+            });
+
+            const input = wrapper.find('input');
+
+            await input.setValue('foo');
+            expect(wrapper.find('strong.validation-error').exists()).toBeFalsy();
+
+            await input.trigger('blur');
+            expect(wrapper.find('strong.validation-error').exists()).toBeTruthy();
+            expect(wrapper.find('strong.validation-error').text()).toBe('max error');
+
+            await input.setValue('f');
+            await input.trigger('blur');
+            expect(wrapper.find('strong.validation-error').exists()).toBeFalsy();
+        });
+    });
+
+    describe('Custom validations', () => {
+        const validations = [
+            {
+                name: 'custom',
+                validator: (data: FieldData, find: string) => (<string> data.value)?.includes(find),
+                parameters: [ 'bar' ]
+            }
+        ];
+
+        it('should trigger custom validation', async () => {
+            const wrapper = mount(TextField, {
+                props: Object.assign({}, props, { validations: validations }),
+                slots: Object.assign({}, { custom: 'custom error' })
+            });
+
+            const input = wrapper.find('input');
+
+            await input.setValue('foo');
+            expect(wrapper.find('strong.validation-error').exists()).toBeFalsy();
+
+            await input.trigger('blur');
+            expect(wrapper.find('strong.validation-error').exists()).toBeTruthy();
+            expect(wrapper.find('strong.validation-error').text()).toBe('custom error');
+
+            await input.setValue('foobarbaz');
+            expect(wrapper.find('strong.validation-error').exists()).toBeFalsy();
+        });
     });
 });
 
