@@ -133,7 +133,7 @@ watch(() => props.focus, (received: boolean): void => {
 });
 
 const inputValidated = (index: number, data: ValidatedFieldData): void => {
-    state.value[index] = (<string> data.value).slice(0, 1);
+    state.value[index] = (<string> data.value)?.slice(0, 1) ?? null;
     if (!data.valid) {
         return;
     }
