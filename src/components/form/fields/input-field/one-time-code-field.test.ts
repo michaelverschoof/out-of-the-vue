@@ -439,7 +439,7 @@ describe('Validating field', () => {
         expect(wrapper.find('strong.validation-error').exists()).toBeTruthy();
     });
 
-    describe.only('Custom validations', () => {
+    describe('Custom validations', () => {
         const validations = [
             {
                 name: 'custom',
