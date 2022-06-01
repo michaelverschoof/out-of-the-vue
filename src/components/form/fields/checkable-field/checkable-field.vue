@@ -185,5 +185,9 @@ function filterSelected(selected: string[]): string[] {
     .hidden {
         display: none;
     }
+
+    .content {
+        flex-grow: 1;
+    }
 }
 </style>

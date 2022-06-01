@@ -229,24 +229,24 @@ describe('Updating input', () => {
 
 describe('Preventing keyboard input', () => {
 
-    it('should prevent characters not in the regex', async () => {
+    it('should allow characters in the regex', async () => {
         const { wrapper } = mountComponent({ allowedCharacters: '[A-z]' }, true);
 
-        const myEvent = new KeyboardEvent('keypress', { key: 'a' });
-        vi.spyOn(myEvent, 'preventDefault');
+        const keyPress = new KeyboardEvent('keypress', { key: 'a' });
+        vi.spyOn(keyPress, 'preventDefault');
 
-        wrapper.find('input').element.dispatchEvent(myEvent);
-        expect(myEvent.preventDefault).not.toHaveBeenCalled();
+        wrapper.find('input').element.dispatchEvent(keyPress);
+        expect(keyPress.preventDefault).not.toHaveBeenCalled();
     });
 
     it('should prevent characters not in the regex', async () => {
         const { wrapper } = mountComponent({ allowedCharacters: '[A-z]' }, true);
 
-        const myEvent = new KeyboardEvent('keypress', { key: '9' });
-        vi.spyOn(myEvent, 'preventDefault');
+        const keyPress = new KeyboardEvent('keypress', { key: '9' });
+        vi.spyOn(keyPress, 'preventDefault');
 
-        wrapper.find('input').element.dispatchEvent(myEvent);
-        expect(myEvent.preventDefault).toHaveBeenCalled();
+        wrapper.find('input').element.dispatchEvent(keyPress);
+        expect(keyPress.preventDefault).toHaveBeenCalled();
     });
 });
 
