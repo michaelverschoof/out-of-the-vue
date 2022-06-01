@@ -133,7 +133,7 @@ watch(() => props.focus, (received: boolean): void => {
 });
 
 const inputValidated = (index: number, data: ValidatedFieldData): void => {
-    state.value[index] = data.value;
+    state.value[index] = (<string> data.value).slice(0, 1);
     if (!data.valid) {
         return;
     }
@@ -191,7 +191,7 @@ function convertValueForState(value?: string): void {
         return;
     }
 
-    const filtered = filter(value, regex).slice(0, props.length).split('');
+    const filtered = filter(value, regex).toUpperCase().slice(0, props.length).split('');
     state.value = stateValue.map((item, index) => filtered[index] ?? null);
 
     focusedElement.value = null;
