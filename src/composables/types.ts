@@ -4,6 +4,8 @@ export type InputTransformType = 'uppercase' | 'lowercase';
 
 /**
  * Emit event types
+ * TODO: These types can only be used with defineEmits after https://github.com/vuejs/core/issues/4294 has been fixed
+ * Currently there is no support for importing type literals
  */
 export type UpdateEmitType = 'created' | 'updated';
 export type FocusEmitType = 'focused' | 'blurred';
