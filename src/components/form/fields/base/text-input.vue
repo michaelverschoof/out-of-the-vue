@@ -10,7 +10,7 @@
         @blur="blurElement"
         @focus="focusElement"
         @input="filterInputData"
-        @keypress="preventDisallowedCharacters"
+        @keydown="preventDisallowedCharacters"
         @paste.prevent="filterPasteData"
     />
 </template>

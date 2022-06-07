@@ -1,43 +1,168 @@
 import Modal from '@/components/modal.vue';
+import { emitted } from '@test/emits';
 import { ProvidedSlots } from '@test/types';
-import { DOMWrapper, mount, VueWrapper } from '@vue/test-utils';
-import { beforeAll, describe, expect, it } from 'vitest';
+import { mount, VueWrapper } from '@vue/test-utils';
+import { afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 
-// /**
-//  * @vitest-environment happy-dom
-//  */
+/**
+ * @vitest-environment jsdom
+ */
+
+const opener = {
+    opener: `<template #opener="{ open }">
+                 <button id="opener" @click="open">Opener</button>
+             </template>`
+};
+
+const content = {
+    header: `<template #header="{ close }">
+                 <button id="header" @click="close">Header</button>
+             </template>`,
+    default: `<template #default="{ close }">
+                 <button id="content" @click="close">Content</button>
+             </template>`,
+    footer: `<template #footer="{ close }">
+                 <button id="footer" @click="close">Footer</button>
+             </template>`
+};
+
+const all = Object.assign({}, opener, content);
 
 beforeAll(() => {
     expect(Modal).toBeTruthy();
 });
 
+beforeEach(() => {
+    const parent = document.createElement('div');
+    parent.id = 'parent';
+    document.body.appendChild(parent);
+});
+
+afterEach(() => {
+    document.body.outerHTML = '';
+});
+
 describe('Mounting components', () => {
 
     it('should mount the component', async () => {
-        const { backdrop, modal, wrapper } = mountComponent();
-        // expect(inputs.length).toBe(6);
-        // expect(inputs.every(input => input.attributes().name.startsWith(props.name))).toBeTruthy();
-        //
-        // const emits = emitted(wrapper, 'created');
-        // expect(emits[0]).toEqual(createdEmit);
+        const wrapper = await mountComponent();
+        expect(wrapper.html()).toMatchSnapshot();
+    });
+
+    it('should mount the component with an opener', async () => {
+        const wrapper = await mountComponent(opener);
+        expect(wrapper.html()).toMatchSnapshot();
+    });
+
+    it('should mount the component in opened state', async () => {
+        const wrapper = await mountComponent(all, { opened: 1 });
+
+        const modal = await getModalElement(wrapper);
+        expect(modal).toMatchSnapshot();
     });
 });
 
-function mountComponent(props?: { parent?: string; opened?: number }, slots?: ProvidedSlots): { wrapper: VueWrapper<any>, backdrop: DOMWrapper<HTMLDivElement>, modal: DOMWrapper<HTMLDivElement> } {
-    const wrapper = mount(Modal, {
-        props: props,
+describe('Opening and closing modal', async () => {
+
+    it('should open using opener', async () => {
+        const wrapper = await mountComponent(all);
+
+        let modal = await getModalElement(wrapper);
+        expect(modal).not.toMatchSnapshot();
+
+        await wrapper.find('#opener').trigger('click');
+        expect(modal).toMatchSnapshot();
+
+        emitted(wrapper, 'opened');
+    });
+
+    it('should close using header', async () => {
+        const wrapper = await mountComponent(all, { opened: 1 });
+
+        let modal = await getModalElement(wrapper);
+        (<HTMLButtonElement> modal.querySelector('#header')).click();
+
+        modal = await getModalElement(wrapper);
+        expect(modal).toBeNull();
+
+        emitted(wrapper, 'closed');
+    });
+
+    it('should close using content', async () => {
+        const wrapper = await mountComponent(all, { opened: 1 });
+
+        let modal = await getModalElement(wrapper);
+        (<HTMLButtonElement> modal.querySelector('#content')).click();
+
+        modal = await getModalElement(wrapper);
+        expect(modal).toBeNull();
+
+        emitted(wrapper, 'closed');
+    });
+
+    it('should close using footer', async () => {
+        const wrapper = await mountComponent(all, { opened: 1 });
+
+        let modal = await getModalElement(wrapper);
+        (<HTMLButtonElement> modal.querySelector('#footer')).click();
+
+        modal = await getModalElement(wrapper);
+        expect(modal).toBeNull();
+
+        emitted(wrapper, 'closed');
+    });
+
+    it('should close using backdrop', async () => {
+        const wrapper = await mountComponent(all, { opened: 1 });
+
+        let modal = await getModalElement(wrapper);
+        expect(modal).not.toBeNull();
+
+        const backdrop = document.querySelector('.backdrop') as HTMLDivElement;
+        backdrop.click();
+
+        modal = await getModalElement(wrapper);
+        expect(modal).toBeNull();
+
+        emitted(wrapper, 'closed');
+    });
+
+    it('should close using escape button', async () => {
+        const wrapper = await mountComponent(all, { opened: 1 });
+
+        let modal = await getModalElement(wrapper);
+        expect(modal).not.toBeNull();
+
+        const backdrop = document.querySelector('.backdrop') as HTMLDivElement;
+        backdrop.focus();
+
+        const keyPress = new KeyboardEvent('keydown', { key: 'esc' });
+        backdrop.dispatchEvent(keyPress);
+
+        modal = await getModalElement(wrapper);
+        expect(modal).toBeNull();
+
+        emitted(wrapper, 'closed');
+    });
+});
+
+it('should unmount the component', async () => {
+    const wrapper = await mountComponent();
+    expect(wrapper.html()).toMatchSnapshot();
+
+    await wrapper.unmount();
+    expect(wrapper.html()).not.toMatchSnapshot();
+});
+
+async function mountComponent(slots?: ProvidedSlots, props?: { opened?: number }): Promise<VueWrapper<any>> {
+    return mount(Modal, {
+        props: Object.assign({}, { parent: '#parent' }, props),
         slots: slots,
         attachTo: document.body
     });
+}
 
-    const backdrop = wrapper.find('.backdrop') as DOMWrapper<HTMLDivElement>;
-    const modal = wrapper.find('.modal') as DOMWrapper<HTMLDivElement>;
-
-    // slots: {
-    // default: `<template #default="{ debounce }">
-    //                     <div @debounce="debounce(${ stringedData })">Foo</div>
-    //                   </template>`
-    // },
-
-    return { wrapper, backdrop, modal };
+async function getModalElement(wrapper: VueWrapper<any>): Promise<HTMLDivElement> {
+    await wrapper.vm.$nextTick();
+    return document.querySelector('.modal') as HTMLDivElement;
 }

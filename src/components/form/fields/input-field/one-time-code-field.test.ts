@@ -285,7 +285,7 @@ describe('Preventing keyboard input', () => {
             attachTo: document.body
         });
 
-        const myEvent = new KeyboardEvent('keypress', { key: 'a' });
+        const myEvent = new KeyboardEvent('keydown', { key: 'a' });
         vi.spyOn(myEvent, 'preventDefault');
 
         wrapper.find('input').element.dispatchEvent(myEvent);
@@ -298,7 +298,7 @@ describe('Preventing keyboard input', () => {
             attachTo: document.body
         });
 
-        const myEvent = new KeyboardEvent('keypress', { key: '9' });
+        const myEvent = new KeyboardEvent('keydown', { key: '9' });
         vi.spyOn(myEvent, 'preventDefault');
 
         wrapper.find('input').element.dispatchEvent(myEvent);
@@ -311,7 +311,7 @@ describe('Preventing keyboard input', () => {
             attachTo: document.body
         });
 
-        const myEvent = new KeyboardEvent('keypress', { key: '9' });
+        const myEvent = new KeyboardEvent('keydown', { key: '9' });
         vi.spyOn(myEvent, 'preventDefault');
 
         wrapper.find('input').element.dispatchEvent(myEvent);
@@ -324,7 +324,7 @@ describe('Preventing keyboard input', () => {
             attachTo: document.body
         });
 
-        const myEvent = new KeyboardEvent('keypress', { key: 'a' });
+        const myEvent = new KeyboardEvent('keydown', { key: 'a' });
         vi.spyOn(myEvent, 'preventDefault');
 
         wrapper.find('input').element.dispatchEvent(myEvent);

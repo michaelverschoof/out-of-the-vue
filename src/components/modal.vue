@@ -4,7 +4,7 @@
     <teleport :to="parent">
         <transition name="modal">
 
-            <div v-if="showing" ref="element" class="backdrop" tabindex="-1" @click.self="close" @keyup.esc="close">
+            <div v-if="showing" ref="element" class="backdrop" tabindex="-1" @click.self="close" @keydown.esc="close">
                 <div v-bind="$attrs" class="modal">
                     <header v-if="$slots.header">
                         <slot name="header" :close="close" />
