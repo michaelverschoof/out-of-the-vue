@@ -25,7 +25,7 @@
 <script lang="ts" setup>
 import { OptionalProps } from '@/components/props.types';
 import { ModalEmitType } from '@/composables/types';
-import { onMounted, onUnmounted, ref } from 'vue';
+import { onMounted, onUnmounted, ref, watch } from 'vue';
 
 const emit = defineEmits<{ (event: ModalEmitType): void; }>();
 
@@ -42,6 +42,10 @@ const element = ref<HTMLElement>(null);
 
 const showing = ref(false);
 
+watch(() => props.opened, () => {
+    showing.value = !!props.opened || 0 === props.opened;
+});
+
 const open = () => {
     showing.value = true;
     emit('opened');
@@ -57,7 +61,7 @@ const close = (): void => {
 };
 
 onMounted(() => {
-    showing.value = !!props.opened || props.opened === 0;
+    showing.value = !!props.opened || 0 === props.opened;
 });
 
 onUnmounted(() => {
