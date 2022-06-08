@@ -1,7 +1,7 @@
 <template>
     <fieldset class="checkable-field input-field">
 
-        <validatable-input :validations="validationMethods" @created="initialized" @updated="validated">
+        <validatable-input :validations="validationMethods" :trigger-validation="triggerValidation" @created="initialized" @updated="validated">
             <template #default="{ initialize, validate, invalid, showing, showValidity }">
 
                 <header v-if="$slots.label" class="label">
@@ -9,26 +9,26 @@
                 </header>
 
                 <main ref="main" tabindex="-1" @blur.capture="fieldBlurred(showValidity)">
-                    <template v-for="(item, key) of options" :key="key">
+                    <template v-for="(item, key) of $slots" :key="key">
 
-                        <label
-                            class="checkable-field-item"
-                            :class="{ selected: selectedItems.has(key), disabled: disabled.includes(key) }"
+                        <label v-if="!nonOptionSlots.includes(key)"
+                               :class="{ selected: state.value.includes(key), disabled: disabled.includes(key) }"
+                               class="checkable-field-item"
                         >
                             <checkable-input
                                 :class="{ hidden: hideInput }"
                                 :name="`checkable-input-${ name }`"
                                 :value="key"
                                 :type="type"
-                                :checked="selected.includes(key)"
+                                :checked="state.value.includes(key)"
                                 :disabled="disabled.includes(key)"
                                 tabindex="0"
-                                @created="(data) => { updated(data); initialize(state); }"
+                                @created="(data) => { created(data); initialize(state); }"
                                 @updated="(data) => { updated(data); validate(state); }"
                             />
 
                             <span class="content">
-                                <slot :name="key" />
+                                <slot :name="key" :selected="state.value.includes(key)" />
                             </span>
                         </label>
 
@@ -55,8 +55,7 @@ import ValidatableInput from '@/components/form/fields/base/validatable-input.vu
 import { OptionalProps, RequiredProps } from '@/components/props.types';
 import { CheckableFieldData, UpdateEmitType, ValidatedFieldData, ValidationMethod } from '@/composables/types';
 import { predefinedValidations } from '@/composables/validate-user-input';
-import { filter } from '@/util/slots';
-import { reactive, ref, useSlots } from 'vue';
+import { onMounted, reactive, ref, watch } from 'vue';
 
 const emit = defineEmits<{ (event: UpdateEmitType, data: ValidatedFieldData): void; }>();
 
@@ -68,6 +67,7 @@ const props = defineProps({
     min: OptionalProps.number,
     max: OptionalProps.number,
     validations: OptionalProps.validations,
+    triggerValidation: OptionalProps.string,
     hideInput: OptionalProps.booleanFalse,
     type: {
         type: String as () => 'radio' | 'checkbox',
@@ -87,9 +87,9 @@ if (props.type !== 'radio') {
     );
 }
 
-const options = filter(useSlots(), [ 'label', 'information', ...validationMethods.map(method => method.name) ]);
+const nonOptionSlots = [ 'label', 'information', ...validationMethods.map(method => method.name) ];
 
-const selectedItems = ref<Set<string>>(new Set(props.selected));
+const selectedItems = ref<Set<string>>(filterSelected(props.selected));
 
 const state = reactive<ValidatedFieldData>({
     name: props.name,
@@ -98,21 +98,35 @@ const state = reactive<ValidatedFieldData>({
     failed: []
 });
 
+watch(() => props.selected, (received: string[]) => {
+    if (received === state.value) {
+        return;
+    }
+
+    selectedItems.value = filterSelected(received);
+    state.value = Array.from(selectedItems.value);
+});
+
+const created = (data: CheckableFieldData): void => {
+    if (props.type === 'radio' && !data.checked) {
+        return;
+    }
+
+    updated(data);
+};
+
 const updated = (data: CheckableFieldData): void => {
-    if (props.type === 'radio') {
+    if (props.type === 'radio' && data.checked) {
         selectedItems.value.clear();
     }
 
     data.checked ? selectedItems.value.add(data.value) : selectedItems.value.delete(data.value);
-
     state.value = Array.from(selectedItems.value);
 };
 
 const initialized = (data: ValidatedFieldData): void => {
     state.valid = data.valid;
     state.failed = data.failed;
-
-    emit('created', state);
 };
 
 const validated = (data: ValidatedFieldData): void => {
@@ -125,13 +139,21 @@ const validated = (data: ValidatedFieldData): void => {
 const main = ref<HTMLElement>(null);
 const fieldBlurred = (showValidity: () => void) => {
     requestAnimationFrame(() => {
-        if (main.value.contains(document.activeElement)) {
+        if (!main.value || main.value.contains(document.activeElement)) {
             return;
         }
 
         showValidity();
     });
 };
+
+onMounted(() => {
+    emit('created', state);
+});
+
+function filterSelected(selected: string[]): Set<string> {
+    return new Set((selected || []).filter(item => item !== null && item !== undefined));
+}
 </script>
 
 <style lang="scss" scoped>
@@ -139,12 +161,10 @@ const fieldBlurred = (showValidity: () => void) => {
 
 .checkable-field-item {
     align-items: center;
-    border-radius: 0.375em;
     cursor: pointer;
     display: flex;
-    column-gap: 0.5em;
+    column-gap: 1em;
     min-height: 3.375em;
-    padding: 0.5em 1em;
 
     &.disabled {
         cursor: not-allowed;

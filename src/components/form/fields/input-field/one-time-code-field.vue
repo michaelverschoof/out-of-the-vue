@@ -1,7 +1,7 @@
 <template>
     <fieldset class="one-time-code-field input-field" @paste.capture.prevent="filterPasteData">
 
-        <validatable-input :validations="fieldValidations" @updated="fieldValidated">
+        <validatable-input :validations="fieldValidations" :trigger-validation="triggerValidation" @updated="fieldValidated">
             <template #default="{ validate: validateState, invalid: invalidState, showing, showValidity }">
 
                 <header v-if="$slots.label" class="label">
@@ -66,6 +66,7 @@ const props = defineProps({
     focus: OptionalProps.boolean,
     required: OptionalProps.booleanFalse,
     validations: OptionalProps.validations,
+    triggerValidation: OptionalProps.string,
     type: {
         type: String as () => 'alpha' | 'numeric' | 'alphanumeric',
         required: false,

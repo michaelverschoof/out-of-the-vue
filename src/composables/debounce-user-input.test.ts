@@ -49,4 +49,14 @@ describe('Debounce', () => {
         expect(callback).toHaveBeenCalled();
         expect(callback).toHaveBeenCalledTimes(1);
     });
+
+    it('should trigger after 400 milliseconds if delay is null', () => {
+        const callback = vi.fn();
+
+        debounce(callback, null);
+        vi.advanceTimersByTime(400);
+
+        expect(callback).toHaveBeenCalled();
+        expect(callback).toHaveBeenCalledTimes(1);
+    });
 });

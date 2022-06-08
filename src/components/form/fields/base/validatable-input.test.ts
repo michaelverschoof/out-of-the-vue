@@ -1,10 +1,11 @@
 import ValidatableInput from '@/components/form/fields/base/validatable-input.vue';
-import { ValidationMethod } from '@/composables/types';
+import { SubmittedSymbol, ValidationMethod } from '@/composables/types';
 import { predefinedValidations } from '@/composables/validate-user-input';
 import { emitted } from '@test/emits';
 import { MountedComponent } from '@test/types';
-import { mount } from '@vue/test-utils';
-import { beforeAll, describe, expect, it } from 'vitest';
+import { mount, MountingOptions } from '@vue/test-utils';
+import { afterEach, beforeAll, describe, expect, it } from 'vitest';
+import { ref } from 'vue';
 
 /**
  * @vitest-environment happy-dom
@@ -17,6 +18,8 @@ const validations = [
     { ...predefinedValidations['min-length'], parameters: [ 2 ] },
     { ...predefinedValidations['max-length'], parameters: [ 5 ] }
 ];
+
+let provided = ref(false);
 
 beforeAll(() => {
     expect(ValidatableInput).toBeTruthy();
@@ -214,11 +217,90 @@ describe('Show validity', () => {
     });
 });
 
-function mountComponent(value?: string, validations?: ValidationMethod[]): MountedComponent {
+describe('Triggering validation externally', () => {
+
+    describe('Triggering validation by prop', () => {
+
+        it('should show error', async () => {
+            const { wrapper } = mountComponent(null, validations);
+
+            await wrapper.setProps({ triggerValidation: 'required' });
+
+            expect(wrapper.find('strong.validation-error').exists()).toBeTruthy();
+            expect(wrapper.find('strong.validation-error').text()).toBe('required error');
+
+            expect(wrapper.emitted('updated')).toBeFalsy();
+        });
+
+        it('should hide error', async () => {
+            const { wrapper } = mountComponent(null, validations);
+
+            await wrapper.setProps({ triggerValidation: 'required' });
+
+            expect(wrapper.find('strong.validation-error').exists()).toBeTruthy();
+            expect(wrapper.find('strong.validation-error').text()).toBe('required error');
+
+            await wrapper.setProps({ triggerValidation: null });
+
+            expect(wrapper.find('strong.validation-error').exists()).toBeFalsy();
+        });
+
+        it('should return if no existing validation is provided', async () => {
+            const { wrapper } = mountComponent(null, validations);
+
+            await wrapper.setProps({ triggerValidation: 'foo' });
+
+            expect(wrapper.find('strong.validation-error').exists()).toBeFalsy();
+        });
+    });
+
+    describe('Triggering validation by provide', () => {
+
+        afterEach(() => {
+            provided.value = false;
+        });
+
+        it('should show error', async () => {
+            const { wrapper } = mountComponent(null, validations, true);
+            expect(wrapper.find('strong.validation-error').exists()).toBeFalsy();
+
+            provided.value = true;
+            await wrapper.vm.$nextTick();
+
+            expect(wrapper.find('strong.validation-error').exists()).toBeTruthy();
+            expect(wrapper.find('strong.validation-error').text()).toBe('required error');
+        });
+
+        it('should hide error', async () => {
+            const { wrapper } = mountComponent(null, validations, true);
+
+            provided.value = true;
+            await wrapper.vm.$nextTick();
+
+            expect(wrapper.find('strong.validation-error').exists()).toBeTruthy();
+
+            provided.value = false;
+            await wrapper.vm.$nextTick();
+
+            expect(wrapper.find('strong.validation-error').exists()).toBeFalsy();
+        });
+
+        it('should return if no value is provided', async () => {
+            const { wrapper } = mountComponent(null, validations);
+
+            provided.value = true;
+            await wrapper.vm.$nextTick();
+
+            expect(wrapper.find('strong.validation-error').exists()).toBeFalsy();
+        });
+    });
+});
+
+function mountComponent(value?: string, validations?: ValidationMethod[], enableProvide?: boolean): MountedComponent {
     const testData = !!value || value === '' ? Object.assign({}, data, { value: value }) : data;
     const stringedData = JSON.stringify(testData).replace(/"/g, '\'');
 
-    const wrapper = mount(ValidatableInput, {
+    const options: MountingOptions<any> = {
         slots: {
             default: `<template #default="{ initialize, validate, invalid, showing, showValidity }">
                         <div :class="{ invalid, showing }"
@@ -228,13 +310,23 @@ function mountComponent(value?: string, validations?: ValidationMethod[]): Mount
                         >Foo</div>
                       </template>`,
             required: 'required error',
-            'min': 'min error',
-            'max': 'max error'
+            min: 'min error',
+            max: 'max error'
         },
         props: {
             validations: validations
         }
-    });
+    };
+
+    if (enableProvide) {
+        options.global = {
+            provide: {
+                [SubmittedSymbol]: provided
+            }
+        };
+    }
+
+    const wrapper = mount(ValidatableInput, options);
 
     const element = wrapper.find('div');
 

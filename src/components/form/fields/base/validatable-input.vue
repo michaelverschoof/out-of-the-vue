@@ -2,7 +2,7 @@
     <slot v-bind="$attrs" :initialize="initialize" :validate="validate" :invalid="!state.valid" :showing="showing" :show-validity="showValidity" />
 
     <template v-if="!state.valid && showing" v-for="validation of validations">
-        <strong v-if="$slots[validation.name] && state.failed[0] === validation.name" class="validation-error">
+        <strong v-if="provided($slots[validation.name]) && state.failed[0] === validation.name" class="validation-error">
             <slot :name="validation.name" />
         </strong>
     </template>
@@ -10,19 +10,60 @@
 
 <script lang="ts" setup>
 import { OptionalProps } from '@/components/props.types';
-import { FieldData, UpdateEmitType, ValidatedFieldData } from '@/composables/types';
+import { FieldData, SubmittedSymbol, UpdateEmitType, ValidatedFieldData } from '@/composables/types';
 import { useUserInputValidation } from '@/composables/validate-user-input';
-import { reactive, ref } from 'vue';
+import { provided } from '@/util/slots';
+import { inject, reactive, ref, watch } from 'vue';
 
 const emit = defineEmits<{ (event: UpdateEmitType, data: ValidatedFieldData): void; }>();
 
-const props = defineProps({ validations: OptionalProps.validations });
+const props = defineProps({
+    validations: OptionalProps.validations,
+    triggerValidation: OptionalProps.string
+});
 
 const state = reactive<ValidatedFieldData>({
     name: null,
     value: null,
     valid: !props.validations || !props.validations.length,
     failed: []
+});
+
+const triggeredSubmitValidation = inject(SubmittedSymbol, ref(false));
+
+watch(triggeredSubmitValidation, () => {
+    if (!triggeredSubmitValidation.value) {
+        showing.value = false;
+        return;
+    }
+
+    const failedValidations = validateInput(state, props.validations);
+    state.valid = !failedValidations.length;
+    state.failed = failedValidations;
+
+    showing.value = true;
+});
+
+const triggeredValidation = ref(null);
+
+watch(() => props.triggerValidation, (received: string) => {
+    if (!received) {
+        state.failed = state.failed.filter(item => item !== triggeredValidation.value);
+        state.valid = !!state.failed.length;
+        showing.value = !state.valid;
+        return;
+    }
+
+    const validation = props.validations.find(validation => validation.name === received);
+    if (!validation) {
+        return;
+    }
+
+    state.valid = false;
+    showing.value = true;
+    if (!state.failed.includes(received)) {
+        state.failed.push(received);
+    }
 });
 
 const showing = ref(false);

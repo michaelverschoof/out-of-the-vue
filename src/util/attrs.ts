@@ -5,10 +5,18 @@ type Data = Record<string, unknown>;
  * @param attributes the attributes list
  * @param exclude an array of attribute names to filter out
  */
-export function filter(attributes: Data, exclude: string[]): Data {
+export function exclude(attributes: Data, exclude: string[]): Data {
     if (!attributes || !exclude) {
         return attributes;
     }
 
     return Object.fromEntries(Object.entries(attributes).filter(([ key ]) => !exclude.includes(key)));
+}
+
+export function include(attributes: Data, include: string[]): Data {
+    if (!attributes || !include) {
+        return attributes;
+    }
+
+    return Object.fromEntries(Object.entries(attributes).filter(([ key ]) => include.includes(key)));
 }

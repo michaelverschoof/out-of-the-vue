@@ -6,7 +6,7 @@
         :type="type"
         :id="`${name}-${value}`"
         :name="name"
-        :checked="state.checked"
+        :checked="checked"
         v-model="model"
         @click="reselect"
     />
@@ -15,7 +15,7 @@
 <script lang="ts" setup>
 import { OptionalProps, RequiredProps } from '@/components/props.types';
 import { CheckableFieldData, UpdateEmitType } from '@/composables/types';
-import { computed, reactive, ref } from 'vue';
+import { computed, reactive, ref, watch } from 'vue';
 
 const emit = defineEmits<{ (event: UpdateEmitType, data: CheckableFieldData): void; }>();
 
@@ -43,6 +43,10 @@ const model = computed({
         state.checked = element.value.checked;
         emit('updated', { ...state });
     }
+});
+
+watch(() => props.checked, (received: boolean) => {
+    state.checked = received;
 });
 
 const reselect = () => {

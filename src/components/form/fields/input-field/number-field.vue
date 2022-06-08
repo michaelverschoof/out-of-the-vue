@@ -4,7 +4,7 @@
         <debounceable-input :delay="typingDelay" @updated="debounced">
             <template #default="{ debounce }">
 
-                <validatable-input :validations="validationMethods" @created="initialized" @updated="debounce">
+                <validatable-input :validations="validationMethods" :trigger-validation="triggerValidation" @created="initialized" @updated="debounce">
                     <template #default="{ validate, invalid, showing, showValidity }">
 
                         <header v-if="$slots.label" class="label">
@@ -18,7 +18,7 @@
                                 </template>
 
                                 <numeric-input
-                                    v-bind="filter($attrs, ['class'])"
+                                    v-bind="exclude($attrs, ['class', 'onCreated', 'onUpdated'])"
                                     :name="name"
                                     :value="value"
                                     :allow-decimals="allowDecimals"
@@ -59,7 +59,7 @@ import ValidatableInput from '@/components/form/fields/base/validatable-input.vu
 import { OptionalProps, RequiredProps } from '@/components/props.types';
 import { UpdateEmitType, ValidatedFieldData, ValidationMethod } from '@/composables/types';
 import { predefinedValidations } from '@/composables/validate-user-input';
-import { filter } from '@/util/attrs';
+import { exclude } from '@/util/attrs';
 import { ref } from 'vue';
 
 const emit = defineEmits<{ (event: UpdateEmitType, data: ValidatedFieldData): void; }>();
@@ -73,7 +73,8 @@ const props = defineProps({
     required: OptionalProps.booleanFalse,
     min: OptionalProps.number,
     max: OptionalProps.number,
-    validations: OptionalProps.validations
+    validations: OptionalProps.validations,
+    triggerValidation: OptionalProps.string
 });
 
 const focused = ref(false);
