@@ -1,11 +1,11 @@
 <template>
-    <label class="number-field input-field" :class="$attrs.class">
+    <label class="number-field input-field" v-bind="include($attrs, ['class'])">
 
         <debounceable-input :delay="typingDelay" @updated="debounced">
             <template #default="{ debounce }">
 
                 <validatable-input :validations="validationMethods" :trigger-validation="triggerValidation" @created="initialized" @updated="debounce">
-                    <template #default="{ validate, invalid, showing, showValidity }">
+                    <template #default="{ initialize, validate, invalid, showing, showValidity }">
 
                         <header v-if="$slots.label" class="label">
                             <slot name="label" />
@@ -25,8 +25,8 @@
                                     :allow-negative="allowNegative"
                                     @focused="focused = true"
                                     @blurred="focused = false; showValidity();"
+                                    @created="initialize"
                                     @updated="validate"
-                                    @created="validate"
                                 />
 
                                 <template #append>
@@ -59,7 +59,7 @@ import ValidatableInput from '@/components/form/fields/base/validatable-input.vu
 import { OptionalProps, RequiredProps } from '@/components/props.types';
 import { UpdateEmitType, ValidatedFieldData, ValidationMethod } from '@/composables/types';
 import { predefinedValidations } from '@/composables/validate-user-input';
-import { exclude } from '@/util/attrs';
+import { exclude, include } from '@/util/attrs';
 import { ref } from 'vue';
 
 const emit = defineEmits<{ (event: UpdateEmitType, data: ValidatedFieldData): void; }>();
@@ -77,7 +77,7 @@ const props = defineProps({
     triggerValidation: OptionalProps.string
 });
 
-const focused = ref(false);
+const focused = ref<boolean>(false);
 
 const validationMethods: ValidationMethod[] = [
     { ...predefinedValidations['required'], parameters: [ props.required ] },
@@ -87,11 +87,11 @@ const validationMethods: ValidationMethod[] = [
 ];
 
 const initialized = (data: ValidatedFieldData): void => {
-    emit('created', data);
+    emit('created', { ...data });
 };
 
 const debounced = (data: ValidatedFieldData): void => {
-    emit('updated', data);
+    emit('updated', { ...data });
 };
 </script>
 

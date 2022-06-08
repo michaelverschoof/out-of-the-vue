@@ -11,8 +11,11 @@
                 <main ref="main" tabindex="-1" @blur.capture="fieldBlurred(showValidity)">
                     <template v-for="(number, index) of length">
 
-                        <validatable-input :validations="inputValidations" @updated="(data) => { inputValidated(index, data); validateState(state) }">
-                            <template #default="{ validate, invalid }">
+                        <validatable-input :validations="inputValidations"
+                                           @created="validateState(state)"
+                                           @updated="(data) => { inputValidated(index, data); validateState(state) }"
+                        >
+                            <template #default="{ initialize, validate, invalid }">
 
                                 <text-input
                                     class="input"
@@ -25,7 +28,7 @@
                                     :value="state.value[index]"
                                     @keydown.delete.prevent="clearInput(index)"
                                     @focused="focusedElement = index"
-                                    @created="validate"
+                                    @created="initialize"
                                     @updated="validate"
                                 />
 
@@ -41,8 +44,8 @@
 
             </template>
 
-            <template #required>
-                <slot name="required" />
+            <template v-for="validation of fieldValidations" #[validation.name]>
+                <slot :name="validation.name" />
             </template>
         </validatable-input>
 
@@ -56,13 +59,12 @@ import { OptionalProps, RequiredProps } from '@/components/props.types';
 import { FieldData, UpdateEmitType, ValidatedFieldData, ValidationMethod } from '@/composables/types';
 import { useUserInput } from '@/composables/user-input';
 import { predefinedValidations } from '@/composables/validate-user-input';
-import { computed, reactive, ref, watch } from 'vue';
+import { computed, onMounted, reactive, ref, watch } from 'vue';
 
 const emit = defineEmits<{ (event: UpdateEmitType, data: ValidatedFieldData): void; }>();
 
 const props = defineProps({
     name: RequiredProps.string,
-    value: OptionalProps.string,
     focus: OptionalProps.boolean,
     required: OptionalProps.booleanFalse,
     validations: OptionalProps.validations,
@@ -91,7 +93,8 @@ const fieldValidations: ValidationMethod[] = [
             const value = <(string | number)[]> data.value;
             return !required || (!!value && value.length === length && value.every(val => val !== null));
         }
-    }
+    },
+    ...props.validations
 ];
 
 const allowedCharacters = `[${ props.type !== 'numeric' ? 'A-z' : '' }${ props.type !== 'alpha' ? '0-9' : '' }]`;
@@ -100,7 +103,7 @@ const state = reactive<ValidatedFieldData>({
     name: props.name,
     value: [],
     valid: !props.required,
-    failed: []
+    failed: props.required ? [ 'required' ] : []
 });
 
 /**
@@ -116,13 +119,26 @@ const focusedElement = computed({
     }
 });
 
+watch(() => props.focus, (received: boolean): void => {
+    if (!received) {
+        focusedElement.value = -1;
+        return;
+    }
+
+    if (selectedIndex.value !== null && selectedIndex.value !== -1) {
+        return;
+    }
+
+    focusedElement.value = (<string[]> state.value).indexOf(null);
+});
+
 const inputValidated = (index: number, data: ValidatedFieldData): void => {
-    state.value[index] = data.value;
+    state.value[index] = (<string> data.value)?.slice(0, 1) ?? null;
     if (!data.valid) {
         return;
     }
 
-    focusedElement.value = null;
+    focusedElement.value = index + 1;
 };
 
 const fieldValidated = (data: ValidatedFieldData): void => {
@@ -147,7 +163,7 @@ const fieldValidated = (data: ValidatedFieldData): void => {
 const main = ref<HTMLElement>(null);
 const fieldBlurred = (showValidity: () => void): void => {
     requestAnimationFrame(() => {
-        if (main.value.contains(document.activeElement)) {
+        if (!main.value || main.value.contains(document.activeElement)) {
             return;
         }
 
@@ -155,10 +171,6 @@ const fieldBlurred = (showValidity: () => void): void => {
         showValidity();
     });
 };
-
-watch(() => props.value, (received: string) => {
-    convertValueForState(received);
-});
 
 const filterPasteData = (event: ClipboardEvent): void => {
     const value = event.clipboardData?.getData('text');
@@ -172,14 +184,14 @@ const filterPasteData = (event: ClipboardEvent): void => {
 const { filter } = useUserInput();
 const regex = new RegExp(allowedCharacters, 'g');
 
-function convertValueForState(value: string): void {
+function convertValueForState(value?: string): void {
     const stateValue = [ ...new Array(props.length) ];
     if (!value) {
         state.value = stateValue.map(() => null);
         return;
     }
 
-    const filtered = filter(value, regex).slice(0, props.length).split('');
+    const filtered = filter(value, regex).toUpperCase().slice(0, props.length).split('');
     state.value = stateValue.map((item, index) => filtered[index] ?? null);
 
     focusedElement.value = null;
@@ -193,6 +205,11 @@ const clearInput = (index: number): void => {
 
     state.value[index] = null;
 };
+
+onMounted(() => {
+    convertValueForState();
+    emit('created', { ...state });
+});
 </script>
 
 <style lang="scss" scoped>

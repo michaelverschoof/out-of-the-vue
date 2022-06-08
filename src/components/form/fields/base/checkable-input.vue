@@ -2,22 +2,28 @@
     <input
         ref="element"
         class="checkable-input"
+        :class="{ focused }"
         autocomplete="off"
         :type="type"
         :id="`${name}-${value}`"
         :name="name"
         :checked="checked"
         v-model="model"
+        @focus="focusElement"
+        @blur="blurElement"
         @click="reselect"
     />
 </template>
 
 <script lang="ts" setup>
 import { OptionalProps, RequiredProps } from '@/components/props.types';
-import { CheckableFieldData, UpdateEmitType } from '@/composables/types';
+import { CheckableFieldData, FocusEmitType, UpdateEmitType } from '@/composables/types';
 import { computed, reactive, ref, watch } from 'vue';
 
-const emit = defineEmits<{ (event: UpdateEmitType, data: CheckableFieldData): void; }>();
+const emit = defineEmits<{
+    (event: FocusEmitType): void;
+    (event: UpdateEmitType, data: CheckableFieldData): void;
+}>();
 
 const props = defineProps({
     name: RequiredProps.string,
@@ -30,6 +36,7 @@ const props = defineProps({
 });
 
 const element = ref<HTMLInputElement>();
+const focused = ref<boolean>(false);
 
 const state = reactive<CheckableFieldData>({
     name: props.name,
@@ -55,6 +62,16 @@ const reselect = () => {
     }
 
     emit('updated', { ...state });
+};
+
+const focusElement = (): void => {
+    focused.value = true;
+    emit('focused');
+};
+
+const blurElement = (): void => {
+    focused.value = false;
+    emit('blurred');
 };
 
 emit('created', { ...state });

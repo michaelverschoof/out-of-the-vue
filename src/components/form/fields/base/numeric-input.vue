@@ -1,5 +1,6 @@
 <template>
     <text-input
+        v-bind="exclude($attrs, ['class', 'onCreated', 'onUpdated'])"
         :allowed-characters="regex"
         :inputmode="allowDecimals ? 'decimal' : 'numeric'"
         :name="name"
@@ -14,6 +15,8 @@
 import TextInput from '@/components/form/fields/base/text-input.vue';
 import { OptionalProps, RequiredProps } from '@/components/props.types';
 import { NumberFieldData, StringFieldData, UpdateEmitType } from '@/composables/types';
+import { exclude } from '@/util/attrs';
+import { filter, parse } from '@/util/numbers';
 import { computed, reactive, ref, watch } from 'vue';
 
 const emit = defineEmits<{ (event: UpdateEmitType, data: NumberFieldData): void; }>();
@@ -54,38 +57,31 @@ watch(() => props.value, (received: number): void => {
     model.value = state.value?.toString();
 });
 
-const parse = (data: StringFieldData): number => {
-    let filtered = data.value?.trim();
+const parseNumber = (data: StringFieldData): number => {
+    const filtered = filter(data.value, props.allowDecimals, props.allowNegative);
     if (!filtered) {
         state.value = null;
         return null;
     }
 
-    if (props.allowDecimals) {
-        // Filter all decimal signs except the last
-        filtered = data.value.replace(/[.,](?=.*[.,])/g, '');
-    }
-
-    if (props.allowNegative) {
-        // Filter minus signs from the string except the first character (as it's allowed there)
-        filtered = filtered[0] + filtered.slice(1).replace('-', '');
-    }
-
     // Set the filtered value for the text input field
     model.value = filtered;
-
-    // Parse it to a number and return it with null as a fallback in case of NaN (which should not happen)
-    const numeric = Number(filtered.replace(',', '.'));
-    state.value = !isNaN(numeric) ? numeric : null;
+    state.value = parse(filtered);
 };
 
 const created = (data: StringFieldData): void => {
-    parse(data);
+    parseNumber(data);
     emit('created', { ...state });
 };
 
 const updated = (data: StringFieldData): void => {
-    parse(data);
+    parseNumber(data);
     emit('updated', { ...state });
+};
+</script>
+
+<script lang="ts">
+export default {
+    inheritAttrs: false
 };
 </script>

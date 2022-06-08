@@ -147,6 +147,53 @@ describe('Ticking boxes', () => {
     });
 });
 
+describe('Focusing boxes', () => {
+
+    it('should focus the radio component', async () => {
+        const { input, wrapper } = mountRadio();
+
+        await input.trigger('focus');
+        expect(input.classes().includes('focused')).toBeTruthy();
+
+        emitted(wrapper, 'focused');
+    });
+
+    it('should focus the checkbox component', async () => {
+        const { input, wrapper } = mountCheckbox();
+
+        await input.trigger('focus');
+        expect(input.classes().includes('focused')).toBeTruthy();
+
+        emitted(wrapper, 'focused');
+    });
+
+    it('should blur the radio component', async () => {
+        const { input, wrapper } = mountRadio();
+
+        await input.trigger('focus');
+        expect(input.classes().includes('focused')).toBeTruthy();
+
+        await input.trigger('blur');
+        expect(input.classes().includes('focused')).toBeFalsy();
+
+        emitted(wrapper, 'focused');
+        emitted(wrapper, 'blurred');
+    });
+
+    it('should blur the checkbox component', async () => {
+        const { input, wrapper } = mountCheckbox();
+
+        await input.trigger('focus');
+        expect(input.classes().includes('focused')).toBeTruthy();
+
+        await input.trigger('blur');
+        expect(input.classes().includes('focused')).toBeFalsy();
+
+        emitted(wrapper, 'focused');
+        emitted(wrapper, 'blurred');
+    });
+});
+
 function check(input: DOMWrapper<Element>, triggerChange: boolean = true): Promise<void> {
     (<HTMLInputElement> input.element).checked = true;
     expect((<HTMLInputElement> input.element).checked).toBeTruthy();

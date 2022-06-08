@@ -75,7 +75,7 @@ const props = defineProps({
     triggerValidation: OptionalProps.string
 });
 
-const focused = ref(false);
+const focused = ref<boolean>(false);
 
 const validationMethods: ValidationMethod[] = [
     { ...predefinedValidations['required'], parameters: [ props.required ] },
@@ -85,11 +85,11 @@ const validationMethods: ValidationMethod[] = [
 ];
 
 const initialized = (data: ValidatedFieldData): void => {
-    emit('created', data);
+    emit('created', { ...data });
 };
 
 const debounced = (data: ValidatedFieldData): void => {
-    emit('updated', data);
+    emit('updated', { ...data });
 };
 </script>
 

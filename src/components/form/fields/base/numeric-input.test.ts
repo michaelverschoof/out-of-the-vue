@@ -62,7 +62,7 @@ describe('Updating input', () => {
     it('should update value from props', async () => {
         const { input, wrapper } = mountComponent();
 
-        await wrapper.setProps(Object.assign({}, numberProps, { value: 456.78 }));
+        await wrapper.setProps({ value: 456.78 });
         expect(input.element.value).toBe('456.78');
 
         const emits = emitted(wrapper, 'updated');
@@ -85,7 +85,7 @@ describe('Updating input', () => {
         await input.setValue('456');
         expect(input.element.value).toBe('456');
 
-        await wrapper.setProps(Object.assign({}, numberProps, { value: 456 }));
+        await wrapper.setProps({ value: 456 });
         expect(input.element.value).toBe('456');
 
         const created = emitted(wrapper, 'created');

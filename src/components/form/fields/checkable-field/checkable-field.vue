@@ -12,7 +12,7 @@
                     <template v-for="(item, key) of $slots" :key="key">
 
                         <label v-if="!nonOptionSlots.includes(key)"
-                               :class="{ selected: state.value.includes(key), disabled: disabled.includes(key) }"
+                               :class="{ focused: focusedItems.has(key), selected: state.value.includes(key), disabled: disabled.includes(key) }"
                                class="checkable-field-item"
                         >
                             <checkable-input
@@ -23,6 +23,8 @@
                                 :checked="state.value.includes(key)"
                                 :disabled="disabled.includes(key)"
                                 tabindex="0"
+                                @focused="focusItem(key)"
+                                @blurred="blurItem(key)"
                                 @created="(data) => { created(data); initialize(state); }"
                                 @updated="(data) => { updated(data); validate(state); }"
                             />
@@ -89,7 +91,8 @@ if (props.type !== 'radio') {
 
 const nonOptionSlots = [ 'label', 'information', ...validationMethods.map(method => method.name) ];
 
-const selectedItems = ref<Set<string>>(filterSelected(props.selected));
+const selectedItems = ref<Set<string>>(new Set(filterSelected(props.selected)));
+const focusedItems = ref<Set<string>>(new Set());
 
 const state = reactive<ValidatedFieldData>({
     name: props.name,
@@ -99,11 +102,12 @@ const state = reactive<ValidatedFieldData>({
 });
 
 watch(() => props.selected, (received: string[]) => {
-    if (received === state.value) {
+    const filtered = filterSelected(received);
+    if (JSON.stringify(filtered) === JSON.stringify(state.value)) {
         return;
     }
 
-    selectedItems.value = filterSelected(received);
+    selectedItems.value = new Set(filtered);
     state.value = Array.from(selectedItems.value);
 });
 
@@ -133,11 +137,19 @@ const validated = (data: ValidatedFieldData): void => {
     state.valid = data.valid;
     state.failed = data.failed;
 
-    emit('updated', state);
+    emit('updated', { ...state });
+};
+
+const focusItem = (item: string): void => {
+    focusedItems.value.add(item);
+};
+
+const blurItem = (item: string): void => {
+    focusedItems.value.delete(item);
 };
 
 const main = ref<HTMLElement>(null);
-const fieldBlurred = (showValidity: () => void) => {
+const fieldBlurred = (showValidity: () => void): void => {
     requestAnimationFrame(() => {
         if (!main.value || main.value.contains(document.activeElement)) {
             return;
@@ -148,11 +160,11 @@ const fieldBlurred = (showValidity: () => void) => {
 };
 
 onMounted(() => {
-    emit('created', state);
+    emit('created', { ...state });
 });
 
-function filterSelected(selected: string[]): Set<string> {
-    return new Set((selected || []).filter(item => item !== null && item !== undefined));
+function filterSelected(selected: string[]): string[] {
+    return (selected || []).filter(item => item !== null && item !== undefined);
 }
 </script>
 
@@ -172,6 +184,10 @@ function filterSelected(selected: string[]): Set<string> {
 
     .hidden {
         display: none;
+    }
+
+    .content {
+        flex-grow: 1;
     }
 }
 </style>

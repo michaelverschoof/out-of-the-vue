@@ -31,6 +31,7 @@ import { provided } from '@/util/slots';
     grid-template-areas: "prepend content append";
     grid-template-columns: max-content 1fr max-content;
     height: 100%;
+    width: 100%;
 
     .prepend, .append {
         display: flex;

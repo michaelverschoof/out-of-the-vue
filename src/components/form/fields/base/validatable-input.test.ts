@@ -273,6 +273,7 @@ describe('Triggering validation externally', () => {
 
         it('should hide error', async () => {
             const { wrapper } = mountComponent(null, validations, true);
+            expect(wrapper.find('strong.validation-error').exists()).toBeFalsy();
 
             provided.value = true;
             await wrapper.vm.$nextTick();
@@ -283,6 +284,24 @@ describe('Triggering validation externally', () => {
             await wrapper.vm.$nextTick();
 
             expect(wrapper.find('strong.validation-error').exists()).toBeFalsy();
+        });
+
+        it('should keep showing error if trigger was set', async () => {
+            const { element, wrapper } = mountComponent('foo', validations, true);
+            expect(wrapper.find('strong.validation-error').exists()).toBeFalsy();
+
+            await element.trigger('updated');
+            expect(wrapper.find('strong.validation-error').exists()).toBeFalsy();
+
+            await wrapper.setProps({ triggerValidation: 'max' });
+            expect(wrapper.find('strong.validation-error').exists()).toBeTruthy();
+            expect(wrapper.find('strong.validation-error').text()).toBe('max error');
+
+            provided.value = true;
+            await wrapper.vm.$nextTick();
+
+            expect(wrapper.findAll('strong.validation-error').length).toBe(1);
+            expect(wrapper.find('strong.validation-error').text()).toBe('max error');
         });
 
         it('should return if no value is provided', async () => {
