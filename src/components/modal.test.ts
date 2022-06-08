@@ -89,12 +89,16 @@ describe('Opening and closing modal', async () => {
     });
 
     it('should not open using prop if already opened', async () => {
-        const wrapper = await mountComponent(all, true);
+        const wrapper = await mountComponent(all);
 
-        const modal = await getModalElement(wrapper);
+        let modal = await getModalElement(wrapper);
+        expect(modal).not.toMatchSnapshot();
+
+        await wrapper.find('#opener').trigger('click');
         expect(modal).toMatchSnapshot();
 
         await wrapper.setProps({ opened: true });
+        modal = await getModalElement(wrapper);
         expect(modal).toMatchSnapshot();
 
         emitted(wrapper, 'opened', 1);
