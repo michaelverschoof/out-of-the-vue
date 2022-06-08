@@ -48,7 +48,7 @@ const state = reactive<NumberFieldData>({
     value: props.value ?? null
 });
 
-watch(() => props.value, (received: number): void => {
+watch(() => props.value, (received: number) => {
     if (received === state.value) {
         return;
     }

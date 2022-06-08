@@ -55,7 +55,7 @@ describe('Mounting components', () => {
     });
 
     it('should mount the component in opened state', async () => {
-        const wrapper = await mountComponent(all, { opened: 1 });
+        const wrapper = await mountComponent(all, true);
 
         const modal = await getModalElement(wrapper);
         expect(modal).toMatchSnapshot();
@@ -76,8 +76,44 @@ describe('Opening and closing modal', async () => {
         emitted(wrapper, 'opened');
     });
 
+    it('should open using prop', async () => {
+        const wrapper = await mountComponent(all);
+
+        const modal = await getModalElement(wrapper);
+        expect(modal).not.toMatchSnapshot();
+
+        await wrapper.setProps({ opened: true });
+        expect(modal).toMatchSnapshot();
+
+        emitted(wrapper, 'opened');
+    });
+
+    it('should not open using prop if already opened', async () => {
+        const wrapper = await mountComponent(all, true);
+
+        const modal = await getModalElement(wrapper);
+        expect(modal).toMatchSnapshot();
+
+        await wrapper.setProps({ opened: true });
+        expect(modal).toMatchSnapshot();
+
+        emitted(wrapper, 'opened', 1);
+    });
+
+    it('should close using prop', async () => {
+        const wrapper = await mountComponent(all, true);
+
+        const modal = await getModalElement(wrapper);
+        expect(modal).toMatchSnapshot();
+
+        await wrapper.setProps({ opened: false });
+        expect(modal).not.toMatchSnapshot();
+
+        emitted(wrapper, 'closed');
+    });
+
     it('should close using header', async () => {
-        const wrapper = await mountComponent(all, { opened: 1 });
+        const wrapper = await mountComponent(all, true);
 
         let modal = await getModalElement(wrapper);
         (<HTMLButtonElement> modal.querySelector('#header')).click();
@@ -89,7 +125,7 @@ describe('Opening and closing modal', async () => {
     });
 
     it('should close using content', async () => {
-        const wrapper = await mountComponent(all, { opened: 1 });
+        const wrapper = await mountComponent(all, true);
 
         let modal = await getModalElement(wrapper);
         (<HTMLButtonElement> modal.querySelector('#content')).click();
@@ -101,7 +137,7 @@ describe('Opening and closing modal', async () => {
     });
 
     it('should close using footer', async () => {
-        const wrapper = await mountComponent(all, { opened: 1 });
+        const wrapper = await mountComponent(all, true);
 
         let modal = await getModalElement(wrapper);
         (<HTMLButtonElement> modal.querySelector('#footer')).click();
@@ -113,7 +149,7 @@ describe('Opening and closing modal', async () => {
     });
 
     it('should close using backdrop', async () => {
-        const wrapper = await mountComponent(all, { opened: 1 });
+        const wrapper = await mountComponent(all, true);
 
         let modal = await getModalElement(wrapper);
         expect(modal).not.toBeNull();
@@ -128,7 +164,7 @@ describe('Opening and closing modal', async () => {
     });
 
     it('should close using escape button', async () => {
-        const wrapper = await mountComponent(all, { opened: 1 });
+        const wrapper = await mountComponent(all, true);
 
         let modal = await getModalElement(wrapper);
         expect(modal).not.toBeNull();
@@ -154,9 +190,9 @@ it('should unmount the component', async () => {
     expect(wrapper.html()).not.toMatchSnapshot();
 });
 
-async function mountComponent(slots?: ProvidedSlots, props?: { opened?: number }): Promise<VueWrapper<any>> {
+async function mountComponent(slots?: ProvidedSlots, open: boolean = false): Promise<VueWrapper<any>> {
     return mount(Modal, {
-        props: Object.assign({}, { parent: '#parent' }, props),
+        props: { parent: '#parent', opened: open },
         slots: slots,
         attachTo: document.body
     });

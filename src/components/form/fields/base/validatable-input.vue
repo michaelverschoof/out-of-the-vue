@@ -31,8 +31,8 @@ const state = reactive<ValidatedFieldData>({
 
 const triggeredSubmitValidation = inject(SubmittedSymbol, ref(false));
 
-watch(triggeredSubmitValidation, () => {
-    if (!triggeredSubmitValidation.value && !props.triggerValidation) {
+watch(triggeredSubmitValidation, (received: boolean) => {
+    if (!received && !props.triggerValidation) {
         showing.value = false;
         return;
     }

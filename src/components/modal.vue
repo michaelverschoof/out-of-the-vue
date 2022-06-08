@@ -35,15 +35,19 @@ const props = defineProps({
         required: false,
         default: 'body'
     },
-    opened: OptionalProps.number
+    opened: OptionalProps.boolean
 });
 
 const element = ref<HTMLElement>(null);
 
 const showing = ref(false);
 
-watch(() => props.opened, () => {
-    showing.value = !!props.opened || 0 === props.opened;
+watch(() => props.opened, (received: boolean) => {
+    if (received === showing.value) {
+        return;
+    }
+
+    received ? open() : close();
 });
 
 const open = () => {
@@ -61,11 +65,15 @@ const close = (): void => {
 };
 
 onMounted(() => {
-    showing.value = !!props.opened || 0 === props.opened;
+    if (!props.opened) {
+        return;
+    }
+
+    open();
 });
 
 onUnmounted(() => {
-    showing.value = false;
+    close();
 });
 </script>
 

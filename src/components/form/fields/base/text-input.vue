@@ -55,7 +55,7 @@ const model = computed({
     }
 });
 
-watch(() => props.value, (received: string): void => {
+watch(() => props.value, (received: string) => {
     if (received === model.value) {
         return;
     }
@@ -63,7 +63,7 @@ watch(() => props.value, (received: string): void => {
     model.value = filterAndTransform(received);
 });
 
-watch(() => props.focus, (received: boolean): void => {
+watch(() => props.focus, (received: boolean) => {
     !received ? element.value?.blur() : element.value?.focus();
 });
 
