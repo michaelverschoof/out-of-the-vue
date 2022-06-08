@@ -61,7 +61,7 @@
         </checkable-field>
     </div>
 
-    <modal>
+    <modal :opened="modalOpened" @closed="modalOpened = null;">
         <template #opener="{ open }">
             <button @click="open">open modal</button>
         </template>
@@ -80,6 +80,8 @@
             Some footer stuff
         </template>
     </modal>
+
+    <button type="button" @click="modalOpened = 1;">set modal's opened to 1</button>
 </template>
 
 <script lang="ts" setup>
@@ -119,6 +121,8 @@ const onUpdated = (data: ValidatedFieldData): void => {
     console.log(data);
     field[data.name] = data;
 };
+
+const modalOpened = ref<number>(null);
 </script>
 
 <style lang="scss">

@@ -4,7 +4,7 @@
     <teleport :to="parent">
         <transition name="modal">
 
-            <div v-if="showing" ref="element" class="backdrop" tabindex="-1" @click.self="close" @keyup.esc="close">
+            <div v-if="showing" ref="element" class="backdrop" tabindex="-1" @click.self="close" @keydown.esc="close">
                 <div v-bind="$attrs" class="modal">
                     <header v-if="$slots.header">
                         <slot name="header" :close="close" />
@@ -25,7 +25,7 @@
 <script lang="ts" setup>
 import { OptionalProps } from '@/components/props.types';
 import { ModalEmitType } from '@/composables/types';
-import { onMounted, onUnmounted, ref } from 'vue';
+import { onMounted, onUnmounted, ref, watch } from 'vue';
 
 const emit = defineEmits<{ (event: ModalEmitType): void; }>();
 
@@ -35,12 +35,20 @@ const props = defineProps({
         required: false,
         default: 'body'
     },
-    opened: OptionalProps.number
+    opened: OptionalProps.boolean
 });
 
 const element = ref<HTMLElement>(null);
 
 const showing = ref(false);
+
+watch(() => props.opened, (received: boolean) => {
+    if (received === showing.value) {
+        return;
+    }
+
+    received ? open() : close();
+});
 
 const open = () => {
     showing.value = true;
@@ -57,11 +65,15 @@ const close = (): void => {
 };
 
 onMounted(() => {
-    showing.value = !!props.opened || props.opened === 0;
+    if (!props.opened) {
+        return;
+    }
+
+    open();
 });
 
 onUnmounted(() => {
-    showing.value = false;
+    close();
 });
 </script>
 

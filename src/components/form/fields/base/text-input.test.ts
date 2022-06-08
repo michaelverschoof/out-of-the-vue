@@ -232,7 +232,7 @@ describe('Preventing keyboard input', () => {
     it('should allow characters in the regex', async () => {
         const { wrapper } = mountComponent({ allowedCharacters: '[A-z]' }, true);
 
-        const keyPress = new KeyboardEvent('keypress', { key: 'a' });
+        const keyPress = new KeyboardEvent('keydown', { key: 'a' });
         vi.spyOn(keyPress, 'preventDefault');
 
         wrapper.find('input').element.dispatchEvent(keyPress);
@@ -242,7 +242,7 @@ describe('Preventing keyboard input', () => {
     it('should prevent characters not in the regex', async () => {
         const { wrapper } = mountComponent({ allowedCharacters: '[A-z]' }, true);
 
-        const keyPress = new KeyboardEvent('keypress', { key: '9' });
+        const keyPress = new KeyboardEvent('keydown', { key: '9' });
         vi.spyOn(keyPress, 'preventDefault');
 
         wrapper.find('input').element.dispatchEvent(keyPress);
