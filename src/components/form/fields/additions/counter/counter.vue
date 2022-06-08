@@ -17,13 +17,3 @@ defineProps({
     }
 });
 </script>
-
-<style lang="scss" scoped>
-.counter {
-    transition: color 200ms ease;
-
-    &.exceeded {
-        color: #ff0000;
-    }
-}
-</style>

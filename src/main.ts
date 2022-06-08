@@ -1,4 +1,4 @@
+import OutOfTheVue from '@/out-of-the-vue.vue';
 import { createApp } from 'vue';
-import OutOfTheVue from './OutOfTheVue.vue';
 
 createApp(OutOfTheVue).mount('#app');

@@ -14,7 +14,7 @@
                         <validatable-input :validations="inputValidations" @updated="(data) => { inputValidated(index, data); validateState(state) }">
                             <template #default="{ validate, invalid }">
 
-                                <user-input
+                                <text-input
                                     class="input"
                                     maxlength="1"
                                     transform-input="uppercase"
@@ -50,7 +50,7 @@
 </template>
 
 <script lang="ts" setup>
-import UserInput from '@/components/form/fields/base/user-input.vue';
+import TextInput from '@/components/form/fields/base/text-input.vue';
 import ValidatableInput from '@/components/form/fields/base/validatable-input.vue';
 import { OptionalProps, RequiredProps } from '@/components/props.types';
 import { FieldData, UpdateEmitType, ValidatedFieldData, ValidationMethod } from '@/composables/types';

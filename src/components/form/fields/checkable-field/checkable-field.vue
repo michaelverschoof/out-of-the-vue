@@ -146,10 +146,6 @@ const fieldBlurred = (showValidity: () => void) => {
     min-height: 3.375em;
     padding: 0.5em 1em;
 
-    &.selected {
-        background: #f3f7f9;
-    }
-
     &.disabled {
         cursor: not-allowed;
     }

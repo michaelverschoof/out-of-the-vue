@@ -68,7 +68,6 @@ onUnmounted(() => {
 <style lang="scss" scoped>
 .backdrop {
     align-items: center;
-    background-color: rgba(52, 58, 64, 0.8);
     display: flex;
     flex-direction: column;
     height: 100%;
@@ -80,50 +79,21 @@ onUnmounted(() => {
     width: 100%;
 
     .modal {
-        background-color: darkgreen;
-    }
-
-    .modal {
         display: flex;
         flex-direction: column;
-        transition: transform 500ms ease;
-        color: black;
         max-width: 100vw;
         max-height: 100vh;
         overflow-y: hidden;
         flex-wrap: nowrap;
 
-        header {
+        header,
+        footer {
             flex-shrink: 0;
         }
 
         main {
             overflow-y: auto;
             flex-grow: 1;
-        }
-
-        footer {
-            flex-shrink: 0;
-        }
-    }
-}
-
-.modal {
-    &-enter-active,
-    &-leave-active {
-        transition: opacity 300ms ease;
-    }
-
-    &-leave-active {
-        transition-delay: 300ms;
-    }
-
-    &-enter-from,
-    &-leave-to {
-        opacity: 0;
-
-        .modal {
-            transform: translateY(100%);
         }
     }
 }

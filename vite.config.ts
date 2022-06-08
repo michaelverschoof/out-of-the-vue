@@ -11,6 +11,22 @@ export default defineConfig({
     resolve: {
         alias: { '@': src, '@test': test }
     },
+    build: {
+        lib: {
+            entry: `${ src }/index.ts`,
+            name: 'OutOfTheVue',
+            fileName: (format) => `out-of-the-vue.${ format }.js`
+        },
+        rollupOptions: {
+            external: [ 'vue' ],
+            output: {
+                globals: {
+                    vue: 'Vue'
+                },
+                sourcemapExcludeSources: true
+            }
+        }
+    },
     test: {
         resolveSnapshotPath: (testPath, snapExtension) => `${ snapshots }/${ testPath }${ snapExtension }`
     }

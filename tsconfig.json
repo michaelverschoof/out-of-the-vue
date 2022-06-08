@@ -1,6 +1,12 @@
 {
     "compilerOptions": {
         "baseUrl": ".",
+        "outDir": "dist",
+        "declaration": true,
+        "declarationDir": "dist/types",
+        "module": "esnext",
+        "moduleResolution": "node",
+        "skipLibCheck": true,
         "paths": {
             "@/*": [
                 "src/*"
@@ -8,8 +14,9 @@
             "@test/*": [
                 "test/*"
             ]
-        },
-        "module": "esnext",
-        "moduleResolution": "node"
-    }
+        }
+    },
+    "include": [
+        "src"
+    ]
 }

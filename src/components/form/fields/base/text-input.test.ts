@@ -1,4 +1,4 @@
-import UserInput from '@/components/form/fields/base/user-input.vue';
+import TextInput from '@/components/form/fields/base/text-input.vue';
 import { emitted } from '@test/emits';
 import { DOMWrapper, mount, VueWrapper } from '@vue/test-utils';
 import { beforeAll, describe, expect, it } from 'vitest';
@@ -8,7 +8,7 @@ import { beforeAll, describe, expect, it } from 'vitest';
  */
 
 const props = {
-    name: 'user-input',
+    name: 'text-input',
     value: 'foo',
     focus: false
 };
@@ -17,7 +17,7 @@ const textProps = Object.assign({ textarea: false }, props);
 const textareaProps = Object.assign({ textarea: true }, props);
 
 beforeAll(() => {
-    expect(UserInput).toBeTruthy();
+    expect(TextInput).toBeTruthy();
 });
 
 describe('Mounting components', () => {
@@ -247,7 +247,7 @@ function mountComponent(props: { [key: string]: any } = null, attachToDocument: 
         options['attachTo'] = document.body;
     }
 
-    const wrapper = mount(UserInput, options);
+    const wrapper = mount(TextInput, options);
     const input = wrapper.find('input');
 
     return { wrapper, input };
