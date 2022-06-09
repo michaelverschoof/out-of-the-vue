@@ -12,8 +12,8 @@
                     <template v-for="(number, index) of length">
 
                         <validatable-input :validations="inputValidations"
-                                           @created="validateState(state)"
-                                           @updated="(data) => { inputValidated(index, data); validateState(state) }"
+                                           @created="validateState(toRaw(state))"
+                                           @updated="(data) => { inputValidated(index, data); validateState(toRaw(state)) }"
                         >
                             <template #default="{ initialize, validate, invalid }">
 
@@ -59,7 +59,7 @@ import { OptionalProps, RequiredProps } from '@/components/props.types';
 import { FieldData, UpdateEmitType, ValidatedFieldData, ValidationMethod } from '@/composables/types';
 import { useUserInput } from '@/composables/user-input';
 import { predefinedValidations } from '@/composables/validate-user-input';
-import { computed, onMounted, reactive, ref, watch } from 'vue';
+import { computed, onMounted, reactive, ref, toRaw, watch } from 'vue';
 
 const emit = defineEmits<{ (event: UpdateEmitType, data: ValidatedFieldData): void; }>();
 
