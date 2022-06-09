@@ -82,7 +82,7 @@ describe('Opening and closing modal', async () => {
         const modal = await getModalElement(wrapper);
         expect(modal).not.toMatchSnapshot();
 
-        await wrapper.setProps({ opened: true });
+        await wrapper.setProps({ open: true });
         expect(modal).toMatchSnapshot();
 
         emitted(wrapper, 'opened');
@@ -97,7 +97,7 @@ describe('Opening and closing modal', async () => {
         await wrapper.find('#opener').trigger('click');
         expect(modal).toMatchSnapshot();
 
-        await wrapper.setProps({ opened: true });
+        await wrapper.setProps({ open: true });
         modal = await getModalElement(wrapper);
         expect(modal).toMatchSnapshot();
 
@@ -110,7 +110,7 @@ describe('Opening and closing modal', async () => {
         const modal = await getModalElement(wrapper);
         expect(modal).toMatchSnapshot();
 
-        await wrapper.setProps({ opened: false });
+        await wrapper.setProps({ open: false });
         expect(modal).not.toMatchSnapshot();
 
         emitted(wrapper, 'closed');
@@ -196,7 +196,7 @@ it('should unmount the component', async () => {
 
 async function mountComponent(slots?: ProvidedSlots, open: boolean = false): Promise<VueWrapper<any>> {
     return mount(Modal, {
-        props: { parent: '#parent', opened: open },
+        props: { parent: '#parent', open: open },
         slots: slots,
         attachTo: document.body
     });

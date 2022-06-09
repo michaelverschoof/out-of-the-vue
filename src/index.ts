@@ -5,7 +5,7 @@ export { default as Modal } from './components/modal.vue';
 export { default as CheckableField } from './components/form/fields/checkable-field/checkable-field.vue';
 export { default as TextField } from './components/form/fields/input-field/text-field.vue';
 export { default as NumberField } from './components/form/fields/input-field/number-field.vue';
-export { default as OneTimeCode } from './components/form/fields/input-field/one-time-code-field.vue';
+export { default as OneTimeCodeField } from './components/form/fields/input-field/one-time-code-field.vue';
 
 /**
  * Base field components

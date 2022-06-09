@@ -1,19 +1,19 @@
 <template>
-    <slot name="opener" :open="open" />
+    <slot name="opener" :open="openModal" />
 
     <teleport :to="parent">
         <transition name="modal">
 
-            <div v-if="showing" ref="element" class="backdrop" tabindex="-1" @click.self="close" @keydown.esc="close">
+            <div v-if="showing" ref="element" class="backdrop" tabindex="-1" @click.self="closeModal" @keydown.esc="closeModal">
                 <div v-bind="$attrs" class="modal">
                     <header v-if="$slots.header">
-                        <slot name="header" :close="close" />
+                        <slot name="header" :close="closeModal" />
                     </header>
                     <main>
-                        <slot :close="close" />
+                        <slot :close="closeModal" />
                     </main>
                     <footer v-if="$slots.footer">
-                        <slot name="footer" :close="close" />
+                        <slot name="footer" :close="closeModal" />
                     </footer>
                 </div>
             </div>
@@ -35,22 +35,22 @@ const props = defineProps({
         required: false,
         default: 'body'
     },
-    opened: OptionalProps.boolean
+    open: OptionalProps.boolean
 });
 
 const element = ref<HTMLElement>(null);
 
 const showing = ref(false);
 
-watch(() => props.opened, (received: boolean) => {
+watch(() => props.open, (received: boolean) => {
     if (received === showing.value) {
         return;
     }
 
-    received ? open() : close();
+    received ? openModal() : closeModal();
 });
 
-const open = () => {
+const openModal = () => {
     showing.value = true;
     emit('opened');
 
@@ -59,21 +59,21 @@ const open = () => {
     });
 };
 
-const close = (): void => {
+const closeModal = (): void => {
     showing.value = false;
     emit('closed');
 };
 
 onMounted(() => {
-    if (!props.opened) {
+    if (!props.open) {
         return;
     }
 
-    open();
+    openModal();
 });
 
 onUnmounted(() => {
-    close();
+    closeModal();
 });
 </script>
 

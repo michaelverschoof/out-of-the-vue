@@ -15,7 +15,7 @@ const props = {
 
 const createdEmit = {
     name: props.name,
-    value: [ null, null, null, null, null, null ],
+    value: null,
     valid: true,
     failed: []
 };
@@ -397,11 +397,11 @@ describe('Validating field', () => {
         const inputs = wrapper.findAll('input');
         expect(wrapper.find('strong.validation-error').exists()).toBeFalsy();
 
-        await inputs[0].element.focus();
+        await inputs[0].trigger('focus');
         expect(inputs.some(input => input.classes().includes('invalid'))).toBeFalsy();
         expect(wrapper.find('strong.validation-error').exists()).toBeFalsy();
 
-        await wrapper.find('main').trigger('blur');
+        await inputs[0].trigger('blur');
         expect(inputs.every(input => input.classes().includes('invalid'))).toBeTruthy();
 
         expect(wrapper.find('strong.validation-error').exists()).toBeTruthy();
@@ -418,7 +418,7 @@ describe('Validating field', () => {
         const inputs = wrapper.findAll('input');
         expect(wrapper.find('strong.validation-error').exists()).toBeFalsy();
 
-        await inputs[0].element.focus();
+        await inputs[0].trigger('focus');
         expect(inputs[0].classes().includes('focused')).toBeTruthy();
 
         await wrapper.find('main').trigger('blur');
