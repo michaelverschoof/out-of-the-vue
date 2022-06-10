@@ -1,7 +1,7 @@
 {
     "name": "out-of-the-vue",
     "author": "Michael Verschoof",
-    "version": "0.1.0-beta.23",
+    "version": "0.1.0-beta.24",
     "license": "MIT",
     "files": [
         "dist"
