@@ -1,11 +1,74 @@
-# Vue 3 + Typescript + Vite
+<h1 align="center">Out of the Vue</h1>
+<p align="center">A functional component library based on Vue 3 and Vite</p>
 
-This template should help get you started developing with Vue 3 and Typescript in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+<p align="center">
+  <a href="https://www.npmjs.com/package/out-of-the-vue">
+    <img src="https://img.shields.io/npm/dt/out-of-the-vue.svg" alt="Downloads">
+  </a>
+  <a href="https://www.npmjs.com/package/out-of-the-vue">
+    <img src="https://img.shields.io/npm/dm/out-of-the-vue.svg" alt="Downloads">
+  </a>
+  <a href="https://github.com/michaelverschoof/out-of-the-vue/blob/main/LICENSE.md">
+    <img src="https://img.shields.io/npm/l/out-of-the-vue.svg" alt="License">
+  </a>
+  <br>
+  <a href="https://www.npmjs.com/package/out-of-the-vue">
+    <img src="https://img.shields.io/npm/v/out-of-the-vue.svg" alt="Version">
+  </a>
+</p>
 
-## Recommended IDE Setup
+### Introduction
 
-- [VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=johnsoncodehk.volar)
+Out-of-the-vue is a Vue component library focused on offering functionality rather than design. No more messing around with the same functionalities (such as
+form field validations, modals, etc.) for each project, so you can focus on your features.
 
-## Type Support For `.vue` Imports in TS
+The project provides a very minimal design for layout but other than that, you're completely free to make it your own.
 
-Since TypeScript cannot handle type information for `.vue` imports, they are shimmed to be a generic Vue component type by default. In most cases this is fine if you don't really care about component prop types outside of templates. However, if you wish to get actual prop types in `.vue` imports (for example to get props validation when using manual `h(...)` calls), you can enable Volar's `.vue` type support plugin by running `Volar: Switch TS Plugin on/off` from VSCode command palette.
+#### Features
+
+- Lightweight with **automatic** tree-shaking
+- Rich features
+- Out-of-the-box TypeScript support
+- Fully tested using [Vitest](https://vitest.dev/)
+- Functionalities can be used as both components as composables
+- Build your own components using the base components as building blocks
+
+#### Some functionalities:
+
+> Out-of-the-vue requires Vue >= v3
+
+- Most common form field validation with the possibility to add custom validations
+- Adding custom error messages, field helpers and labels
+- User input debouncing
+- Word / character counting
+- Custom content in (for example) checkboxes and radio buttons
+- Opening and closing of modals is provided by the component
+
+### Getting started
+
+#### Installing the package:
+
+```bash
+$ npm install out-of-the-vue
+```
+
+#### Using a component in your project:
+
+```ts
+import { TextField } from 'out-of-the-vue';
+```
+
+```html 
+<text-field name="myTextField" required :min="10" :max="255"
+            @created="onCreated" @updated="onUpdated"
+>
+    <template #label>My text field</template>
+    <template #required>This field is required</template>
+    <template #min>Min 10 characters required</template>
+    <template #max>Max 255 characters allowed</template>
+</text-field>
+```
+
+### License
+
+[MIT](./LICENSE) License © 2022-present [Michael Verschoof](https://github.com/michaelverschoof) and out-of-the-vue contributors.
