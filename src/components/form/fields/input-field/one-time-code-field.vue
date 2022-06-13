@@ -1,8 +1,8 @@
 <template>
     <fieldset class="one-time-code-field input-field" @paste.capture.prevent="filterPasteData">
 
-        <validatable-input :validations="fieldValidations" :trigger-validation="triggerValidation" @updated="fieldValidated">
-            <template #default="{ validate: validateState, invalid: invalidState, showing, showValidity }">
+        <validatable-input :validations="fieldValidations" :trigger-validation="triggerValidation" @created="fieldInitialized" @updated="fieldValidated">
+            <template #default="{ initialize: initializeState, validate: validateState, invalid: invalidState, showing, showValidity }">
 
                 <header v-if="$slots.label" class="label">
                     <slot name="label" />
@@ -12,8 +12,8 @@
                     <template v-for="(number, index) of length">
 
                         <validatable-input :validations="inputValidations"
-                                           @created="validateState(state)"
-                                           @updated="(data) => { inputValidated(index, data); validateState(state) }"
+                                           @created="(data) => { inputInitialized(index, data); initializeState(toRaw(state)) }"
+                                           @updated="(data) => { inputValidated(index, data); validateState(toRaw(state)) }"
                         >
                             <template #default="{ initialize, validate, invalid }">
 
@@ -59,7 +59,7 @@ import { OptionalProps, RequiredProps } from '@/components/props.types';
 import { FieldData, UpdateEmitType, ValidatedFieldData, ValidationMethod } from '@/composables/types';
 import { useUserInput } from '@/composables/user-input';
 import { predefinedValidations } from '@/composables/validate-user-input';
-import { computed, onMounted, reactive, ref, watch } from 'vue';
+import { computed, onMounted, reactive, ref, toRaw, watch } from 'vue';
 
 const emit = defineEmits<{ (event: UpdateEmitType, data: ValidatedFieldData): void; }>();
 
@@ -125,12 +125,16 @@ watch(() => props.focus, (received: boolean): void => {
         return;
     }
 
-    if (selectedIndex.value !== null && selectedIndex.value !== -1) {
+    if (focusedElement.value !== null && focusedElement.value !== -1) {
         return;
     }
 
     focusedElement.value = (<string[]> state.value).indexOf(null);
 });
+
+const inputInitialized = (index: number, data: ValidatedFieldData) => {
+    state.value[index] = (<string> data.value)?.slice(0, 1) ?? null;
+};
 
 const inputValidated = (index: number, data: ValidatedFieldData): void => {
     state.value[index] = (<string> data.value)?.slice(0, 1) ?? null;
@@ -141,23 +145,16 @@ const inputValidated = (index: number, data: ValidatedFieldData): void => {
     focusedElement.value = index + 1;
 };
 
+const fieldInitialized = (data: ValidatedFieldData): void => {
+    state.valid = data.valid;
+    state.failed = data.failed;
+};
+
 const fieldValidated = (data: ValidatedFieldData): void => {
     state.valid = data.valid;
     state.failed = data.failed;
 
-    let emitValue: string | number = (<string[]> state.value).join('');
-    if (props.type === 'numeric') {
-        emitValue = Number(emitValue);
-    }
-
-    const emitData: ValidatedFieldData = {
-        name: state.name,
-        value: emitValue,
-        valid: state.valid,
-        failed: state.failed
-    };
-
-    emit('updated', emitData);
+    updatedState('updated');
 };
 
 const main = ref<HTMLElement>(null);
@@ -181,6 +178,15 @@ const filterPasteData = (event: ClipboardEvent): void => {
     convertValueForState(value);
 };
 
+const clearInput = (index: number): void => {
+    if (state.value[index] === null) {
+        focusedElement.value = index - 1;
+        return;
+    }
+
+    state.value[index] = null;
+};
+
 const { filter } = useUserInput();
 const regex = new RegExp(allowedCharacters, 'g');
 
@@ -197,18 +203,27 @@ function convertValueForState(value?: string): void {
     focusedElement.value = null;
 }
 
-const clearInput = (index: number): void => {
-    if (state.value[index] === null) {
-        focusedElement.value = index - 1;
-        return;
+function updatedState(event: UpdateEmitType) {
+    const value = (<string[]> state.value).join('');
+
+    let emitValue: string | number = !!value ? value : null;
+    if (props.type === 'numeric' && !!emitValue) {
+        emitValue = Number(emitValue);
     }
 
-    state.value[index] = null;
-};
+    const emitData: ValidatedFieldData = {
+        name: state.name,
+        value: emitValue,
+        valid: state.valid,
+        failed: state.failed
+    };
+
+    emit(event, emitData);
+}
 
 onMounted(() => {
     convertValueForState();
-    emit('created', { ...state });
+    updatedState('created');
 });
 </script>
 
