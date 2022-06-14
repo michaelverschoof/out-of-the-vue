@@ -1,2 +1,2 @@
 ignore:
-  - "coverage/tmp"
+  - "**/coverage/tmp"
