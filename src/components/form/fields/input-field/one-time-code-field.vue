@@ -12,7 +12,7 @@
                     <template v-for="(number, index) of length">
 
                         <validatable-input :validations="inputValidations"
-                                           @created="(data) => { inputInitialized(index, data); initializeState(toRaw(state)) }"
+                                           @created="initializeState(toRaw(state))"
                                            @updated="(data) => { inputValidated(index, data); validateState(toRaw(state)) }"
                         >
                             <template #default="{ initialize, validate, invalid }">
@@ -131,10 +131,6 @@ watch(() => props.focus, (received: boolean): void => {
 
     focusedElement.value = (<string[]> state.value).indexOf(null);
 });
-
-const inputInitialized = (index: number, data: ValidatedFieldData) => {
-    state.value[index] = (<string> data.value)?.slice(0, 1) ?? null;
-};
 
 const inputValidated = (index: number, data: ValidatedFieldData): void => {
     state.value[index] = (<string> data.value)?.slice(0, 1) ?? null;

@@ -29,7 +29,7 @@ export default defineConfig({
     },
     test: {
         coverage: {
-            reporter: [ 'html', 'lcov' ]
+            reporter: [ 'text', 'lcov' ]
         },
         resolveSnapshotPath: (testPath, snapExtension) => {
             const path = testPath.split('/').splice(-2);

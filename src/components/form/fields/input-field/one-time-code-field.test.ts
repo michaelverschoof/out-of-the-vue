@@ -63,6 +63,46 @@ describe('Mounting components', () => {
     });
 });
 
+describe('Give updated value on input', () => {
+
+    const updateEvent: ValidatedFieldData = {
+        name: 'one-time-code-field',
+        value: 'A',
+        valid: true,
+        failed: []
+    };
+
+    it('should emit on input', async () => {
+        const wrapper = mount(OneTimeCodeField, {
+            props: Object.assign({}, props, { type: 'alpha' }),
+            attachTo: document.body
+        });
+
+        const input = wrapper.find('input');
+
+        await input.trigger('updated', updateEvent);
+        expect(input.element.value).toBe('A');
+
+        const emits = emitted(wrapper, 'updated', 2);
+        expect(emits.every(emit => emit.value === 'A')).toBeTruthy();
+    });
+
+    it('should emit number on input', async () => {
+        const wrapper = mount(OneTimeCodeField, {
+            props: Object.assign({}, props, { type: 'numeric' }),
+            attachTo: document.body
+        });
+
+        const input = wrapper.find('input');
+
+        await input.trigger('updated', Object.assign({}, updateEvent, { value: '9' }));
+        expect(input.element.value).toBe('9');
+
+        const emits = emitted(wrapper, 'updated', 2);
+        expect(emits.every(emit => emit.value === 9)).toBeTruthy();
+    });
+});
+
 describe('Focusing components', () => {
 
     describe('On focus', () => {
@@ -229,7 +269,6 @@ describe('Jump focus on input', () => {
     });
 
     it('should empty field instead of jumping back', async () => {
-        // const { inputs, wrapper } = mountComponent();
         const wrapper = mount(OneTimeCodeField, {
             props: Object.assign({}, props, { required: true }),
             slots: { required: 'required error' },
