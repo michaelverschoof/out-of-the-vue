@@ -1,26 +1,24 @@
 <template>
     <slot v-bind="$attrs" :initialize="initialize" :validate="validate" :invalid="!state.valid" :showing="showing" :show-validity="showValidity" />
 
-    <template v-if="!state.valid && showing" v-for="validation of validations">
-        <strong v-if="provided($slots[validation.name]) && state.failed[0] === validation.name" class="validation-error">
-            <slot :name="validation.name" />
-        </strong>
+    <template v-if="!state.valid && showing">
+        <template v-for="validation of validations">
+            <strong v-if="provided($slots[validation.name]) && state.failed[0] === validation.name" class="validation-error">
+                <slot :name="validation.name" />
+            </strong>
+        </template>
     </template>
 </template>
 
 <script lang="ts" setup>
-import { OptionalProps } from '@/components/props.types';
-import { FieldData, SubmittedSymbol, UpdateEmitType, ValidatedFieldData } from '@/composables/types';
+import { FieldData, SubmittedSymbol, UpdateEmitType, ValidatedFieldData, ValidationMethod } from '@/composables/types';
 import { useUserInputValidation } from '@/composables/validate-user-input';
 import { provided } from '@/util/slots';
 import { inject, reactive, ref, watch } from 'vue';
 
-const emit = defineEmits<{ (event: UpdateEmitType, data: ValidatedFieldData): void; }>();
+const emit = defineEmits<{ (event: 'created' | 'updated', data: ValidatedFieldData): void; }>();
 
-const props = defineProps({
-    validations: OptionalProps.validations,
-    triggerValidation: OptionalProps.string
-});
+const props = defineProps<{ validations?: ValidationMethod[]; triggerValidation?: string; }>();
 
 const state = reactive<ValidatedFieldData>({
     name: null,
@@ -29,7 +27,7 @@ const state = reactive<ValidatedFieldData>({
     failed: []
 });
 
-const triggeredSubmitValidation = inject(SubmittedSymbol, ref(false));
+const triggeredSubmitValidation = inject(SubmittedSymbol, ref<boolean>(false));
 
 watch(triggeredSubmitValidation, (received: boolean) => {
     if (!received && !props.triggerValidation) {
@@ -44,7 +42,7 @@ watch(triggeredSubmitValidation, (received: boolean) => {
     showing.value = true;
 });
 
-const triggeredValidation = ref(null);
+const triggeredValidation = ref<string>(null);
 
 watch(() => props.triggerValidation, (received: string) => {
     if (!received) {
@@ -54,7 +52,7 @@ watch(() => props.triggerValidation, (received: string) => {
         return;
     }
 
-    const validation = props.validations.find(validation => validation.name === received);
+    const validation = props.validations?.find(validation => validation.name === received);
     if (!validation) {
         return;
     }
@@ -66,7 +64,7 @@ watch(() => props.triggerValidation, (received: string) => {
     }
 });
 
-const showing = ref(false);
+const showing = ref<boolean>(false);
 
 const { validate: validateInput } = useUserInputValidation();
 
@@ -78,6 +76,7 @@ const validate = (data: FieldData): void => {
     return validateFieldData(data, 'updated');
 };
 
+// TODO: Move to composable for non-component use
 const validateFieldData = (data: FieldData, event: UpdateEmitType): void => {
     if (state.value === data.value && state.name === data.name) {
         return;

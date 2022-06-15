@@ -1,6 +1,6 @@
 <template>
     <component
-        :is="textarea ? 'textarea' : 'input'"
+        :is="!!textarea ? 'textarea' : 'input'"
         :id="name"
         ref="element"
         class="text-input"
@@ -16,28 +16,23 @@
 </template>
 
 <script lang="ts" setup>
-import { OptionalProps, RequiredProps } from '@/components/props.types';
-import { FocusEmitType, InputTransformType, StringFieldData, UpdateEmitType } from '@/composables/types';
+import { StringFieldData } from '@/composables/types';
 import { useUserInput } from '@/composables/user-input';
 import { computed, onMounted, reactive, ref, watch } from 'vue';
 
 const emit = defineEmits<{
-    (event: FocusEmitType): void;
-    (event: UpdateEmitType, data: StringFieldData): void;
+    (event: 'focused' | 'blurred'): void;
+    (event: 'created' | 'updated', data: StringFieldData): void;
 }>();
 
-const props = defineProps({
-    name: RequiredProps.string,
-    value: OptionalProps.string,
-    textarea: OptionalProps.booleanFalse,
-    focus: OptionalProps.booleanFalse,
-    allowedCharacters: OptionalProps.string,
-    transformInput: {
-        type: String as () => InputTransformType,
-        required: false,
-        default: null
-    }
-});
+const props = defineProps<{
+    name: string;
+    value?: string;
+    textarea?: boolean;
+    focus?: boolean;
+    allowedCharacters?: string;
+    transformInput?: 'uppercase' | 'lowercase';
+}>();
 
 const element = ref<HTMLInputElement | HTMLTextAreaElement>(null);
 const focused = ref<boolean>(false);

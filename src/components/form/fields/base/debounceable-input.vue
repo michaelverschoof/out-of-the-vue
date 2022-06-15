@@ -1,15 +1,14 @@
 <template>
-    <slot v-bind="$attrs" :debounce="debounce" />
+    <slot :debounce="debounce" />
 </template>
 
 <script lang="ts" setup>
-import { OptionalProps } from '@/components/props.types';
 import { useUserInputDebouncing } from '@/composables/debounce-user-input';
-import { FieldData, UpdateEmitType, ValidatedFieldData } from '@/composables/types';
+import { FieldData, ValidatedFieldData } from '@/composables/types';
 
-const emit = defineEmits<{ (event: UpdateEmitType, data: FieldData | ValidatedFieldData): void; }>();
+const emit = defineEmits<{ (event: 'created' | 'updated', data: FieldData | ValidatedFieldData): void; }>();
 
-const props = defineProps({ delay: OptionalProps.number });
+const props = defineProps<{ delay?: number; }>();
 
 const { debounce: debounceInput } = useUserInputDebouncing();
 

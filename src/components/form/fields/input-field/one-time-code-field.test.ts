@@ -1,12 +1,12 @@
 import OneTimeCodeField from '@/components/form/fields/input-field/one-time-code-field.vue';
-import { FieldData, ValidatedFieldData } from '@/composables/types';
+import { FieldData } from '@/composables/types';
 import { emitted } from '@test/emits';
 import { DOMWrapper, mount, VueWrapper } from '@vue/test-utils';
 import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
 /**
  * @vitest-environment jsdom
- * Used instead of happy-dom to get the `main.value.includes(document.activeElement)` working
+ * Used instead of happy-dom to get the `document.activeElement` working
  */
 
 const props = {
@@ -65,13 +65,6 @@ describe('Mounting components', () => {
 
 describe('Give updated value on input', () => {
 
-    const updateEvent: ValidatedFieldData = {
-        name: 'one-time-code-field',
-        value: 'A',
-        valid: true,
-        failed: []
-    };
-
     it('should emit on input', async () => {
         const wrapper = mount(OneTimeCodeField, {
             props: Object.assign({}, props, { type: 'alpha' }),
@@ -80,11 +73,11 @@ describe('Give updated value on input', () => {
 
         const input = wrapper.find('input');
 
-        await input.trigger('updated', updateEvent);
+        await input.setValue('a');
         expect(input.element.value).toBe('A');
 
-        const emits = emitted(wrapper, 'updated', 2);
-        expect(emits.every(emit => emit.value === 'A')).toBeTruthy();
+        const emits = emitted(wrapper, 'updated');
+        expect(emits[0].value === 'A').toBeTruthy();
     });
 
     it('should emit number on input', async () => {
@@ -95,11 +88,11 @@ describe('Give updated value on input', () => {
 
         const input = wrapper.find('input');
 
-        await input.trigger('updated', Object.assign({}, updateEvent, { value: '9' }));
+        await input.setValue('9');
         expect(input.element.value).toBe('9');
 
-        const emits = emitted(wrapper, 'updated', 2);
-        expect(emits.every(emit => emit.value === 9)).toBeTruthy();
+        const emits = emitted(wrapper, 'updated');
+        expect(emits[0].value === 9).toBeTruthy();
     });
 });
 
@@ -158,14 +151,13 @@ describe('Focusing components', () => {
 
         it('should jump focus to next natively', async () => {
             const { inputs, wrapper } = mountComponent();
-
             expect(wrapper.find('.focused').exists()).toBeFalsy();
 
-            await inputs[0].element.focus();
+            await inputs[0].trigger('focus');
             expect(inputs[0].element).toBe(document.activeElement);
             expect(inputs[0].classes().includes('focused')).toBeTruthy();
 
-            await inputs[1].trigger('focused');
+            await inputs[1].trigger('focus');
             expect(inputs[1].element).toBe(document.activeElement);
             expect(inputs[1].classes().includes('focused')).toBeTruthy();
         });
@@ -204,62 +196,49 @@ describe('Focusing components', () => {
 
 describe('Jump focus on input', () => {
 
-    const updateEvent: ValidatedFieldData = {
-        name: 'one-time-code-field',
-        value: 'A',
-        valid: true,
-        failed: []
-    };
-
     it('should jump focus to next', async () => {
         const { inputs, wrapper } = mountComponent();
-
         expect(wrapper.find('.focused').exists()).toBeFalsy();
 
-        await inputs[0].element.focus();
+        await inputs[0].trigger('focus');
         expect(inputs[0].classes().includes('focused')).toBeTruthy();
 
-        await inputs[0].trigger('updated', updateEvent);
+        await inputs[0].setValue('a');
         expect(inputs[0].element.value).toBe('A');
-
         expect(inputs[0].classes().includes('focused')).toBeFalsy();
         expect(inputs[1].classes().includes('focused')).toBeTruthy();
     });
 
     it('should jump to the first empty input after the last', async () => {
         const { inputs, wrapper } = mountComponent();
-
         expect(wrapper.find('.focused').exists()).toBeFalsy();
 
-        await inputs[5].element.focus();
+        await inputs[5].trigger('focus');
         expect(inputs[5].classes().includes('focused')).toBeTruthy();
 
-        await inputs[5].trigger('updated', updateEvent);
+        await inputs[5].setValue('a');
         expect(inputs[5].classes().includes('focused')).toBeFalsy();
         expect(inputs[0].classes().includes('focused')).toBeTruthy();
     });
 
     it('should jump out after the last when all are filled', async () => {
         const { inputs, wrapper } = mountComponent();
-
         expect(wrapper.find('.focused').exists()).toBeFalsy();
 
-        await inputs[0].trigger('updated', updateEvent);
-        await inputs[1].trigger('updated', updateEvent);
-        await inputs[2].trigger('updated', updateEvent);
-        await inputs[3].trigger('updated', updateEvent);
-        await inputs[4].trigger('updated', updateEvent);
-        await inputs[5].trigger('updated', updateEvent);
-
+        await inputs[0].setValue('a');
+        await inputs[1].setValue('a');
+        await inputs[2].setValue('a');
+        await inputs[3].setValue('a');
+        await inputs[4].setValue('a');
+        await inputs[5].setValue('a');
         expect(wrapper.find('.focused').exists()).toBeFalsy();
     });
 
     it('should jump focus to previous', async () => {
         const { inputs, wrapper } = mountComponent();
-
         expect(wrapper.find('.focused').exists()).toBeFalsy();
 
-        await inputs[0].trigger('updated', updateEvent);
+        await inputs[0].setValue('a');
         expect(inputs[0].classes().includes('focused')).toBeFalsy();
         expect(inputs[1].classes().includes('focused')).toBeTruthy();
 
@@ -279,11 +258,11 @@ describe('Jump focus on input', () => {
 
         expect(wrapper.find('.focused').exists()).toBeFalsy();
 
-        await inputs[0].trigger('updated', updateEvent);
+        await inputs[0].setValue('a');
         expect(inputs[0].classes().includes('focused')).toBeFalsy();
         expect(inputs[1].classes().includes('focused')).toBeTruthy();
 
-        await inputs[1].trigger('updated', Object.assign({}, updateEvent, { value: 'B' }));
+        await inputs[1].setValue('b');
         expect(inputs[1].element.value).toBe('B');
         expect(inputs[1].classes().includes('focused')).toBeFalsy();
         expect(inputs[2].classes().includes('focused')).toBeTruthy();
@@ -310,7 +289,7 @@ describe('Jump focus on input', () => {
         await inputs[0].element.focus();
         expect(inputs[0].classes().includes('focused')).toBeTruthy();
 
-        await inputs[0].trigger('updated', { name: updateEvent.name, value: null });
+        await inputs[0].setValue(null);
         expect(inputs[0].classes().includes('focused')).toBeTruthy();
         expect(inputs[1].classes().includes('focused')).toBeFalsy();
     });
