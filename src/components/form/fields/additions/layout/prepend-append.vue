@@ -21,7 +21,7 @@
 
 <script lang="ts" setup>
 import { provided } from '@/util/slots';
-// TODO: Get ifs working without this function
+//
 </script>
 
 <style lang="scss" scoped>

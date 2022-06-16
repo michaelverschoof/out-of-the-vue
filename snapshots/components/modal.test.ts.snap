@@ -46,6 +46,27 @@ exports[`Mounting components > should mount the component in opened state 1`] = 
 </div>
 `;
 
+exports[`Mounting components > should mount the component in opened state without a header and footer 1`] = `
+<div
+  class="modal"
+  data-v-0eaeaf66=""
+>
+  <!--v-if-->
+  <main
+    data-v-0eaeaf66=""
+  >
+    
+    <button
+      id="content"
+    >
+      Content
+    </button>
+    
+  </main>
+  <!--v-if-->
+</div>
+`;
+
 exports[`Mounting components > should mount the component with an opener 1`] = `
 "<button id=\\"opener\\">Opener</button>
 <!--teleport start-->

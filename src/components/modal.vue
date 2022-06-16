@@ -1,7 +1,7 @@
 <template>
     <slot name="opener" :open="openModal" />
 
-    <teleport :to="parent">
+    <teleport :to="parent ?? 'body'">
         <transition name="modal">
 
             <div v-if="showing" ref="element" class="backdrop" tabindex="-1" @click.self="closeModal" @keydown.esc="closeModal">
@@ -23,24 +23,14 @@
 </template>
 
 <script lang="ts" setup>
-import { OptionalProps } from '@/components/props.types';
-import { ModalEmitType } from '@/composables/types';
 import { onMounted, onUnmounted, ref, watch } from 'vue';
 
-const emit = defineEmits<{ (event: ModalEmitType): void; }>();
+const emit = defineEmits<{ (event: 'opened' | 'closed'): void; }>();
 
-const props = defineProps({
-    parent: {
-        type: String,
-        required: false,
-        default: 'body'
-    },
-    open: OptionalProps.boolean
-});
+const props = defineProps<{ parent?: string; open?: boolean; }>();
 
 const element = ref<HTMLElement>(null);
-
-const showing = ref(false);
+const showing = ref<boolean>(false);
 
 watch(() => props.open, (received: boolean) => {
     if (received === showing.value) {
@@ -50,7 +40,7 @@ watch(() => props.open, (received: boolean) => {
     received ? openModal() : closeModal();
 });
 
-const openModal = () => {
+const openModal = (): void => {
     showing.value = true;
     emit('opened');
 

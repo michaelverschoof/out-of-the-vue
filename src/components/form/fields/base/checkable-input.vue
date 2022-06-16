@@ -1,39 +1,30 @@
 <template>
     <input
-        ref="element"
-        class="checkable-input"
-        :class="{ focused }"
         autocomplete="off"
-        :type="type"
+        class="checkable-input"
+        ref="element"
+        v-model="model"
+        :checked="checked"
+        :class="{ focused }"
         :id="`${name}-${value}`"
         :name="name"
-        :checked="checked"
-        v-model="model"
-        @focus="focusElement"
-        @blur="blurElement"
+        :type="type"
+        @blur="blur"
+        @focus="focus"
         @click="reselect"
     />
 </template>
 
 <script lang="ts" setup>
-import { OptionalProps, RequiredProps } from '@/components/props.types';
-import { CheckableFieldData, FocusEmitType, UpdateEmitType } from '@/composables/types';
-import { computed, reactive, ref, watch } from 'vue';
+import { CheckableFieldData } from '@/composables/types';
+import { computed, onMounted, reactive, ref, watch } from 'vue';
 
 const emit = defineEmits<{
-    (event: FocusEmitType): void;
-    (event: UpdateEmitType, data: CheckableFieldData): void;
+    (event: 'focused' | 'blurred'): void;
+    (event: 'created' | 'updated', data: CheckableFieldData): void;
 }>();
 
-const props = defineProps({
-    name: RequiredProps.string,
-    value: RequiredProps.string,
-    checked: OptionalProps.booleanFalse,
-    type: {
-        type: String as () => 'radio' | 'checkbox',
-        required: true
-    }
-});
+const props = defineProps<{ type: 'radio' | 'checkbox'; name: string; value: string; checked?: boolean; }>();
 
 const element = ref<HTMLInputElement>();
 const focused = ref<boolean>(false);
@@ -41,7 +32,7 @@ const focused = ref<boolean>(false);
 const state = reactive<CheckableFieldData>({
     name: props.name,
     value: props.value,
-    checked: props.checked
+    checked: props.checked ?? false
 });
 
 const model = computed({
@@ -64,15 +55,15 @@ const reselect = () => {
     emit('updated', { ...state });
 };
 
-const focusElement = (): void => {
+const focus = (): void => {
     focused.value = true;
     emit('focused');
 };
 
-const blurElement = (): void => {
+const blur = (): void => {
     focused.value = false;
     emit('blurred');
 };
 
-emit('created', { ...state });
+onMounted(() => emit('created', { ...state }));
 </script>

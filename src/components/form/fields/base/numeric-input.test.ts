@@ -9,8 +9,7 @@ import { beforeAll, describe, expect, it } from 'vitest';
 
 const numberProps = {
     name: 'numeric-input',
-    value: 123.45,
-    focus: false
+    value: 123.45
 };
 
 beforeAll(() => {
@@ -25,10 +24,7 @@ describe('Mounting component', () => {
         expect(input.exists()).toBeTruthy();
 
         const emits = emitted(wrapper, 'created');
-        expect(emits[0]).toEqual({
-            name: numberProps.name,
-            value: 123.45
-        });
+        expect(emits[0]).toEqual(numberProps);
     });
 
     it('should mount the input component without a value', async () => {
@@ -54,6 +50,15 @@ describe('Mounting component', () => {
             name: numberProps.name,
             value: 123
         });
+    });
+
+    it('should mount the input component with negative not allowed', async () => {
+        const { input, wrapper } = mountComponent({ allowNegative: false });
+
+        expect(input.exists()).toBeTruthy();
+
+        const emits = emitted(wrapper, 'created');
+        expect(emits[0]).toEqual(numberProps);
     });
 });
 

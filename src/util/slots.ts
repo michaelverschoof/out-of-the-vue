@@ -1,6 +1,5 @@
 import { Slot } from 'vue';
 
-
 /**
  * Check if a slot has any content provided
  * @param slot the slot to check

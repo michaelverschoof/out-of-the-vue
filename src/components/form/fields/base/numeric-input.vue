@@ -13,35 +13,21 @@
 
 <script lang="ts" setup>
 import TextInput from '@/components/form/fields/base/text-input.vue';
-import { OptionalProps, RequiredProps } from '@/components/props.types';
-import { NumberFieldData, StringFieldData, UpdateEmitType } from '@/composables/types';
+import { NumberFieldData, StringFieldData } from '@/composables/types';
 import { exclude } from '@/util/attrs';
 import { filter, parse } from '@/util/numbers';
 import { computed, reactive, ref, watch } from 'vue';
 
-const emit = defineEmits<{ (event: UpdateEmitType, data: NumberFieldData): void; }>();
+const emit = defineEmits<{ (event: 'created' | 'updated', data: NumberFieldData): void; }>();
 
-const props = defineProps({
-    name: RequiredProps.string,
-    value: OptionalProps.number,
-    allowDecimals: OptionalProps.booleanTrue,
-    allowNegative: OptionalProps.booleanTrue
-});
+const props = withDefaults(
+    defineProps<{ name: string; value?: number; allowDecimals?: boolean; allowNegative?: boolean; }>(),
+    { allowDecimals: true, allowNegative: true }
+);
 
-const regex = computed(() => {
-    let reg = '0-9';
+const regex = computed(() => `[0-9${ props.allowDecimals ? '.,' : '' }${ props.allowNegative ? '-' : '' }]`);
 
-    if (props.allowDecimals) {
-        reg += '.,';
-    }
-    if (props.allowNegative) {
-        reg += '-';
-    }
-
-    return `[${ reg }]`;
-});
-
-const model = ref<string>(props.value?.toString() ?? null); // TODO add decimal separator and use that
+const model = ref<string>(props.value?.toString() ?? null);
 
 const state = reactive<NumberFieldData>({
     name: props.name,
@@ -64,7 +50,6 @@ const parseNumber = (data: StringFieldData): number => {
         return null;
     }
 
-    // Set the filtered value for the text input field
     model.value = filtered;
     state.value = parse(filtered);
 };

@@ -109,11 +109,18 @@ describe('Ticking boxes', () => {
         expect(emits[0].checked).toBeTruthy();
     });
 
+    it('should not tick the checkbox component on load with null', async () => {
+        const { input, wrapper } = mountCheckbox(null);
+
+        expect(input.element.checked).toBeFalsy();
+
+        emitted(wrapper, 'created', 0);
+    });
+
     it('should tick the checkbox component on prop update', async () => {
         const { input, wrapper } = mountCheckbox();
 
         await wrapper.setProps({ checked: true });
-
         expect(input.element.checked).toBeTruthy();
 
         emitted(wrapper, 'updated', 0);
@@ -207,7 +214,7 @@ function uncheck(input: DOMWrapper<Element>): Promise<void> {
 }
 
 function mountCheckbox(checked?: boolean): { wrapper: VueWrapper<any>, input: DOMWrapper<HTMLInputElement> } {
-    const props = !checked ? checkboxProps : Object.assign({}, checkboxProps, { checked: true });
+    const props = checked === false ? checkboxProps : Object.assign({}, checkboxProps, { checked: checked });
 
     const wrapper = mount(CheckableInput, {
         props: props

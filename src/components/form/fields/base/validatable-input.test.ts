@@ -19,7 +19,7 @@ const validations = [
     { ...predefinedValidations['max-length'], parameters: [ 5 ] }
 ];
 
-let provided = ref(false);
+let provided = ref<boolean>(false);
 
 beforeAll(() => {
     expect(ValidatableInput).toBeTruthy();

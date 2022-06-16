@@ -56,7 +56,12 @@ describe('Mounting components', () => {
 
     it('should mount the component in opened state', async () => {
         const wrapper = await mountComponent(all, true);
+        const modal = await getModalElement(wrapper);
+        expect(modal).toMatchSnapshot();
+    });
 
+    it('should mount the component in opened state without a header and footer', async () => {
+        const wrapper = await mountComponent({ default: all.default }, true);
         const modal = await getModalElement(wrapper);
         expect(modal).toMatchSnapshot();
     });

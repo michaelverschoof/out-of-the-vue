@@ -12,7 +12,7 @@
                     <template v-for="(item, key) of $slots" :key="key">
 
                         <label v-if="!nonOptionSlots.includes(key)"
-                               :class="{ focused: focusedItems.has(key), selected: state.value.includes(key), disabled: disabled.includes(key) }"
+                               :class="{ focused: focusedItems.has(key), selected: state.value.includes(key), disabled: disabled?.includes(key) }"
                                class="checkable-field-item"
                         >
                             <checkable-input
@@ -21,7 +21,7 @@
                                 :value="key"
                                 :type="type"
                                 :checked="state.value.includes(key)"
-                                :disabled="disabled.includes(key)"
+                                :disabled="disabled?.includes(key)"
                                 tabindex="0"
                                 @focused="focusItem(key)"
                                 @blurred="blurItem(key)"
@@ -54,32 +54,28 @@
 <script lang="ts" setup>
 import CheckableInput from '@/components/form/fields/base/checkable-input.vue';
 import ValidatableInput from '@/components/form/fields/base/validatable-input.vue';
-import { OptionalProps, RequiredProps } from '@/components/props.types';
-import { CheckableFieldData, UpdateEmitType, ValidatedFieldData, ValidationMethod } from '@/composables/types';
+import { CheckableFieldData, ValidatedFieldData, ValidationMethod } from '@/composables/types';
 import { predefinedValidations } from '@/composables/validate-user-input';
 import { onMounted, reactive, ref, watch } from 'vue';
 
-const emit = defineEmits<{ (event: UpdateEmitType, data: ValidatedFieldData): void; }>();
+const emit = defineEmits<{ (event: 'created' | 'updated', data: ValidatedFieldData): void; }>();
 
-const props = defineProps({
-    name: RequiredProps.string,
-    selected: OptionalProps.stringArray,
-    disabled: OptionalProps.stringArray,
-    required: OptionalProps.booleanFalse,
-    min: OptionalProps.number,
-    max: OptionalProps.number,
-    validations: OptionalProps.validations,
-    triggerValidation: OptionalProps.string,
-    hideInput: OptionalProps.booleanFalse,
-    type: {
-        type: String as () => 'radio' | 'checkbox',
-        required: true
-    }
-});
+const props = defineProps<{
+    type: 'radio' | 'checkbox';
+    name: string;
+    selected?: string[];
+    disabled?: string[];
+    required?: boolean;
+    min?: number;
+    max?: number;
+    validations?: ValidationMethod[];
+    triggerValidation?: string;
+    hideInput?: boolean;
+}>();
 
 const validationMethods: ValidationMethod[] = [
     { ...predefinedValidations['required-array'], parameters: [ props.required ] },
-    ...props.validations
+    ...props.validations ?? []
 ];
 
 if (props.type !== 'radio') {
