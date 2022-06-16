@@ -61,7 +61,7 @@
         </checkable-field>
     </div>
 
-    <modal :opened="modalOpened" @closed="modalOpened = null;">
+    <modal :open="modalOpened" @closed="modalOpened = null;" class="foo">
         <template #opener="{ open }">
             <button @click="open">open modal</button>
         </template>

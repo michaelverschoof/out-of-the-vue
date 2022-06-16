@@ -4,11 +4,11 @@
 
             <text-input
                 class="input"
-                maxlength="1"
                 transform-input="uppercase"
                 :allowed-characters="allowedCharacters"
                 :class="{ invalid: invalid && showValidation }"
                 :focus="focus"
+                :max="1"
                 :name="`${name}-${index}`"
                 :value="value"
                 @focused="$emit('focused')"

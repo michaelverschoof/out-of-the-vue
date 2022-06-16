@@ -67,6 +67,12 @@ onUnmounted(() => {
 });
 </script>
 
+<script lang="ts">
+export default {
+    inheritAttrs: false
+};
+</script>
+
 <style lang="scss" scoped>
 .backdrop {
     align-items: center;

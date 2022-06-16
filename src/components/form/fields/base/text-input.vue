@@ -5,6 +5,7 @@
         ref="element"
         class="text-input"
         :class="{ focused }"
+        :maxLength="max"
         :name="name"
         :value="model"
         @blur="blurElement"
@@ -30,6 +31,7 @@ const props = defineProps<{
     value?: string;
     textarea?: boolean;
     focus?: boolean;
+    max?: number;
     allowedCharacters?: string;
     transformInput?: 'uppercase' | 'lowercase';
 }>();
@@ -94,7 +96,12 @@ const filterInputData = (event: Event): void => {
 
 const { filter, transform } = useUserInput();
 const filterAndTransform = (value: string): string => {
-    const filtered = filter(value, inputRegex);
+    let filtered = filter(value, inputRegex);
+    if (!filtered) {
+        return filtered;
+    }
+
+    filtered = props.max ? filtered.slice(0, props.max) : filtered;
     if (!props.transformInput) {
         return filtered;
     }
