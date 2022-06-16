@@ -247,6 +247,18 @@ describe('Validating field', () => {
         expect(wrapper.find('strong.validation-error').exists()).toBeTruthy();
     });
 
+    it('should not show a validation error when null', async () => {
+        const wrapper = mount(NumberField, {
+            props: Object.assign({}, props, { required: null }),
+            slots: { required: 'required error' }
+        });
+
+        expect(wrapper.find('strong.validation-error').exists()).toBeFalsy();
+
+        await wrapper.setProps({ triggerValidation: 'required' });
+        expect(wrapper.find('strong.validation-error').exists()).toBeTruthy();
+    });
+
     describe('Specific validations', () => {
 
         it('should trigger min validation', async () => {

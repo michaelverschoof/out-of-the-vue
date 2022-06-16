@@ -11,29 +11,19 @@
                 <main ref="main" tabindex="-1" @blur.capture="fieldBlurred(showValidity)">
                     <template v-for="(number, index) of length">
 
-                        <validatable-input :validations="inputValidations"
-                                           @created="(data) => { inputInitialized(index, data); initializeState(toRaw(state)) }"
-                                           @updated="(data) => { inputValidated(index, data); validateState(toRaw(state)) }"
-                        >
-                            <template #default="{ initialize, validate, invalid }">
-
-                                <text-input
-                                    class="input"
-                                    maxlength="1"
-                                    transform-input="uppercase"
-                                    :allowed-characters="allowedCharacters"
-                                    :class="{ invalid: invalid && showing }"
-                                    :focus="index === focusedElement"
-                                    :name="`${name}-${index}`"
-                                    :value="state.value[index]"
-                                    @keydown.delete.prevent="clearInput(index)"
-                                    @focused="focusedElement = index"
-                                    @created="initialize"
-                                    @updated="validate"
-                                />
-
-                            </template>
-                        </validatable-input>
+                        <one-time-code-field-item
+                            :index="index"
+                            :name="name"
+                            :allowed-characters="allowedCharacters"
+                            :focus="index === focusedElement"
+                            :show-validation="showing"
+                            :validations="inputValidations"
+                            :value="state.value[index]"
+                            @cleared="cleared(index)"
+                            @focused="focusedElement = index"
+                            @created="initializeState(toRaw(state))"
+                            @updated="(data) => { inputValidated(index, data); validateState(toRaw(state)) }"
+                        />
 
                     </template>
                 </main>
@@ -53,33 +43,27 @@
 </template>
 
 <script lang="ts" setup>
-import TextInput from '@/components/form/fields/base/text-input.vue';
 import ValidatableInput from '@/components/form/fields/base/validatable-input.vue';
-import { OptionalProps, RequiredProps } from '@/components/props.types';
+import OneTimeCodeFieldItem from '@/components/form/fields/input-field/one-time-code-field-item.vue';
 import { FieldData, UpdateEmitType, ValidatedFieldData, ValidationMethod } from '@/composables/types';
 import { useUserInput } from '@/composables/user-input';
 import { predefinedValidations } from '@/composables/validate-user-input';
 import { computed, onMounted, reactive, ref, toRaw, watch } from 'vue';
 
-const emit = defineEmits<{ (event: UpdateEmitType, data: ValidatedFieldData): void; }>();
+const emit = defineEmits<{ (event: 'created' | 'updated', data: ValidatedFieldData): void; }>();
 
-const props = defineProps({
-    name: RequiredProps.string,
-    focus: OptionalProps.boolean,
-    required: OptionalProps.booleanFalse,
-    validations: OptionalProps.validations,
-    triggerValidation: OptionalProps.string,
-    type: {
-        type: String as () => 'alpha' | 'numeric' | 'alphanumeric',
-        required: false,
-        default: 'alphanumeric'
-    },
-    length: {
-        type: Number,
-        required: false,
-        default: 6
-    }
-});
+const props = withDefaults(
+    defineProps<{
+        name: string;
+        focus?: boolean;
+        required?: boolean;
+        validations?: ValidationMethod[];
+        triggerValidation?: string;
+        type?: 'alpha' | 'numeric' | 'alphanumeric';
+        length?: number;
+    }>(),
+    { type: 'alphanumeric', length: 6 }
+);
 
 const inputValidations: ValidationMethod[] = [
     { ...predefinedValidations['required'], parameters: [ props.required ] }
@@ -94,10 +78,8 @@ const fieldValidations: ValidationMethod[] = [
             return !required || (!!value && value.length === length && value.every(val => val !== null));
         }
     },
-    ...props.validations
+    ...props.validations ?? []
 ];
-
-const allowedCharacters = `[${ props.type !== 'numeric' ? 'A-z' : '' }${ props.type !== 'alpha' ? '0-9' : '' }]`;
 
 const state = reactive<ValidatedFieldData>({
     name: props.name,
@@ -111,7 +93,7 @@ const state = reactive<ValidatedFieldData>({
  * When setting the value to null, the focused item will be determined by the first null value in the list
  * When setting the value to -1, no element will be focused
  */
-const selectedIndex = ref(props.focus ? 0 : -1);
+const selectedIndex = ref<number>(props.focus ? 0 : -1);
 const focusedElement = computed({
     get: () => selectedIndex.value ?? (<string[]> state.value).indexOf(null),
     set: (index: number) => {
@@ -131,10 +113,6 @@ watch(() => props.focus, (received: boolean): void => {
 
     focusedElement.value = (<string[]> state.value).indexOf(null);
 });
-
-const inputInitialized = (index: number, data: ValidatedFieldData) => {
-    state.value[index] = (<string> data.value)?.slice(0, 1) ?? null;
-};
 
 const inputValidated = (index: number, data: ValidatedFieldData): void => {
     state.value[index] = (<string> data.value)?.slice(0, 1) ?? null;
@@ -178,7 +156,7 @@ const filterPasteData = (event: ClipboardEvent): void => {
     convertValueForState(value);
 };
 
-const clearInput = (index: number): void => {
+const cleared = (index: number): void => {
     if (state.value[index] === null) {
         focusedElement.value = index - 1;
         return;
@@ -188,6 +166,7 @@ const clearInput = (index: number): void => {
 };
 
 const { filter } = useUserInput();
+const allowedCharacters = `[${ props.type !== 'numeric' ? 'A-z' : '' }${ props.type !== 'alpha' ? '0-9' : '' }]`;
 const regex = new RegExp(allowedCharacters, 'g');
 
 function convertValueForState(value?: string): void {
@@ -203,7 +182,7 @@ function convertValueForState(value?: string): void {
     focusedElement.value = null;
 }
 
-function updatedState(event: UpdateEmitType) {
+function updatedState(event: UpdateEmitType): void {
     const value = (<string[]> state.value).join('');
 
     let emitValue: string | number = !!value ? value : null;
@@ -230,16 +209,7 @@ onMounted(() => {
 <style lang="scss" scoped>
 @use "../input-field";
 
-.one-time-code-field {
-
-    main {
-        grid-template-columns: repeat(v-bind("props.length"), 1fr);
-
-        input.input {
-            font-size: 1.5em;
-            height: 2.25em;
-            text-align: center;
-        }
-    }
+.one-time-code-field main {
+    grid-template-columns: repeat(v-bind("props.length"), 1fr);
 }
 </style>

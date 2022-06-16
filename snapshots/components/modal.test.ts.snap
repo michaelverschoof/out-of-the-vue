@@ -1,0 +1,216 @@
+// Vitest Snapshot v1
+
+exports[`Mounting components > should mount the component 1`] = `
+"<!--teleport start-->
+<!--teleport end-->"
+`;
+
+exports[`Mounting components > should mount the component in opened state 1`] = `
+<div
+  class="modal"
+  data-v-0eaeaf66=""
+>
+  <header
+    data-v-0eaeaf66=""
+  >
+    
+    <button
+      id="header"
+    >
+      Header
+    </button>
+    
+  </header>
+  <main
+    data-v-0eaeaf66=""
+  >
+    
+    <button
+      id="content"
+    >
+      Content
+    </button>
+    
+  </main>
+  <footer
+    data-v-0eaeaf66=""
+  >
+    
+    <button
+      id="footer"
+    >
+      Footer
+    </button>
+    
+  </footer>
+</div>
+`;
+
+exports[`Mounting components > should mount the component in opened state without a header and footer 1`] = `
+<div
+  class="modal"
+  data-v-0eaeaf66=""
+>
+  <!--v-if-->
+  <main
+    data-v-0eaeaf66=""
+  >
+    
+    <button
+      id="content"
+    >
+      Content
+    </button>
+    
+  </main>
+  <!--v-if-->
+</div>
+`;
+
+exports[`Mounting components > should mount the component with an opener 1`] = `
+"<button id=\\"opener\\">Opener</button>
+<!--teleport start-->
+<!--teleport end-->"
+`;
+
+exports[`Opening and closing modal > should close using prop 1`] = `
+<div
+  class="modal"
+  data-v-0eaeaf66=""
+>
+  <header
+    data-v-0eaeaf66=""
+  >
+    
+    <button
+      id="header"
+    >
+      Header
+    </button>
+    
+  </header>
+  <main
+    data-v-0eaeaf66=""
+  >
+    
+    <button
+      id="content"
+    >
+      Content
+    </button>
+    
+  </main>
+  <footer
+    data-v-0eaeaf66=""
+  >
+    
+    <button
+      id="footer"
+    >
+      Footer
+    </button>
+    
+  </footer>
+</div>
+`;
+
+exports[`Opening and closing modal > should close using prop 2`] = `
+<div
+  class="modal"
+  data-v-0eaeaf66=""
+>
+  <header
+    data-v-0eaeaf66=""
+  >
+    
+    <button
+      id="header"
+    >
+      Header
+    </button>
+    
+  </header>
+  <main
+    data-v-0eaeaf66=""
+  >
+    
+    <button
+      id="content"
+    >
+      Content
+    </button>
+    
+  </main>
+  <footer
+    data-v-0eaeaf66=""
+  >
+    
+    <button
+      id="footer"
+    >
+      Footer
+    </button>
+    
+  </footer>
+</div>
+`;
+
+exports[`Opening and closing modal > should not open using prop if already opened 1`] = `null`;
+
+exports[`Opening and closing modal > should not open using prop if already opened 2`] = `null`;
+
+exports[`Opening and closing modal > should not open using prop if already opened 3`] = `
+<div
+  class="modal"
+  data-v-0eaeaf66=""
+>
+  <header
+    data-v-0eaeaf66=""
+  >
+    
+    <button
+      id="header"
+    >
+      Header
+    </button>
+    
+  </header>
+  <main
+    data-v-0eaeaf66=""
+  >
+    
+    <button
+      id="content"
+    >
+      Content
+    </button>
+    
+  </main>
+  <footer
+    data-v-0eaeaf66=""
+  >
+    
+    <button
+      id="footer"
+    >
+      Footer
+    </button>
+    
+  </footer>
+</div>
+`;
+
+exports[`Opening and closing modal > should open using opener 1`] = `null`;
+
+exports[`Opening and closing modal > should open using opener 2`] = `null`;
+
+exports[`Opening and closing modal > should open using prop 1`] = `null`;
+
+exports[`Opening and closing modal > should open using prop 2`] = `null`;
+
+exports[`should unmount the component 1`] = `
+"<!--teleport start-->
+<!--teleport end-->"
+`;
+
+exports[`should unmount the component 2`] = `"<!--teleport start-->"`;

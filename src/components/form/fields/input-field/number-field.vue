@@ -56,34 +56,36 @@ import PrependAppend from '@/components/form/fields/additions/layout/prepend-app
 import DebounceableInput from '@/components/form/fields/base/debounceable-input.vue';
 import NumericInput from '@/components/form/fields/base/numeric-input.vue';
 import ValidatableInput from '@/components/form/fields/base/validatable-input.vue';
-import { OptionalProps, RequiredProps } from '@/components/props.types';
-import { UpdateEmitType, ValidatedFieldData, ValidationMethod } from '@/composables/types';
+import { ValidatedFieldData, ValidationMethod } from '@/composables/types';
 import { predefinedValidations } from '@/composables/validate-user-input';
 import { exclude, include } from '@/util/attrs';
 import { ref } from 'vue';
 
-const emit = defineEmits<{ (event: UpdateEmitType, data: ValidatedFieldData): void; }>();
+const emit = defineEmits<{ (event: 'created' | 'updated', data: ValidatedFieldData): void; }>();
 
-const props = defineProps({
-    name: RequiredProps.string,
-    value: OptionalProps.number,
-    typingDelay: OptionalProps.number, // TODO rename to something better,
-    allowDecimals: OptionalProps.booleanTrue,
-    allowNegative: OptionalProps.booleanTrue,
-    required: OptionalProps.booleanFalse,
-    min: OptionalProps.number,
-    max: OptionalProps.number,
-    validations: OptionalProps.validations,
-    triggerValidation: OptionalProps.string
-});
+const props = withDefaults(
+    defineProps<{
+        name: string;
+        value?: number;
+        typingDelay?: number; // TODO rename to something better,
+        allowDecimals?: boolean;
+        allowNegative?: boolean;
+        required?: boolean;
+        min?: number;
+        max?: number;
+        validations?: ValidationMethod[];
+        triggerValidation?: string;
+    }>(),
+    { allowDecimals: true, allowNegative: true }
+);
 
 const focused = ref<boolean>(false);
 
 const validationMethods: ValidationMethod[] = [
-    { ...predefinedValidations['required'], parameters: [ props.required ] },
+    { ...predefinedValidations['required'], parameters: [ props.required ?? false ] },
     { ...predefinedValidations['min-amount'], parameters: [ props.min ] },
     { ...predefinedValidations['max-amount'], parameters: [ props.max ] },
-    ...props.validations
+    ...props.validations ?? []
 ];
 
 const initialized = (data: ValidatedFieldData): void => {
