@@ -48,19 +48,24 @@ const model = computed({
     get: () => state.value,
     set: (value: string) => {
         state.value = value?.trim() ?? null;
-        emit('updated', { ...state });
     }
 });
 
 watch(() => props.value, (received: string) => {
-    if (received === model.value) {
+    const value = filterAndTransform(received);
+    if (received === model.value || value === model.value) {
         return;
     }
 
-    model.value = filterAndTransform(received);
+    model.value = value;
+    emit('updated', { ...state });
 });
 
 watch(() => props.focus, (received: boolean) => {
+    if (focused.value === received) {
+        return;
+    }
+
     !received ? element.value?.blur() : element.value?.focus();
 });
 
@@ -85,6 +90,7 @@ const preventDisallowedCharacters = (event: KeyboardEvent): string => {
  */
 const filterPasteData = (event: ClipboardEvent): void => {
     model.value = filterAndTransform(event.clipboardData.getData('text'));
+    emit('updated', { ...state });
 };
 
 /**
@@ -92,6 +98,7 @@ const filterPasteData = (event: ClipboardEvent): void => {
  */
 const filterInputData = (event: Event): void => {
     model.value = filterAndTransform((<HTMLInputElement> event.target).value);
+    emit('updated', { ...state });
 };
 
 const { filter, transform } = useUserInput();

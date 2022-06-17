@@ -55,9 +55,10 @@ describe('Focusing components', () => {
 
         it('should focus natively', async () => {
             const { input, wrapper } = mountComponent(null, true);
-            await input.element.focus();
 
+            await input.element.focus();
             expect(input.element).toBe(document.activeElement);
+
             emitted(wrapper, 'focused');
         });
 
@@ -65,6 +66,7 @@ describe('Focusing components', () => {
             const { input, wrapper } = mountComponent({ focus: true }, true);
 
             expect(input.element).toBe(document.activeElement);
+
             emitted(wrapper, 'focused');
         });
 
@@ -73,8 +75,21 @@ describe('Focusing components', () => {
             expect(input.element).not.toBe(document.activeElement);
 
             await wrapper.setProps({ focus: true });
-
             expect(input.element).toBe(document.activeElement);
+
+            emitted(wrapper, 'focused');
+        });
+
+        it('should not focus when prop changes if already focused', async () => {
+            const { input, wrapper } = mountComponent(null, true);
+            expect(input.element).not.toBe(document.activeElement);
+
+            await input.element.focus();
+            expect(input.element).toBe(document.activeElement);
+
+            await wrapper.setProps({ focus: true });
+            expect(input.element).toBe(document.activeElement);
+
             emitted(wrapper, 'focused');
         });
     });

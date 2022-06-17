@@ -144,7 +144,6 @@ describe('Focusing components', () => {
             expect(inputs[0].classes().includes('focused')).toBeTruthy();
 
             await wrapper.setProps({ focus: true });
-
             expect(inputs[0].element).toBe(document.activeElement);
             expect(inputs[0].classes().includes('focused')).toBeTruthy();
         });
@@ -153,11 +152,11 @@ describe('Focusing components', () => {
             const { inputs, wrapper } = mountComponent();
             expect(wrapper.find('.focused').exists()).toBeFalsy();
 
-            await inputs[0].trigger('focus');
+            await inputs[0].element.focus();
             expect(inputs[0].element).toBe(document.activeElement);
             expect(inputs[0].classes().includes('focused')).toBeTruthy();
 
-            await inputs[1].trigger('focus');
+            await inputs[1].element.focus();
             expect(inputs[1].element).toBe(document.activeElement);
             expect(inputs[1].classes().includes('focused')).toBeTruthy();
         });
@@ -200,7 +199,7 @@ describe('Jump focus on input', () => {
         const { inputs, wrapper } = mountComponent();
         expect(wrapper.find('.focused').exists()).toBeFalsy();
 
-        await inputs[0].trigger('focus');
+        await inputs[0].element.focus();
         expect(inputs[0].classes().includes('focused')).toBeTruthy();
 
         await inputs[0].setValue('a');
@@ -213,7 +212,7 @@ describe('Jump focus on input', () => {
         const { inputs, wrapper } = mountComponent();
         expect(wrapper.find('.focused').exists()).toBeFalsy();
 
-        await inputs[5].trigger('focus');
+        await inputs[5].element.focus();
         expect(inputs[5].classes().includes('focused')).toBeTruthy();
 
         await inputs[5].setValue('a');
@@ -378,6 +377,8 @@ describe('Pasting data', () => {
         expect(inputs[3].element.value).toBe('');
         expect(inputs[4].element.value).toBe('');
         expect(inputs[5].element.value).toBe('');
+
+        expect(inputs[3].element).toBe(document.activeElement);
     });
 
     it('should not fill if value is empty or null', async () => {
@@ -392,6 +393,8 @@ describe('Pasting data', () => {
         await inputs[0].trigger('paste', { clipboardData: { getData: () => null } });
         expect(inputs[0].element.value).toBe('');
         expect(inputs[1].element.value).toBe('');
+
+        expect(inputs[0].element).toBe(document.activeElement);
     });
 });
 
@@ -415,7 +418,7 @@ describe('Validating field', () => {
         const inputs = wrapper.findAll('input');
         expect(wrapper.find('strong.validation-error').exists()).toBeFalsy();
 
-        await inputs[0].trigger('focus');
+        await inputs[0].element.focus();
         expect(inputs.some(input => input.classes().includes('invalid'))).toBeFalsy();
         expect(wrapper.find('strong.validation-error').exists()).toBeFalsy();
 
@@ -436,7 +439,7 @@ describe('Validating field', () => {
         const inputs = wrapper.findAll('input');
         expect(wrapper.find('strong.validation-error').exists()).toBeFalsy();
 
-        await inputs[0].trigger('focus');
+        await inputs[0].element.focus();
         expect(inputs[0].classes().includes('focused')).toBeTruthy();
 
         await wrapper.find('main').trigger('blur');

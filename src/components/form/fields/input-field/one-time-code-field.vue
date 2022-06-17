@@ -1,5 +1,5 @@
 <template>
-    <fieldset class="one-time-code-field input-field" @paste.capture.prevent="filterPasteData">
+    <fieldset class="one-time-code-field input-field" @paste.prevent="filterPasteData">
 
         <validatable-input :validations="fieldValidations" :trigger-validation="triggerValidation" @created="fieldInitialized" @updated="fieldValidated">
             <template #default="{ initialize: initializeState, validate: validateState, invalid: invalidState, showing, showValidity }">
@@ -8,7 +8,7 @@
                     <slot name="label" />
                 </header>
 
-                <main ref="main" tabindex="-1" @blur.capture="fieldBlurred(showValidity)">
+                <main ref="main" tabindex="-1" @blur.prevent.capture="fieldBlurred(showValidity)">
                     <template v-for="(number, index) of length">
 
                         <one-time-code-field-item
@@ -19,10 +19,10 @@
                             :show-validation="showing"
                             :validations="inputValidations"
                             :value="state.value[index]"
-                            @cleared="cleared(index)"
-                            @focused="focusedElement = index"
+                            @focused="focusedElement.value = index"
                             @created="initializeState(toRaw(state))"
                             @updated="(data) => { inputValidated(index, data); validateState(toRaw(state)) }"
+                            @cleared="cleared(index)"
                         />
 
                     </template>
@@ -111,7 +111,7 @@ watch(() => props.focus, (received: boolean): void => {
         return;
     }
 
-    focusedElement.value = (<string[]> state.value).indexOf(null);
+    autoFocus();
 });
 
 const inputValidated = (index: number, data: ValidatedFieldData): void => {
@@ -150,10 +150,12 @@ const fieldBlurred = (showValidity: () => void): void => {
 const filterPasteData = (event: ClipboardEvent): void => {
     const value = event.clipboardData?.getData('text');
     if (!value) {
+        autoFocus();
         return;
     }
 
     convertValueForState(value);
+    updatedState('updated');
 };
 
 const cleared = (index: number): void => {
@@ -179,7 +181,7 @@ function convertValueForState(value?: string): void {
     const filtered = filter(value, regex).toUpperCase().slice(0, props.length).split('');
     state.value = stateValue.map((item, index) => filtered[index] ?? null);
 
-    focusedElement.value = null;
+    autoFocus();
 }
 
 function updatedState(event: UpdateEmitType): void {
@@ -198,6 +200,10 @@ function updatedState(event: UpdateEmitType): void {
     };
 
     emit(event, emitData);
+}
+
+function autoFocus() {
+    focusedElement.value = null;
 }
 
 onMounted(() => {
