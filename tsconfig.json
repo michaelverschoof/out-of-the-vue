@@ -2,8 +2,6 @@
     "compilerOptions": {
         "baseUrl": ".",
         "outDir": "dist",
-        "declaration": true,
-        "declarationDir": "dist/types",
         "module": "esnext",
         "moduleResolution": "node",
         "skipLibCheck": true,

@@ -1,7 +1,8 @@
 {
     "name": "out-of-the-vue",
     "author": "Michael Verschoof",
-    "version": "0.1.0-rc.1",
+    "description": "Functional components built with Vue 3",
+    "version": "0.1.0-rc.3",
     "license": "MIT",
     "files": [
         "dist"
@@ -18,11 +19,29 @@
     },
     "scripts": {
         "serve": "vite",
-        "build": "vite build && vue-tsc --emitDeclarationOnly --project tsconfig.build.json",
+        "build": "vite build && vue-tsc --project tsconfig.build.json",
         "preview": "vite preview",
         "test": "vitest",
-        "test-coverage": "vitest run --coverage"
+        "test-coverage": "vitest run --coverage",
+        "release": "npm install && npm run build && npm publish"
     },
+    "publishConfig": {
+        "registry": "https://registry.npmjs.org/"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/michaelverschoof/out-of-the-vue.git"
+    },
+    "bugs": "https://github.com/michaelverschoof/out-of-the-vue/issues",
+    "keywords": [
+        "functional",
+        "vue",
+        "vue3",
+        "mobile",
+        "frontend",
+        "component",
+        "components"
+    ],
     "dependencies": {
         "vue": "^3.2.37"
     },
