@@ -2,9 +2,13 @@
     "compilerOptions": {
         "baseUrl": ".",
         "outDir": "dist",
+        "target": "esnext",
         "module": "esnext",
         "moduleResolution": "node",
         "skipLibCheck": true,
+        "declaration": true,
+        "declarationDir": "dist/types",
+        "emitDeclarationOnly": true,
         "paths": {
             "@/*": [
                 "src/*"
@@ -16,5 +20,8 @@
     },
     "include": [
         "src"
+    ],
+    "exclude": [
+        "src/**/*.test.ts"
     ]
 }

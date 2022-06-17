@@ -9,28 +9,28 @@
                 </header>
 
                 <main ref="main" tabindex="-1" @blur.capture="fieldBlurred(showValidity)">
-                    <template v-for="(item, key) of $slots" :key="key">
+                    <template v-for="slot of slots" :key="slot">
 
-                        <label v-if="!nonOptionSlots.includes(key)"
-                               :class="{ focused: focusedItems.has(key), selected: state.value.includes(key), disabled: disabled?.includes(key) }"
+                        <label v-if="!nonOptionSlots.includes(slot)"
+                               :class="{ focused: focusedItems.has(slot), selected: state.value.includes(slot), disabled: disabled?.includes(slot) }"
                                class="checkable-field-item"
                         >
                             <checkable-input
                                 :class="{ hidden: hideInput }"
                                 :name="`checkable-input-${ name }`"
-                                :value="key"
+                                :value="slot"
                                 :type="type"
-                                :checked="state.value.includes(key)"
-                                :disabled="disabled?.includes(key)"
+                                :checked="state.value.includes(slot)"
+                                :disabled="disabled?.includes(slot)"
                                 tabindex="0"
-                                @focused="focusItem(key)"
-                                @blurred="blurItem(key)"
+                                @focused="focusItem(slot)"
+                                @blurred="blurItem(slot)"
                                 @created="(data) => { created(data); initialize(state); }"
                                 @updated="(data) => { updated(data); validate(state); }"
                             />
 
                             <span class="content">
-                                <slot :name="key" :selected="state.value.includes(key)" />
+                                <slot :name="slot" :selected="state.value.includes(slot)" />
                             </span>
                         </label>
 
@@ -56,7 +56,7 @@ import CheckableInput from '@/components/form/fields/base/checkable-input.vue';
 import ValidatableInput from '@/components/form/fields/base/validatable-input.vue';
 import { CheckableFieldData, ValidatedFieldData, ValidationMethod } from '@/composables/types';
 import { predefinedValidations } from '@/composables/validate-user-input';
-import { onMounted, reactive, ref, watch } from 'vue';
+import { onMounted, reactive, ref, useSlots, watch } from 'vue';
 
 const emit = defineEmits<{ (event: 'created' | 'updated', data: ValidatedFieldData): void; }>();
 
@@ -85,6 +85,7 @@ if (props.type !== 'radio') {
     );
 }
 
+const slots = Object.keys(useSlots());
 const nonOptionSlots = [ 'label', 'information', ...validationMethods.map(method => method.name) ];
 
 const selectedItems = ref<Set<string>>(new Set(filterSelected(props.selected)));

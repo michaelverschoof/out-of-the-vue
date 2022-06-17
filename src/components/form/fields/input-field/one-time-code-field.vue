@@ -19,7 +19,7 @@
                             :show-validation="showing"
                             :validations="inputValidations"
                             :value="state.value[index]"
-                            @focused="focusedElement.value = index"
+                            @focused="focusedElement = index"
                             @created="initializeState(toRaw(state))"
                             @updated="(data) => { inputValidated(index, data); validateState(toRaw(state)) }"
                             @cleared="cleared(index)"

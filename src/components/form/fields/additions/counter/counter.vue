@@ -5,5 +5,5 @@
 </template>
 
 <script lang="ts" setup>
-defineProps<{ limit: number; count?: number; tag?: string; }>();
+const props = defineProps<{ limit: number; count?: number; tag?: string; }>();
 </script>
