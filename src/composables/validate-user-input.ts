@@ -1,4 +1,4 @@
-import { BaseValidationType, FieldData, ValidationMethod } from '@/composables/types';
+import { BaseValidationType, FieldData, ValidationMethod, ValidationMethodParameters } from '@/composables/types';
 import { maximum as maximumAmount, minimum as minimumAmount } from '@/composables/validations/amount';
 import { maximum as maximumArray, minimum as minimumArray, required as requiredArray } from '@/composables/validations/array';
 import { maximum as maximumLength, minimum as minimumLength, required } from '@/composables/validations/base';
@@ -13,35 +13,35 @@ type BaseValidationRegistry = {
 export const predefinedValidations: BaseValidationRegistry = {
     'required': {
         name: 'required',
-        validator: required
+        validator: (data: FieldData, ...parameters: ValidationMethodParameters) => required(data, parameters[0] as boolean ?? null)
     },
     'max-length': {
         name: 'max',
-        validator: maximumLength
+        validator: (data: FieldData, ...parameters: ValidationMethodParameters) => maximumLength(data, parameters[0] as number ?? null)
     },
     'min-length': {
         name: 'min',
-        validator: minimumLength
+        validator: (data: FieldData, ...parameters: ValidationMethodParameters) => minimumLength(data, parameters[0] as number ?? null)
     },
     'max-amount': {
         name: 'max',
-        validator: maximumAmount
+        validator: (data: FieldData, ...parameters: ValidationMethodParameters) => maximumAmount(data, parameters[0] as number ?? null)
     },
     'min-amount': {
         name: 'min',
-        validator: minimumAmount
+        validator: (data: FieldData, ...parameters: ValidationMethodParameters) => minimumAmount(data, parameters[0] as number ?? null)
     },
     'required-array': {
         name: 'required',
-        validator: requiredArray
+        validator: (data: FieldData, ...parameters: ValidationMethodParameters) => requiredArray(data, parameters[0] as boolean ?? null)
     },
     'min-array': {
         name: 'min',
-        validator: minimumArray
+        validator: (data: FieldData, ...parameters: ValidationMethodParameters) => minimumArray(data, parameters[0] as number ?? null)
     },
     'max-array': {
         name: 'max',
-        validator: maximumArray
+        validator: (data: FieldData, ...parameters: ValidationMethodParameters) => maximumArray(data, parameters[0] as number ?? null)
     }
 };
 
@@ -59,7 +59,7 @@ export const useUserInputValidation = () => {
         for (const validation of validations) {
             const result = validation.validator(data, ...(validation.parameters || []));
 
-            !!result ? failed.delete(validation.name) : failed.add(validation.name);
+            result ? failed.delete(validation.name) : failed.add(validation.name);
         }
 
         return Array.from(failed);

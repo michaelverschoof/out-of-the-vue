@@ -43,6 +43,7 @@ describe('Mounting component', () => {
         const { input, wrapper } = mountComponent({ allowDecimals: false, value: 123 });
 
         expect(input.exists()).toBeTruthy();
+        // @ts-ignore
         expect(input.element.attributes['inputmode']['value']).toBe('numeric');
 
         const emits = emitted(wrapper, 'created');
@@ -72,6 +73,16 @@ describe('Updating input', () => {
 
         const emits = emitted(wrapper, 'updated');
         expect(emits[0].value).toBe(456.78);
+    });
+
+    it('should not update value from props if value is undefined', async () => {
+        const { input, wrapper } = mountComponent();
+
+        await wrapper.setProps({ value: undefined });
+        expect(input.element.value).toBe('');
+
+        const emits = emitted(wrapper, 'updated');
+        expect(emits[0].value).toBe(null);
     });
 
     it('should update value from input', async () => {
@@ -111,7 +122,7 @@ describe('Updating input', () => {
     });
 });
 
-function mountComponent(props: { [key: string]: any } = null): { wrapper: VueWrapper<any>, input: DOMWrapper<HTMLInputElement> } {
+function mountComponent(props: { [key: string]: number | boolean | null } | null = null): { wrapper: VueWrapper<any>, input: DOMWrapper<HTMLInputElement> } {
     const options = {
         props: Object.assign({}, numberProps, props || null)
     };

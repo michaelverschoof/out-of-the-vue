@@ -109,8 +109,8 @@ describe('Ticking boxes', () => {
         expect(emits[0].checked).toBeTruthy();
     });
 
-    it('should not tick the checkbox component on load with null', async () => {
-        const { input, wrapper } = mountCheckbox(null);
+    it('should not tick the checkbox component on load with undefined', async () => {
+        const { input, wrapper } = mountCheckbox(undefined);
 
         expect(input.element.checked).toBeFalsy();
 

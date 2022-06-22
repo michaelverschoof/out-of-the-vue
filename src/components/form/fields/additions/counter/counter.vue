@@ -1,5 +1,5 @@
 <template>
-    <component :is="tag ?? 'span'" class="counter" :class="{ exceeded: count > limit }">
+    <component :is="tag ?? 'span'" class="counter" :class="{ exceeded: (count ?? 0) > limit }">
         {{ count ?? 0 }} / {{ limit }}
     </component>
 </template>

@@ -54,7 +54,7 @@
 <script lang="ts" setup>
 import CheckableInput from '@/components/form/fields/base/checkable-input.vue';
 import ValidatableInput from '@/components/form/fields/base/validatable-input.vue';
-import { CheckableFieldData, ValidatedFieldData, ValidationMethod } from '@/composables/types';
+import { CheckableFieldData, ValidatedFieldData, ValidatedStringArrayFieldData, ValidationMethod } from '@/composables/types';
 import { predefinedValidations } from '@/composables/validate-user-input';
 import { onMounted, reactive, ref, useSlots, watch } from 'vue';
 
@@ -91,20 +91,20 @@ const nonOptionSlots = [ 'label', 'information', ...validationMethods.map(method
 const selectedItems = ref<Set<string>>(new Set(filterSelected(props.selected)));
 const focusedItems = ref<Set<string>>(new Set());
 
-const state = reactive<ValidatedFieldData>({
+const state = reactive<ValidatedStringArrayFieldData>({
     name: props.name,
     value: Array.from(selectedItems.value),
     valid: !props.required,
     failed: []
 });
 
-watch(() => props.selected, (received: string[]) => {
+watch(() => props.selected, (received?: string[]) => {
     const filtered = filterSelected(received);
     if (JSON.stringify(filtered) === JSON.stringify(state.value)) {
         return;
     }
 
-    selectedItems.value = new Set(filtered);
+    selectedItems.value = new Set<string>(filtered);
     state.value = Array.from(selectedItems.value);
 });
 
@@ -145,7 +145,7 @@ const blurItem = (item: string): void => {
     focusedItems.value.delete(item);
 };
 
-const main = ref<HTMLElement>(null);
+const main = ref<HTMLElement | null>(null);
 const fieldBlurred = (showValidity: () => void): void => {
     requestAnimationFrame(() => {
         if (!main.value || main.value.contains(document.activeElement)) {
@@ -160,8 +160,8 @@ onMounted(() => {
     emit('created', { ...state });
 });
 
-function filterSelected(selected: string[]): string[] {
-    return (selected || []).filter(item => item !== null && item !== undefined);
+function filterSelected(selected?: (string | null)[]): string[] {
+    return (selected || []).filter(item => item !== null) as string[];
 }
 </script>
 

@@ -4,7 +4,7 @@
  * @param allowDecimals
  * @param allowNegative
  */
-export function filter(value: string, allowDecimals: boolean = true, allowNegative: boolean = true): string {
+export function filter(value: string, allowDecimals: boolean = true, allowNegative: boolean = true): string | null {
     let filtered = value?.replace(/\s/g, '');
     if (!filtered) {
         return null;
@@ -27,7 +27,7 @@ export function filter(value: string, allowDecimals: boolean = true, allowNegati
  * Parse the provided string value to a number
  * @param value
  */
-export function parse(value: string): number {
+export function parse(value: string): number | null {
     if (!value) {
         return null;
     }

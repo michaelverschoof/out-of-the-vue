@@ -25,14 +25,10 @@ describe('Filter value', () => {
 
     it('should return the value if there is no regex', () => {
         expect(filter(value, '')).toEqual(value);
-        expect(filter(value, null)).toEqual(value);
-        expect(filter(value, undefined)).toEqual(value);
     });
 
     it('should return null if there is no value', () => {
         expect(filter('', /[A-z ]*/g)).toBeNull();
-        expect(filter(null, /[A-z ]*/g)).toBeNull();
-        expect(filter(undefined, /[A-z ]*/g)).toBeNull();
     });
 });
 
@@ -47,14 +43,7 @@ describe('Transform value', () => {
         expect(transform(value, 'lowercase')).toEqual(value.toLowerCase());
     });
 
-    it('should lowercase if no type is given', () => {
-        expect(transform(value, null)).toEqual(value.toLowerCase());
-        expect(transform(value, undefined)).toEqual(value.toLowerCase());
-    });
-
     it('should return null if there is no value', () => {
         expect(transform('', 'uppercase')).toBeNull();
-        expect(transform(null, 'uppercase')).toBeNull();
-        expect(transform(undefined, 'lowercase')).toBeNull();
     });
 });

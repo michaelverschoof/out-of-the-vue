@@ -29,15 +29,15 @@ const emit = defineEmits<{ (event: 'opened' | 'closed'): void; }>();
 
 const props = defineProps<{ parent?: string; open?: boolean; }>();
 
-const element = ref<HTMLElement>(null);
+const element = ref<HTMLElement | null>(null);
 const showing = ref<boolean>(false);
 
-watch(() => props.open, (received: boolean) => {
+watch(() => props.open, (received?: boolean) => {
     if (received === showing.value) {
         return;
     }
 
-    received ? openModal() : closeModal();
+    !!received ? openModal() : closeModal();
 });
 
 const openModal = (): void => {

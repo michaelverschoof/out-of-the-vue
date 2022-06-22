@@ -1,6 +1,5 @@
 import vue from '@vitejs/plugin-vue';
 import { resolve } from 'path';
-import dts from 'vite-plugin-dts';
 import { defineConfig } from 'vitest/config';
 
 const src = resolve(__dirname, 'src');
@@ -8,11 +7,12 @@ const test = resolve(__dirname, 'test');
 const snapshots = resolve(__dirname, 'snapshots');
 
 export default defineConfig({
-    plugins: [ vue(), dts() ],
+    plugins: [ vue() ],
     resolve: {
         alias: { '@': src, '@test': test }
     },
     build: {
+        target: 'esnext',
         lib: {
             entry: `${ src }/index.ts`,
             name: 'OutOfTheVue'

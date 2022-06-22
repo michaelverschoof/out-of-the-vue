@@ -128,6 +128,7 @@ describe('Focusing components', () => {
 
             expect(wrapper.find('.focused').exists()).toBeFalsy();
 
+            console.log('start');
             await wrapper.setProps({ focus: true });
 
             expect(inputs[0].element).toBe(document.activeElement);

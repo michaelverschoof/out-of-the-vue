@@ -36,7 +36,7 @@ const props = defineProps<{
     transformInput?: 'uppercase' | 'lowercase';
 }>();
 
-const element = ref<HTMLInputElement | HTMLTextAreaElement>(null);
+const element = ref<HTMLInputElement | HTMLTextAreaElement | null>(null);
 const focused = ref<boolean>(false);
 
 const state = reactive<StringFieldData>({
@@ -46,12 +46,12 @@ const state = reactive<StringFieldData>({
 
 const model = computed({
     get: () => state.value,
-    set: (value: string) => {
+    set: (value: string | null) => {
         state.value = value?.trim() ?? null;
     }
 });
 
-watch(() => props.value, (received: string) => {
+watch(() => props.value, (received?: string) => {
     const value = filterAndTransform(received);
     if (received === model.value || value === model.value) {
         return;
@@ -61,7 +61,7 @@ watch(() => props.value, (received: string) => {
     emit('updated', { ...state });
 });
 
-watch(() => props.focus, (received: boolean) => {
+watch(() => props.focus, (received?: boolean) => {
     if (focused.value === received) {
         return;
     }
@@ -77,7 +77,7 @@ const inputRegex = !!props.allowedCharacters ? new RegExp(props.allowedCharacter
 /**
  * Prevent characters other than the allowed to be entered
  */
-const preventDisallowedCharacters = (event: KeyboardEvent): string => {
+const preventDisallowedCharacters = (event: KeyboardEvent): string | void => {
     if (!inputRegex || !!event.key.match(inputRegex)) {
         return event.key;
     }
@@ -89,7 +89,7 @@ const preventDisallowedCharacters = (event: KeyboardEvent): string => {
  * Filter the pasted value by the allowed character format
  */
 const filterPasteData = (event: ClipboardEvent): void => {
-    model.value = filterAndTransform(event.clipboardData.getData('text'));
+    model.value = filterAndTransform(event.clipboardData?.getData('text'));
     emit('updated', { ...state });
 };
 
@@ -102,8 +102,8 @@ const filterInputData = (event: Event): void => {
 };
 
 const { filter, transform } = useUserInput();
-const filterAndTransform = (value: string): string => {
-    let filtered = filter(value, inputRegex);
+const filterAndTransform = (value?: string): string | null => {
+    let filtered = filter(value ?? '', inputRegex ?? '');
     if (!filtered) {
         return filtered;
     }
@@ -127,7 +127,7 @@ const blurElement = (): void => {
 };
 
 onMounted(() => {
-    if (props.focus) {
+    if (props.focus && element.value) {
         element.value.focus();
     }
 

@@ -18,7 +18,7 @@ describe('Single validation', () => {
 
     it('should validate when given no parameter', () => {
         expect(validate(data, [ { ...predefinedValidations.required, parameters: [] } ])).toEqual([]);
-        expect(validate(data, [ { ...predefinedValidations.required, parameters: null } ])).toEqual([]);
+        expect(validate(data, [ { ...predefinedValidations.required, parameters: undefined } ])).toEqual([]);
     });
 
     it('should validate when required is false', () => {

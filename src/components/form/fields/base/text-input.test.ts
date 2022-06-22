@@ -265,13 +265,13 @@ describe('Preventing keyboard input', () => {
     });
 });
 
-function mountComponent(props: { [key: string]: any } = null, attachToDocument: boolean = false): { wrapper: VueWrapper<any>, input: DOMWrapper<HTMLInputElement> } {
-    const options = {
+function mountComponent(props: { [key: string]: string | boolean | null } | null = null, attachToDocument: boolean = false): { wrapper: VueWrapper<any>, input: DOMWrapper<HTMLInputElement> } {
+    const options: { props: object, attachTo?: HTMLElement } = {
         props: Object.assign({}, textProps, props || null)
     };
 
     if (attachToDocument) {
-        options['attachTo'] = document.body;
+        options.attachTo = document.body;
     }
 
     const wrapper = mount(TextInput, options);

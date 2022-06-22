@@ -292,7 +292,6 @@ describe('Validating field', () => {
         await uncheck(item);
 
         expect(wrapper.find('strong.validation-error').exists()).toBeFalsy();
-
         await wrapper.find('main').trigger('blur');
 
         expect(wrapper.find('strong.validation-error').exists()).toBeTruthy();
@@ -311,7 +310,6 @@ describe('Validating field', () => {
 
         await check(items[0]);
         await uncheck(items[0]);
-
         expect(wrapper.find('strong.validation-error').exists()).toBeFalsy();
 
         const input = items[1].find('input');
@@ -322,6 +320,23 @@ describe('Validating field', () => {
         await wrapper.find('main').trigger('blur');
         expect(input.element).toBe(document.activeElement);
 
+        expect(wrapper.find('strong.validation-error').exists()).toBeFalsy();
+    });
+
+    it('should not show a validation error when parameter is undefined', async () => {
+        const wrapper = mount(CheckableField, {
+            props: Object.assign({}, checkboxProps, { required: undefined }),
+            slots: Object.assign({}, slots, { required: 'required error' })
+        });
+
+        const item = wrapper.find('.checkable-field-item');
+        expect(wrapper.find('strong.validation-error').exists()).toBeFalsy();
+
+        await check(item);
+        await uncheck(item);
+        expect(wrapper.find('strong.validation-error').exists()).toBeFalsy();
+
+        await wrapper.find('main').trigger('blur');
         expect(wrapper.find('strong.validation-error').exists()).toBeFalsy();
     });
 

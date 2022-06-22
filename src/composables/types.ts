@@ -1,3 +1,5 @@
+import { InjectionKey, Ref } from 'vue';
+
 export type BaseValidationType = 'required' | 'required-array' | 'min-length' | 'max-length' | 'min-amount' | 'max-amount' | 'min-array' | 'max-array';
 
 export type InputTransformType = 'uppercase' | 'lowercase';
@@ -14,22 +16,22 @@ export type ModalEmitType = 'opened' | 'closed';
 /**
  * Provide / inject Symbols
  */
-export const SubmittedSymbol = Symbol();
+export const SubmittedSymbol: InjectionKey<Ref<boolean>> = Symbol('submitted');
 
 /**
  * Field state emitted from all inputs
  */
 export interface FieldData {
-    name: string;
-    value: string | number | string[] | number[];
+    name: string | null;
+    value: string | number | null | (string | null)[] | (number | null)[];
 }
 
 export interface StringFieldData extends FieldData {
-    value: string;
+    value: string | null;
 }
 
 export interface NumberFieldData extends FieldData {
-    value: number;
+    value: number | null;
 }
 
 export interface CheckableFieldData extends FieldData {
@@ -42,7 +44,11 @@ export interface CheckableFieldData extends FieldData {
  */
 export interface ValidatedFieldData extends FieldData {
     valid: boolean;
-    failed: Array<string | BaseValidationType>;
+    failed: (string | BaseValidationType)[];
+}
+
+export interface ValidatedStringArrayFieldData extends ValidatedFieldData {
+    value: (string | null)[];
 }
 
 /**
@@ -54,4 +60,4 @@ export interface ValidationMethod {
     parameters?: ValidationMethodParameters;
 }
 
-type ValidationMethodParameters = Array<string | number | boolean>;
+export type ValidationMethodParameters = (string | number | boolean | undefined)[];

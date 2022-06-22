@@ -56,7 +56,7 @@ import PrependAppend from '@/components/form/fields/additions/layout/prepend-app
 import DebounceableInput from '@/components/form/fields/base/debounceable-input.vue';
 import NumericInput from '@/components/form/fields/base/numeric-input.vue';
 import ValidatableInput from '@/components/form/fields/base/validatable-input.vue';
-import { ValidatedFieldData, ValidationMethod } from '@/composables/types';
+import { FieldData, ValidatedFieldData, ValidationMethod } from '@/composables/types';
 import { predefinedValidations } from '@/composables/validate-user-input';
 import { exclude, include } from '@/util/attrs';
 import { ref } from 'vue';
@@ -88,12 +88,12 @@ const validationMethods: ValidationMethod[] = [
     ...props.validations ?? []
 ];
 
-const initialized = (data: ValidatedFieldData): void => {
-    emit('created', { ...data });
+const initialized = (data: FieldData | ValidatedFieldData): void => {
+    emit('created', { ...data as ValidatedFieldData });
 };
 
-const debounced = (data: ValidatedFieldData): void => {
-    emit('updated', { ...data });
+const debounced = (data: FieldData | ValidatedFieldData): void => {
+    emit('updated', { ...data as ValidatedFieldData });
 };
 </script>
 

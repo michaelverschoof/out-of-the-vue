@@ -29,7 +29,7 @@ it('should mount the component', async () => {
 it('should trigger debounce', async () => {
     const { element, wrapper } = mountComponent();
 
-    await element.trigger('debounce');
+    await element?.trigger('debounce');
     expect(wrapper.emitted('updated')).toBeFalsy();
 
     vi.advanceTimersToNextTimer();
@@ -41,7 +41,7 @@ it('should trigger debounce', async () => {
 it('should trigger debounce immediately without delay set', async () => {
     const { element, wrapper } = mountComponent(0);
 
-    await element.trigger('debounce');
+    await element?.trigger('debounce');
     const emits = emitted(wrapper, 'updated');
     expect(emits[0]).toEqual(data);
 });

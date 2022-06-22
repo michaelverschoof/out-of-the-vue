@@ -18,7 +18,7 @@
                             :focus="index === focusedElement"
                             :show-validation="showing"
                             :validations="inputValidations"
-                            :value="state.value[index]"
+                            :value="state.value[index] ?? undefined"
                             @focused="focusedElement = index"
                             @created="initializeState(toRaw(state))"
                             @updated="(data) => { inputValidated(index, data); validateState(toRaw(state)) }"
@@ -45,7 +45,7 @@
 <script lang="ts" setup>
 import ValidatableInput from '@/components/form/fields/base/validatable-input.vue';
 import OneTimeCodeFieldItem from '@/components/form/fields/input-field/one-time-code-field-item.vue';
-import { FieldData, UpdateEmitType, ValidatedFieldData, ValidationMethod } from '@/composables/types';
+import { FieldData, UpdateEmitType, ValidatedFieldData, ValidatedStringArrayFieldData, ValidationMethod, ValidationMethodParameters } from '@/composables/types';
 import { useUserInput } from '@/composables/user-input';
 import { predefinedValidations } from '@/composables/validate-user-input';
 import { computed, onMounted, reactive, ref, toRaw, watch } from 'vue';
@@ -73,15 +73,17 @@ const fieldValidations: ValidationMethod[] = [
     {
         name: 'required',
         parameters: [ props.required, props.length ],
-        validator: (data: FieldData, required: boolean, length: number): boolean => {
-            const value = <(string | number)[]> data.value;
+        validator: (data: FieldData, ...parameters: ValidationMethodParameters): boolean => {
+            const required = parameters[0] as boolean;
+            const length = parameters[1] as number;
+            const value = <(string | number | null)[]> data.value;
             return !required || (!!value && value.length === length && value.every(val => val !== null));
         }
     },
     ...props.validations ?? []
 ];
 
-const state = reactive<ValidatedFieldData>({
+const state = reactive<ValidatedStringArrayFieldData>({
     name: props.name,
     value: [],
     valid: !props.required,
@@ -93,25 +95,20 @@ const state = reactive<ValidatedFieldData>({
  * When setting the value to null, the focused item will be determined by the first null value in the list
  * When setting the value to -1, no element will be focused
  */
-const selectedIndex = ref<number>(props.focus ? 0 : -1);
+const selectedIndex = ref<number | null>(props.focus ? 0 : -1);
 const focusedElement = computed({
-    get: () => selectedIndex.value ?? (<string[]> state.value).indexOf(null),
-    set: (index: number) => {
-        selectedIndex.value = index < props.length ? index : null;
+    get: (): number | null => selectedIndex.value ?? state.value.indexOf(null),
+    set: (index: number | null) => {
+        selectedIndex.value = index !== null && index < props.length ? index : null;
     }
 });
 
-watch(() => props.focus, (received: boolean): void => {
-    if (!received) {
-        focusedElement.value = -1;
+watch(() => props.focus, (received?: boolean): void => {
+    if (received) {
         return;
     }
 
-    if (focusedElement.value !== null && focusedElement.value !== -1) {
-        return;
-    }
-
-    autoFocus();
+    focusedElement.value = -1;
 });
 
 const inputValidated = (index: number, data: ValidatedFieldData): void => {
@@ -135,7 +132,7 @@ const fieldValidated = (data: ValidatedFieldData): void => {
     updatedState('updated');
 };
 
-const main = ref<HTMLElement>(null);
+const main = ref<HTMLElement | null>(null);
 const fieldBlurred = (showValidity: () => void): void => {
     requestAnimationFrame(() => {
         if (!main.value || main.value.contains(document.activeElement)) {
@@ -173,28 +170,29 @@ const regex = new RegExp(allowedCharacters, 'g');
 
 function convertValueForState(value?: string): void {
     const stateValue = [ ...new Array(props.length) ];
-    if (!value) {
-        state.value = stateValue.map(() => null);
-        return;
-    }
+    // if (!value) {
+    //     state.value = stateValue.map(() => null);
+    //     console.log(state.value);
+    //     return;
+    // }
 
-    const filtered = filter(value, regex).toUpperCase().slice(0, props.length).split('');
+    const filtered = filter(value ?? '', regex)?.toUpperCase().slice(0, props.length).split('') ?? [];
     state.value = stateValue.map((item, index) => filtered[index] ?? null);
 
     autoFocus();
 }
 
 function updatedState(event: UpdateEmitType): void {
-    const value = (<string[]> state.value).join('');
+    const value = state.value.join('');
 
-    let emitValue: string | number = !!value ? value : null;
-    if (props.type === 'numeric' && !!emitValue) {
+    let emitValue: string | number | null = !!value ? value : null;
+    if (props.type === 'numeric' && emitValue !== null) {
         emitValue = Number(emitValue);
     }
 
     const emitData: ValidatedFieldData = {
         name: state.name,
-        value: emitValue,
+        value: emitValue as string | number,
         valid: state.valid,
         failed: state.failed
     };
@@ -202,7 +200,7 @@ function updatedState(event: UpdateEmitType): void {
     emit(event, emitData);
 }
 
-function autoFocus() {
+function autoFocus(): void {
     focusedElement.value = null;
 }
 

@@ -32,13 +32,11 @@ describe('Validate required', () => {
         expect(required(numbers, false)).toBe(true);
 
         expect(required({} as FieldData, false)).toBe(true);
-        expect(required(null, false)).toBe(true);
     });
 
     it('should not validate if value is incorrect', () => {
         expect(required(empty)).toBe(false);
         expect(required({} as FieldData)).toBe(false);
-        expect(required(null)).toBe(false);
     });
 });
 
@@ -56,15 +54,12 @@ describe('Validate minimum array items', () => {
         expect(minimum(numbers, 0)).toBe(true);
 
         expect(minimum({} as FieldData, 0)).toBe(true);
-        expect(minimum(null, 0)).toBe(true);
-        expect(minimum({} as FieldData, null)).toBe(true);
     });
 
     it('should not validate if data is under the minimum', () => {
         expect(minimum(empty, 2)).toBe(false);
         expect(minimum(strings, lengthStrings + 1)).toBe(false);
         expect(minimum(numbers, lengthNumbers + 1)).toBe(false);
-        expect(minimum(null, 2)).toBe(false);
     });
 });
 
@@ -82,8 +77,6 @@ describe('Validate maximum array items', () => {
         expect(maximum(numbers, 0)).toBe(true);
 
         expect(maximum({} as FieldData, 0)).toBe(true);
-        expect(maximum(null, 0)).toBe(true);
-        expect(maximum({} as FieldData, null)).toBe(true);
     });
 
     it('should not validate if data is above the maximum', () => {
