@@ -1,5 +1,6 @@
 import vue from '@vitejs/plugin-vue';
 import { resolve } from 'path';
+import dts from 'vite-plugin-dts';
 import { defineConfig } from 'vitest/config';
 
 const src = resolve(__dirname, 'src');
@@ -7,9 +8,11 @@ const test = resolve(__dirname, 'test');
 const snapshots = resolve(__dirname, 'snapshots');
 
 export default defineConfig({
-    plugins: [ vue() ],
     resolve: {
-        alias: { '@': src, '@test': test }
+        alias: {
+            '@': src,
+            '@test': test
+        }
     },
     build: {
         target: 'esnext',
@@ -20,12 +23,22 @@ export default defineConfig({
         rollupOptions: {
             external: [ 'vue' ],
             output: {
+                exports: 'named',
+                assetFileNames: 'out-of-the-vue.[ext]',
                 globals: {
                     vue: 'Vue'
                 }
             }
         }
     },
+    plugins: [
+        vue(),
+        dts({
+            tsConfigFilePath: 'tsconfig.build.json',
+            outputDir: 'dist/types',
+            rollupTypes: true
+        })
+    ],
     test: {
         coverage: {
             reporter: [ 'text', 'lcov' ]

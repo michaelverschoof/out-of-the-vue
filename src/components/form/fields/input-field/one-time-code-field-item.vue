@@ -32,7 +32,7 @@ const emit = defineEmits<{
     (event: 'cleared'): void;
 }>();
 
-defineProps<{
+const props = defineProps<{
     index: number;
     name: string;
     value?: string;
