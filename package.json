@@ -16,7 +16,7 @@
             "import": "./dist/out-of-the-vue.es.js",
             "require": "./dist/out-of-the-vue.umd.js"
         },
-        "./dist/style.css": "./dist/out-of-the-vue.css"
+        "./dist/out-of-the-vue.css": "./dist/out-of-the-vue.css"
     },
     "scripts": {
         "serve": "vite",

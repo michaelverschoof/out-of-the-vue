@@ -7,12 +7,18 @@
         "moduleResolution": "node",
         "isolatedModules": true,
         "strict": true,
+        "strictNullChecks": false,
         "jsx": "preserve",
         "sourceMap": true,
         "resolveJsonModule": true,
         "esModuleInterop": true,
         "useDefineForClassFields": true,
-        "types": ["vitest/globals", "vite/client"],
+        "types": [
+            "node",
+            "vue",
+            "vitest/globals",
+            "vite/client"
+        ],
         "paths": {
             "@/*": [
                 "src/*"
