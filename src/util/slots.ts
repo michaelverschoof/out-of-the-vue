@@ -5,9 +5,9 @@ import { Slot } from 'vue';
  * @param slot the slot to check
  */
 export function provided(slot?: Slot) {
-    if (!slot || !slot()[0]) {
+    if (!slot || !slot().length) {
         return false;
     }
 
-    return !!slot()[0].children?.length;
+    return slot().some(content => !!content.el || !!content.children?.length || !!content.props?.innerHTML);
 }

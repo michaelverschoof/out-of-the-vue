@@ -11,7 +11,7 @@
         @blur="blurElement"
         @focus="focusElement"
         @input="filterInputData"
-        @keydown="preventDisallowedCharacters"
+        @keydown="filterInputData"
         @paste.prevent="filterPasteData"
     />
 </template>
@@ -47,7 +47,7 @@ const state = reactive<StringFieldData>({
 const model = computed({
     get: () => state.value,
     set: (value: string | null) => {
-        state.value = value?.trim() ?? null;
+        state.value = value?.trimStart() ?? null;
     }
 });
 
@@ -73,17 +73,6 @@ watch(() => props.focus, (received?: boolean) => {
  * The regex containing the allowed characters
  */
 const inputRegex = !!props.allowedCharacters ? new RegExp(props.allowedCharacters, 'g') : null;
-
-/**
- * Prevent characters other than the allowed to be entered
- */
-const preventDisallowedCharacters = (event: KeyboardEvent): string | void => {
-    if (!inputRegex || !!event.key.match(inputRegex)) {
-        return event.key;
-    }
-
-    event.preventDefault();
-};
 
 /**
  * Filter the pasted value by the allowed character format

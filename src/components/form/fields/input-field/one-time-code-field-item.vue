@@ -1,5 +1,5 @@
 <template>
-    <validatable-input :validations="validations" @created="(data) => $emit('created', data)" @updated="(data) => $emit('updated', data)">
+    <validator :validations="validations" @created="(data) => $emit('created', data)" @updated="(data) => $emit('updated', data)">
         <template #default="{ initialize, validate, invalid }">
 
             <text-input
@@ -18,13 +18,13 @@
             />
 
         </template>
-    </validatable-input>
+    </validator>
 </template>
 
 <script lang="ts" setup>
 import TextInput from '@/components/form/fields/base/text-input.vue';
-import ValidatableInput from '@/components/form/fields/base/validatable-input.vue';
 import { ValidatedFieldData, ValidationMethod } from '@/composables/types';
+import Validator from '@/functionals/validator.vue';
 
 const emit = defineEmits<{
     (event: 'created' | 'updated', data: ValidatedFieldData): void;

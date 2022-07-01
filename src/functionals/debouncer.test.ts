@@ -1,4 +1,4 @@
-import DebounceableInput from '@/components/form/fields/base/debounceable-input.vue';
+import Debouncer from '@/functionals/debouncer.vue';
 import { emitted } from '@test/emits';
 import { MountedComponent } from '@test/types';
 import { mount } from '@vue/test-utils';
@@ -14,7 +14,7 @@ const stringedData = JSON.stringify(data).replace(/"/g, '\'');
 vi.useFakeTimers();
 
 beforeAll(() => {
-    expect(DebounceableInput).toBeTruthy();
+    expect(Debouncer).toBeTruthy();
 });
 
 afterEach(() => {
@@ -47,7 +47,7 @@ it('should trigger debounce immediately without delay set', async () => {
 });
 
 function mountComponent(delay: number = 10): MountedComponent {
-    const wrapper = mount(DebounceableInput, {
+    const wrapper = mount(Debouncer, {
         slots: {
             default: `<template #default="{ debounce }">
                         <div @debounce="debounce(${ stringedData })">Foo</div>

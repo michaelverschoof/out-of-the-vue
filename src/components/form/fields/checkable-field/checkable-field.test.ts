@@ -19,21 +19,21 @@ const slots = {
     baz: 'Baz'
 };
 
-const createdEmit = {
+const createdEmit: ValidatedFieldData = {
     name: props.name,
     value: [],
     valid: true,
     failed: []
 };
 
-const validSingleUpdate = {
+const validSingleUpdate: ValidatedFieldData = {
     name: props.name,
     value: [ 'bar' ],
     valid: true,
     failed: []
 };
 
-const validMultipleUpdate = {
+const validMultipleUpdate: ValidatedFieldData = {
     name: props.name,
     value: [ 'bar', 'baz' ],
     valid: true,

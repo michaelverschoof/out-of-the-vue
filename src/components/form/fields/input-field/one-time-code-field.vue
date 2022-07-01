@@ -1,7 +1,7 @@
 <template>
     <fieldset class="one-time-code-field input-field" @paste.prevent="filterPasteData">
 
-        <validatable-input :validations="fieldValidations" :trigger-validation="triggerValidation" @created="fieldInitialized" @updated="fieldValidated">
+        <validator :validations="fieldValidations" :trigger-validation="triggerValidation" @created="fieldInitialized" @updated="fieldValidated">
             <template #default="{ initialize: initializeState, validate: validateState, invalid: invalidState, showing, showValidity }">
 
                 <header v-if="$slots.label" class="label">
@@ -18,7 +18,7 @@
                             :focus="index === focusedElement"
                             :show-validation="showing"
                             :validations="inputValidations"
-                            :value="state.value[index] ?? undefined"
+                            :value="state.value[index]"
                             @focused="focusedElement = index"
                             @created="initializeState(toRaw(state))"
                             @updated="(data) => { inputValidated(index, data); validateState(toRaw(state)) }"
@@ -37,17 +37,17 @@
             <template v-for="validation of fieldValidations" #[validation.name]>
                 <slot :name="validation.name" />
             </template>
-        </validatable-input>
+        </validator>
 
     </fieldset>
 </template>
 
 <script lang="ts" setup>
-import ValidatableInput from '@/components/form/fields/base/validatable-input.vue';
 import OneTimeCodeFieldItem from '@/components/form/fields/input-field/one-time-code-field-item.vue';
 import { FieldData, UpdateEmitType, ValidatedFieldData, ValidatedStringArrayFieldData, ValidationMethod, ValidationMethodParameters } from '@/composables/types';
 import { useUserInput } from '@/composables/user-input';
 import { predefinedValidations } from '@/composables/validate-user-input';
+import Validator from '@/functionals/validator.vue';
 import { computed, onMounted, reactive, ref, toRaw, watch } from 'vue';
 
 const emit = defineEmits<{ (event: 'created' | 'updated', data: ValidatedFieldData): void; }>();
@@ -74,9 +74,9 @@ const fieldValidations: ValidationMethod[] = [
         name: 'required',
         parameters: [ props.required, props.length ],
         validator: (data: FieldData, ...parameters: ValidationMethodParameters): boolean => {
-            const required = parameters[0] as boolean;
-            const length = parameters[1] as number;
-            const value = <(string | number | null)[]> data.value;
+            const required = <boolean> parameters[0];
+            const length = <number> parameters[1];
+            const value = <(string | null)[]> data.value;
             return !required || (!!value && value.length === length && value.every(val => val !== null));
         }
     },
@@ -170,11 +170,6 @@ const regex = new RegExp(allowedCharacters, 'g');
 
 function convertValueForState(value?: string): void {
     const stateValue = [ ...new Array(props.length) ];
-    // if (!value) {
-    //     state.value = stateValue.map(() => null);
-    //     console.log(state.value);
-    //     return;
-    // }
 
     const filtered = filter(value ?? '', regex)?.toUpperCase().slice(0, props.length).split('') ?? [];
     state.value = stateValue.map((item, index) => filtered[index] ?? null);
@@ -183,16 +178,9 @@ function convertValueForState(value?: string): void {
 }
 
 function updatedState(event: UpdateEmitType): void {
-    const value = state.value.join('');
-
-    let emitValue: string | number | null = !!value ? value : null;
-    if (props.type === 'numeric' && emitValue !== null) {
-        emitValue = Number(emitValue);
-    }
-
     const emitData: ValidatedFieldData = {
         name: state.name,
-        value: emitValue as string | number,
+        value: state.value?.join('') || null,
         valid: state.valid,
         failed: state.failed
     };

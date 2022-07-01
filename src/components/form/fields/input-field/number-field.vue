@@ -1,10 +1,10 @@
 <template>
     <label class="number-field input-field" v-bind="include($attrs, ['class'])">
 
-        <debounceable-input :delay="typingDelay" @updated="debounced">
+        <debouncer :delay="typingDelay" @updated="debounced">
             <template #default="{ debounce }">
 
-                <validatable-input :validations="validationMethods" :trigger-validation="triggerValidation" @created="initialized" @updated="debounce">
+                <validator :validations="validationMethods" :trigger-validation="triggerValidation" @created="initialized" @updated="debounce">
                     <template #default="{ initialize, validate, invalid, showing, showValidity }">
 
                         <header v-if="$slots.label" class="label">
@@ -43,21 +43,21 @@
                     <template v-for="validation of validationMethods" #[validation.name]>
                         <slot :name="validation.name" />
                     </template>
-                </validatable-input>
+                </validator>
 
             </template>
-        </debounceable-input>
+        </debouncer>
 
     </label>
 </template>
 
 <script lang="ts" setup>
-import PrependAppend from '@/components/form/fields/additions/layout/prepend-append.vue';
-import DebounceableInput from '@/components/form/fields/base/debounceable-input.vue';
 import NumericInput from '@/components/form/fields/base/numeric-input.vue';
-import ValidatableInput from '@/components/form/fields/base/validatable-input.vue';
-import { FieldData, ValidatedFieldData, ValidationMethod } from '@/composables/types';
+import PrependAppend from '@/components/layout/prepend-append.vue';
+import { FieldData, ValidatedFieldData, ValidatedNumberFieldData, ValidationMethod } from '@/composables/types';
 import { predefinedValidations } from '@/composables/validate-user-input';
+import Debouncer from '@/functionals/debouncer.vue';
+import Validator from '@/functionals/validator.vue';
 import { exclude, include } from '@/util/attrs';
 import { ref } from 'vue';
 
@@ -89,11 +89,11 @@ const validationMethods: ValidationMethod[] = [
 ];
 
 const initialized = (data: FieldData | ValidatedFieldData): void => {
-    emit('created', { ...data as ValidatedFieldData });
+    emit('created', { ...data as ValidatedNumberFieldData });
 };
 
 const debounced = (data: FieldData | ValidatedFieldData): void => {
-    emit('updated', { ...data as ValidatedFieldData });
+    emit('updated', { ...data as ValidatedNumberFieldData });
 };
 </script>
 

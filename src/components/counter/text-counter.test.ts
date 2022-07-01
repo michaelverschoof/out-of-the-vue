@@ -1,4 +1,4 @@
-import TextCounter from '@/components/form/fields/additions/counter/text-counter.vue';
+import TextCounter from '@/components/counter/text-counter.vue';
 import { MountedComponent } from '@test/types';
 import { DOMWrapper, mount } from '@vue/test-utils';
 import { beforeAll, describe, expect, it } from 'vitest';

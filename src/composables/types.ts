@@ -51,6 +51,14 @@ export interface ValidatedStringArrayFieldData extends ValidatedFieldData {
     value: (string | null)[];
 }
 
+export interface ValidatedStringFieldData extends ValidatedFieldData {
+    value: string;
+}
+
+export interface ValidatedNumberFieldData extends ValidatedFieldData {
+    value: number;
+}
+
 /**
  * Validation method structure used by internally registered validation methods and provided custom validations
  */

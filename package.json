@@ -2,8 +2,15 @@
     "name": "out-of-the-vue",
     "author": "Michael Verschoof",
     "description": "Functional UX components built with Vue 3",
-    "version": "0.1.0-rc.13",
+    "version": "0.1.0-rc.28",
     "license": "MIT",
+    "publishConfig": {
+        "registry": "https://registry.npmjs.org/"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/michaelverschoof/out-of-the-vue.git"
+    },
     "main": "./dist/out-of-the-vue.umd.js",
     "module": "./dist/out-of-the-vue.es.js",
     "types": "./dist/types/index.d.ts",
@@ -26,16 +33,10 @@
         "test:coverage": "vitest run --coverage",
         "release": "npm install && npm run build && npm publish"
     },
-    "publishConfig": {
-        "registry": "https://registry.npmjs.org/"
-    },
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/michaelverschoof/out-of-the-vue.git"
-    },
     "bugs": "https://github.com/michaelverschoof/out-of-the-vue/issues",
     "keywords": [
         "functional",
+        "UX",
         "vue",
         "vue3",
         "mobile",
@@ -48,13 +49,13 @@
         "@vitejs/plugin-vue": "^2.3.3",
         "@vue/test-utils": "^2.0.0",
         "c8": "^7.11.3",
-        "happy-dom": "^5.3.1",
+        "happy-dom": "^5.3.2",
         "jsdom": "^20.0.0",
-        "sass": "^1.52.3",
+        "sass": "^1.53.0",
         "typescript": "^4.7.4",
-        "vite": "^2.9.12",
+        "vite": "^2.9.13",
         "vite-plugin-dts": "^1.2.0",
-        "vitest": "^0.15.2",
+        "vitest": "^0.16.0",
         "vue": "^3.2.37"
     },
     "peerDependencies": {

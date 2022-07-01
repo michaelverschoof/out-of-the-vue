@@ -1,7 +1,7 @@
 import TextInput from '@/components/form/fields/base/text-input.vue';
 import { emitted } from '@test/emits';
 import { DOMWrapper, mount, VueWrapper } from '@vue/test-utils';
-import { beforeAll, describe, expect, it, vi } from 'vitest';
+import { beforeAll, describe, expect, it } from 'vitest';
 
 /**
  * @vitest-environment happy-dom
@@ -239,29 +239,6 @@ describe('Updating input', () => {
 
         const updated = emitted(wrapper, 'updated', 1);
         expect(updated[0].value).toBe('something');
-    });
-});
-
-describe('Preventing keyboard input', () => {
-
-    it('should allow characters in the regex', async () => {
-        const { wrapper } = mountComponent({ allowedCharacters: '[A-z]' }, true);
-
-        const keyPress = new KeyboardEvent('keydown', { key: 'a' });
-        vi.spyOn(keyPress, 'preventDefault');
-
-        wrapper.find('input').element.dispatchEvent(keyPress);
-        expect(keyPress.preventDefault).not.toHaveBeenCalled();
-    });
-
-    it('should prevent characters not in the regex', async () => {
-        const { wrapper } = mountComponent({ allowedCharacters: '[A-z]' }, true);
-
-        const keyPress = new KeyboardEvent('keydown', { key: '9' });
-        vi.spyOn(keyPress, 'preventDefault');
-
-        wrapper.find('input').element.dispatchEvent(keyPress);
-        expect(keyPress.preventDefault).toHaveBeenCalled();
     });
 });
 

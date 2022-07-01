@@ -1,4 +1,4 @@
-import PrependAppend from '@/components/form/fields/additions/layout/prepend-append.vue';
+import PrependAppend from '@/components/layout/prepend-append.vue';
 import { MountedComponent, ProvidedSlots } from '@test/types';
 import { DOMWrapper, mount } from '@vue/test-utils';
 import { beforeAll, describe, expect, it } from 'vitest';

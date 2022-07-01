@@ -1,4 +1,5 @@
 import OneTimeCodeFieldItem from '@/components/form/fields/input-field/one-time-code-field-item.vue';
+import { ValidatedFieldData } from '@/composables/types';
 import { emitted } from '@test/emits';
 import { DOMWrapper, mount, VueWrapper } from '@vue/test-utils';
 import { beforeAll, describe, expect, it } from 'vitest';
@@ -13,7 +14,7 @@ const props = {
     index: 1
 };
 
-const createdEmit = {
+const createdEmit: ValidatedFieldData = {
     name: `${ props.name }-${ props.index }`,
     value: null,
     valid: true,

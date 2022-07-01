@@ -1,5 +1,5 @@
 import TextField from '@/components/form/fields/input-field/text-field.vue';
-import { FieldData } from '@/composables/types';
+import { FieldData, ValidatedFieldData } from '@/composables/types';
 import { emitted } from '@test/emits';
 import { DOMWrapper, mount, VueWrapper } from '@vue/test-utils';
 import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
@@ -12,7 +12,7 @@ const props = {
     name: 'text-field'
 };
 
-const createdEmit = {
+const createdEmit: ValidatedFieldData = {
     name: props.name,
     value: null,
     valid: true,

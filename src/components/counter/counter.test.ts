@@ -1,4 +1,4 @@
-import Counter from '@/components/form/fields/additions/counter/counter.vue';
+import Counter from '@/components/counter/counter.vue';
 import { MountedComponent } from '@test/types';
 import { DOMWrapper, mount } from '@vue/test-utils';
 import { beforeAll, describe, expect, it } from 'vitest';
@@ -22,6 +22,13 @@ describe('Mounting components', () => {
 
         expect(element?.exists()).toBeTruthy();
         expect(element?.text()).toBe('0 / 5');
+    });
+
+    it('should mount the component without limit showing', async () => {
+        const { element } = mountComponent({ limit: 0 });
+
+        expect(element?.exists()).toBeTruthy();
+        expect(element?.text()).toBe('0');
     });
 
     it('should mount the component as provided tag', async () => {
@@ -72,7 +79,7 @@ describe('Counting', () => {
 
 function mountComponent(props: { [key: string]: string | number | null } | null = null): MountedComponent {
     const options = {
-        props: Object.assign({}, counterProps, props || null)
+        props: Object.assign({}, counterProps, props)
     };
 
     const wrapper = mount(Counter, options);

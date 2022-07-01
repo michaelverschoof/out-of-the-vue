@@ -1,7 +1,7 @@
 <template>
     <fieldset class="checkable-field input-field">
 
-        <validatable-input :validations="validationMethods" :trigger-validation="triggerValidation" @created="initialized" @updated="validated">
+        <validator :validations="validationMethods" :trigger-validation="triggerValidation" @created="initialized" @updated="validated">
             <template #default="{ initialize, validate, invalid, showing, showValidity }">
 
                 <header v-if="$slots.label" class="label">
@@ -11,7 +11,7 @@
                 <main ref="main" tabindex="-1" @blur.capture="fieldBlurred(showValidity)">
                     <template v-for="slot of slots" :key="slot">
 
-                        <label v-if="!nonOptionSlots.includes(slot)"
+                        <label v-if="!nonOptionSlots.includes(slot) && provided($slots[slot])"
                                :class="{ focused: focusedItems.has(slot), selected: state.value.includes(slot), disabled: disabled?.includes(slot) }"
                                class="checkable-field-item"
                         >
@@ -46,16 +46,17 @@
             <template v-for="validation of validationMethods" #[validation.name]>
                 <slot :name="validation.name" />
             </template>
-        </validatable-input>
+        </validator>
 
     </fieldset>
 </template>
 
 <script lang="ts" setup>
 import CheckableInput from '@/components/form/fields/base/checkable-input.vue';
-import ValidatableInput from '@/components/form/fields/base/validatable-input.vue';
 import { CheckableFieldData, ValidatedFieldData, ValidatedStringArrayFieldData, ValidationMethod } from '@/composables/types';
 import { predefinedValidations } from '@/composables/validate-user-input';
+import Validator from '@/functionals/validator.vue';
+import { provided } from '@/util/slots';
 import { onMounted, reactive, ref, useSlots, watch } from 'vue';
 
 const emit = defineEmits<{ (event: 'created' | 'updated', data: ValidatedFieldData): void; }>();
