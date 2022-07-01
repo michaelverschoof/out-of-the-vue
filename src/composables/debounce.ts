@@ -1,6 +1,6 @@
 const DELAY = 400;
 
-export const useUserInputDebouncing = () => {
+export const useDebounce = () => {
     let timer: number | null;
 
     /**

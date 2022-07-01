@@ -54,7 +54,7 @@
 import TextInput from '@/components/form/fields/base/text-input.vue';
 import PrependAppend from '@/components/layout/prepend-append.vue';
 import { FieldData, ValidatedFieldData, ValidatedStringFieldData, ValidationMethod } from '@/composables/types';
-import { predefinedValidations } from '@/composables/validate-user-input';
+import { predefinedValidations } from '@/composables/validate';
 import Debouncer from '@/functionals/debouncer.vue';
 import Validator from '@/functionals/validator.vue';
 import { exclude, include } from '@/util/attrs';

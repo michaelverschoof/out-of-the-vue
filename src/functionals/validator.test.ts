@@ -1,5 +1,5 @@
 import { SubmittedSymbol, ValidationMethod } from '@/composables/types';
-import { predefinedValidations } from '@/composables/validate-user-input';
+import { predefinedValidations } from '@/composables/validate';
 import ValidatableInput from '@/functionals/validator.vue';
 import { emitted } from '@test/emits';
 import { MountedComponent } from '@test/types';

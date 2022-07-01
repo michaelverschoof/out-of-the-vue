@@ -2,8 +2,6 @@ import { InjectionKey, Ref } from 'vue';
 
 export type BaseValidationType = 'required' | 'required-array' | 'min-length' | 'max-length' | 'min-amount' | 'max-amount' | 'min-array' | 'max-array';
 
-export type InputTransformType = 'uppercase' | 'lowercase';
-
 /**
  * Emit event types
  * TODO: These types can only be used with defineEmits after https://github.com/vuejs/core/issues/4294 has been fixed

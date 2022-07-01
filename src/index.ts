@@ -1,3 +1,4 @@
+import { InputTransformType } from '@/util/strings';
 import { App } from 'vue';
 
 /**
@@ -27,7 +28,7 @@ import Modal from './components/modal.vue';
 /**
  * Types
  */
-import { BaseValidationType, CheckableFieldData, FieldData, InputTransformType, NumberFieldData, StringFieldData, ValidatedFieldData, ValidatedNumberFieldData, ValidatedStringArrayFieldData, ValidatedStringFieldData, ValidationMethod, ValidationMethodParameters } from './composables/types';
+import { BaseValidationType, CheckableFieldData, FieldData, NumberFieldData, StringFieldData, ValidatedFieldData, ValidatedNumberFieldData, ValidatedStringArrayFieldData, ValidatedStringFieldData, ValidationMethod, ValidationMethodParameters } from './composables/types';
 
 /**
  * Functional components
@@ -50,9 +51,8 @@ export { Debouncer, Validator };
 /**
  * Composables
  */
-export { useUserInputDebouncing } from './composables/debounce-user-input';
-export { useUserInput } from './composables/user-input';
-export { predefinedValidations, useUserInputValidation } from './composables/validate-user-input';
+export { useDebounce } from './composables/debounce';
+export { predefinedValidations, useValidate } from './composables/validate';
 
 /**
  * Types

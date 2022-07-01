@@ -1,10 +1,10 @@
-import { useUserInputDebouncing } from '@/composables/debounce-user-input';
+import { useDebounce } from '@/composables/debounce';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 describe('Debounce', () => {
     vi.useFakeTimers();
 
-    const { debounce } = useUserInputDebouncing();
+    const { debounce } = useDebounce();
 
     afterEach(() => {
         vi.clearAllTimers();

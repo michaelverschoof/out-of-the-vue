@@ -45,7 +45,7 @@ export const predefinedValidations: BaseValidationRegistry = {
     }
 };
 
-export const useUserInputValidation = () => {
+export const useValidate = () => {
     /**
      * Validate the field data using the provided validations
      *

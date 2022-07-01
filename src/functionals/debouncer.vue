@@ -3,14 +3,14 @@
 </template>
 
 <script lang="ts" setup>
-import { useUserInputDebouncing } from '@/composables/debounce-user-input';
+import { useDebounce } from '@/composables/debounce';
 import { FieldData, ValidatedFieldData } from '@/composables/types';
 
 const emit = defineEmits<{ (event: 'created' | 'updated', data: FieldData | ValidatedFieldData): void; }>();
 
 const props = defineProps<{ delay?: number; }>();
 
-const { debounce: debounceInput } = useUserInputDebouncing();
+const { debounce: debounceInput } = useDebounce();
 
 const debounce = (data: FieldData | ValidatedFieldData): void => {
     if (!data || !data.value || props.delay === 0) {

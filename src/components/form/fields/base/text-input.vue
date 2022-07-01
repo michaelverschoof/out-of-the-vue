@@ -18,7 +18,7 @@
 
 <script lang="ts" setup>
 import { StringFieldData } from '@/composables/types';
-import { useUserInput } from '@/composables/user-input';
+import { filter, shorten, transform } from '@/util/strings';
 import { computed, onMounted, reactive, ref, watch } from 'vue';
 
 const emit = defineEmits<{
@@ -90,14 +90,13 @@ const filterInputData = (event: Event): void => {
     emit('updated', { ...state });
 };
 
-const { filter, transform } = useUserInput();
 const filterAndTransform = (value?: string): string | null => {
     let filtered = filter(value ?? '', inputRegex ?? '');
     if (!filtered) {
         return filtered;
     }
 
-    filtered = props.max ? filtered.slice(0, props.max) : filtered;
+    filtered = shorten(filtered, props.max);
     if (!props.transformInput) {
         return filtered;
     }

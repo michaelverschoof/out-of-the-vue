@@ -12,7 +12,7 @@
 
 <script lang="ts" setup>
 import { FieldData, SubmittedSymbol, UpdateEmitType, ValidatedFieldData, ValidationMethod } from '@/composables/types';
-import { useUserInputValidation } from '@/composables/validate-user-input';
+import { useValidate } from '@/composables/validate';
 import { provided } from '@/util/slots';
 import { inject, reactive, ref, watch } from 'vue';
 
@@ -29,7 +29,7 @@ const state = reactive<ValidatedFieldData>({
 
 const triggeredSubmitValidation = inject(SubmittedSymbol, ref<boolean>(false));
 
-const { validate: validateInput } = useUserInputValidation();
+const { validate: validateInput } = useValidate();
 
 watch(triggeredSubmitValidation, (received: boolean) => {
     if (!received && !props.triggerValidation) {

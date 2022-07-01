@@ -44,10 +44,10 @@
 
 <script lang="ts" setup>
 import OneTimeCodeFieldItem from '@/components/form/fields/input-field/one-time-code-field-item.vue';
-import { FieldData, UpdateEmitType, ValidatedFieldData, ValidatedStringArrayFieldData, ValidationMethod, ValidationMethodParameters } from '@/composables/types';
-import { useUserInput } from '@/composables/user-input';
-import { predefinedValidations } from '@/composables/validate-user-input';
+import { FieldData, UpdateEmitType, ValidatedFieldData, ValidatedStringArrayFieldData, ValidatedStringFieldData, ValidationMethod, ValidationMethodParameters } from '@/composables/types';
+import { predefinedValidations } from '@/composables/validate';
 import Validator from '@/functionals/validator.vue';
+import { filter, shorten, transform } from '@/util/strings';
 import { computed, onMounted, reactive, ref, watch } from 'vue';
 
 const emit = defineEmits<{ (event: 'created' | 'updated', data: ValidatedFieldData): void; }>();
@@ -111,8 +111,8 @@ watch(() => props.focus, (received?: boolean): void => {
     focusedElement.value = -1;
 });
 
-const inputValidated = (index: number, data: ValidatedFieldData): void => {
-    state.value[index] = (<string> data.value)?.slice(0, 1) ?? null;
+const inputValidated = (index: number, data: ValidatedStringFieldData): void => {
+    state.value[index] = shorten(data.value, 1);
     if (!data.valid) {
         return;
     }
@@ -164,16 +164,21 @@ const cleared = (index: number): void => {
     state.value[index] = null;
 };
 
-const { filter } = useUserInput();
 const allowedCharacters = `[${ props.type !== 'numeric' ? 'A-z' : '' }${ props.type !== 'alpha' ? '0-9' : '' }]`;
 const regex = new RegExp(allowedCharacters, 'g');
 
 function convertValueForState(value?: string): void {
     const stateValue = [ ...new Array(props.length) ];
 
-    const filtered = filter(value ?? '', regex)?.toUpperCase().slice(0, props.length).split('') ?? [];
-    state.value = stateValue.map((item, index) => filtered[index] ?? null);
+    const filtered = filter(value, regex);
+    if (!filtered) {
+        state.value = stateValue.map(() => null);
+        return autoFocus();
+    }
 
+    const transformed = transform(shorten(filtered, props.length), 'uppercase').split('');
+
+    state.value = stateValue.map((item, index) => transformed[index] ?? null);
     autoFocus();
 }
 

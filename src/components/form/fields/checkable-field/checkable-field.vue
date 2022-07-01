@@ -54,7 +54,7 @@
 <script lang="ts" setup>
 import CheckableInput from '@/components/form/fields/base/checkable-input.vue';
 import { CheckableFieldData, ValidatedFieldData, ValidatedStringArrayFieldData, ValidationMethod } from '@/composables/types';
-import { predefinedValidations } from '@/composables/validate-user-input';
+import { predefinedValidations } from '@/composables/validate';
 import Validator from '@/functionals/validator.vue';
 import { provided } from '@/util/slots';
 import { onMounted, reactive, ref, useSlots, watch } from 'vue';

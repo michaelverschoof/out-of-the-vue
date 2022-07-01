@@ -1,10 +1,9 @@
-import { useUserInput } from '@/composables/user-input';
+import { filter, shorten, transform } from '@/util/strings';
 import { describe, expect, it } from 'vitest';
 
 const value = 'Some value with number 123 in it';
 
 describe('Filter value', () => {
-    const { filter } = useUserInput();
 
     it('should filter out values not in the regex', () => {
         expect(filter(value, 'number 123')).toEqual('number 123');
@@ -33,7 +32,6 @@ describe('Filter value', () => {
 });
 
 describe('Transform value', () => {
-    const { transform } = useUserInput();
 
     it('should uppercase given value', () => {
         expect(transform(value, 'uppercase')).toEqual(value.toUpperCase());
@@ -47,3 +45,19 @@ describe('Transform value', () => {
         expect(transform('', 'uppercase')).toBeNull();
     });
 });
+
+describe('Shorten value', () => {
+
+    it('should shorten given value', () => {
+        expect(shorten(value, 10)).toEqual('Some value');
+    });
+
+    it('should return the value if no length', () => {
+        expect(shorten(value, null)).toEqual(value);
+    });
+
+    it('should return null if there is no value', () => {
+        expect(shorten('', 10)).toBeNull();
+    });
+});
+
