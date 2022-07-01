@@ -20,8 +20,8 @@
                             :validations="inputValidations"
                             :value="state.value[index]"
                             @focused="focusedElement = index"
-                            @created="initializeState(toRaw(state))"
-                            @updated="(data) => { inputValidated(index, data); validateState(toRaw(state)) }"
+                            @created="initializeState({ ...state })"
+                            @updated="(data) => { inputValidated(index, data); validateState({ ...state }) }"
                             @cleared="cleared(index)"
                         />
 
@@ -48,7 +48,7 @@ import { FieldData, UpdateEmitType, ValidatedFieldData, ValidatedStringArrayFiel
 import { useUserInput } from '@/composables/user-input';
 import { predefinedValidations } from '@/composables/validate-user-input';
 import Validator from '@/functionals/validator.vue';
-import { computed, onMounted, reactive, ref, toRaw, watch } from 'vue';
+import { computed, onMounted, reactive, ref, watch } from 'vue';
 
 const emit = defineEmits<{ (event: 'created' | 'updated', data: ValidatedFieldData): void; }>();
 

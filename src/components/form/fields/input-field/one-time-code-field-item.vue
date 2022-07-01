@@ -1,5 +1,5 @@
 <template>
-    <validator :validations="validations" @created="(data) => $emit('created', data)" @updated="(data) => $emit('updated', data)">
+    <validator :validations="validations" @created="(data) => emit('created', data)" @updated="(data) => emit('updated', data)">
         <template #default="{ initialize, validate, invalid }">
 
             <text-input
@@ -11,10 +11,10 @@
                 :max="1"
                 :name="`${name}-${index}`"
                 :value="value"
-                @focused="$emit('focused')"
+                @focused="emit('focused')"
                 @created="initialize"
                 @updated="validate"
-                @keydown.delete.prevent="$emit('cleared')"
+                @keydown.delete.prevent="emit('cleared')"
             />
 
         </template>
