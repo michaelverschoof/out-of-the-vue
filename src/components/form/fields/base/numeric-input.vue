@@ -4,7 +4,6 @@
         :allowed-characters="regex"
         :inputmode="allowDecimals ? 'decimal' : 'numeric'"
         :name="name"
-        :pattern="regex"
         :value="model ?? undefined"
         @updated="updated"
         @created="created"
