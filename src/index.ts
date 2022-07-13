@@ -13,7 +13,6 @@ import TextCounter from './components/counter/text-counter.vue';
 import CheckableInput from './components/form/fields/base/checkable-input.vue';
 import NumericInput from './components/form/fields/base/numeric-input.vue';
 import TextInput from './components/form/fields/base/text-input.vue';
-import CheckableFieldModal from './components/form/fields/checkable-field/checkable-field-modal.vue';
 
 /**
  * Full components
@@ -39,7 +38,7 @@ import Validator from './functionals/validator.vue';
 /**
  * Component exports
  */
-export { CheckableField, CheckableFieldModal, Modal, NumberField, OneTimeCodeField, TextField };
+export { CheckableField, Modal, NumberField, OneTimeCodeField, TextField };
 export { CheckableInput, NumericInput, TextInput };
 export { Counter, PrependAppend, TextCounter };
 

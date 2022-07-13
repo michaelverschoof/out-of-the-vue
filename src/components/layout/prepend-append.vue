@@ -1,6 +1,5 @@
 <template>
     <span v-if="providedPrepend || providedAppend" class="prepend-append">
-
         <span v-if="providedPrepend" class="prepend">
             <slot name="prepend" />
         </span>

@@ -47,6 +47,13 @@ describe('Filling slots', () => {
         expect(element?.find('.prepend').exists()).toBeTruthy();
         expect(element?.find('.append').exists()).toBeTruthy();
     });
+
+    it('should have both elements', async () => {
+        const { element } = mountComponent({ prepend: '<span>Bar</span>', append: 'Baz' });
+        expect(element?.exists()).toBeTruthy();
+        expect(element?.find('.prepend').exists()).toBeTruthy();
+        expect(element?.find('.append').exists()).toBeTruthy();
+    });
 });
 
 function mountComponent(slots?: ProvidedSlots): MountedComponent {

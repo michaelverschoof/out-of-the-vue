@@ -47,7 +47,12 @@ const state = reactive<StringFieldData>({
 const model = computed({
     get: () => state.value,
     set: (value: string | null) => {
+        if (value === state.value) {
+            return;
+        }
+
         state.value = value?.trimStart() ?? null;
+        emit('updated', { ...state });
     }
 });
 
@@ -58,7 +63,6 @@ watch(() => props.value, (received?: string) => {
     }
 
     model.value = value;
-    emit('updated', { ...state });
 });
 
 watch(() => props.focus, (received?: boolean) => {
@@ -79,7 +83,6 @@ const inputRegex = !!props.allowedCharacters ? new RegExp(props.allowedCharacter
  */
 const filterPasteData = (event: ClipboardEvent): void => {
     model.value = filterAndTransform(event.clipboardData?.getData('text'));
-    emit('updated', { ...state });
 };
 
 /**
@@ -87,7 +90,6 @@ const filterPasteData = (event: ClipboardEvent): void => {
  */
 const filterInputData = (event: Event): void => {
     model.value = filterAndTransform((<HTMLInputElement> event.target).value);
-    emit('updated', { ...state });
 };
 
 const filterAndTransform = (value?: string): string | null => {

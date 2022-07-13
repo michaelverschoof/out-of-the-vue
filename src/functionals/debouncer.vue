@@ -13,7 +13,7 @@ const props = defineProps<{ delay?: number; }>();
 const { debounce: debounceInput } = useDebounce();
 
 const debounce = (data: FieldData | ValidatedFieldData): void => {
-    if (!data || !data.value || props.delay === 0) {
+    if (!data || props.delay === 0) {
         return emit('updated', data);
     }
 

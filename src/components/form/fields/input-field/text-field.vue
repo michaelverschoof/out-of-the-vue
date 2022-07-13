@@ -1,11 +1,11 @@
 <template>
     <label class="text-field input-field" v-bind="include($attrs, ['class'])">
 
-        <debouncer :delay="typingDelay" @updated="debounced">
-            <template #default="{ debounce }">
+        <validator :validations="validationMethods" :trigger-validation="triggerValidation" @created="initialized" @updated="validated">
+            <template #default="{ initialize, validate, invalid, showing, showValidity }">
 
-                <validator :validations="validationMethods" :trigger-validation="triggerValidation" @created="initialized" @updated="debounce">
-                    <template #default="{ initialize, validate, invalid, showing, showValidity }">
+                <debouncer :delay="typingDelay" @updated="validate">
+                    <template #default="{ debounce }">
 
                         <header v-if="$slots.label" class="label">
                             <slot name="label" />
@@ -25,7 +25,7 @@
                                     @focused="focused = true"
                                     @blurred="focused = false; showValidity();"
                                     @created="initialize"
-                                    @updated="validate"
+                                    @updated="debounce"
                                 />
 
                                 <template #append>
@@ -37,15 +37,16 @@
                         <footer v-if="$slots.information && !(invalid && showing)" class="information">
                             <slot name="information" />
                         </footer>
-                    </template>
 
-                    <template v-for="validation of validationMethods" #[validation.name]>
-                        <slot :name="validation.name" />
                     </template>
-                </validator>
+                </debouncer>
 
             </template>
-        </debouncer>
+
+            <template v-for="validation of validationMethods" #[validation.name]>
+                <slot :name="validation.name" />
+            </template>
+        </validator>
 
     </label>
 </template>
@@ -87,7 +88,7 @@ const initialized = (data: FieldData | ValidatedFieldData): void => {
     emit('created', { ...data as ValidatedStringFieldData });
 };
 
-const debounced = (data: FieldData | ValidatedFieldData): void => {
+const validated = (data: FieldData | ValidatedFieldData): void => {
     emit('updated', { ...data as ValidatedStringFieldData });
 };
 </script>
