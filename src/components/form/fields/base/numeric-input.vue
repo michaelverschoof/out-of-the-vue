@@ -4,8 +4,7 @@
         :allowed-characters="regex"
         :inputmode="allowDecimals ? 'decimal' : 'numeric'"
         :name="name"
-        :pattern="regex"
-        :value="model"
+        :value="model ?? undefined"
         @updated="updated"
         @created="created"
     />
@@ -27,27 +26,27 @@ const props = withDefaults(
 
 const regex = computed(() => `[0-9${ props.allowDecimals ? '.,' : '' }${ props.allowNegative ? '-' : '' }]`);
 
-const model = ref<string>(props.value?.toString() ?? null);
+const model = ref<string | null>(props.value?.toString() ?? null);
 
 const state = reactive<NumberFieldData>({
     name: props.name,
     value: props.value ?? null
 });
 
-watch(() => props.value, (received: number) => {
+watch(() => props.value, (received?: number) => {
     if (received === state.value) {
         return;
     }
 
-    state.value = received;
-    model.value = state.value?.toString();
+    state.value = received ?? null;
+    model.value = state.value?.toString() ?? null;
 });
 
-const parseNumber = (data: StringFieldData): number => {
-    const filtered = filter(data.value, props.allowDecimals, props.allowNegative);
+const parseNumber = (data: StringFieldData): void => {
+    const filtered = filter(data.value ?? '', props.allowDecimals, props.allowNegative);
     if (!filtered) {
         state.value = null;
-        return null;
+        return;
     }
 
     model.value = filtered;

@@ -1,7 +1,7 @@
 import TextInput from '@/components/form/fields/base/text-input.vue';
 import { emitted } from '@test/emits';
 import { DOMWrapper, mount, VueWrapper } from '@vue/test-utils';
-import { beforeAll, describe, expect, it, vi } from 'vitest';
+import { beforeAll, describe, expect, it } from 'vitest';
 
 /**
  * @vitest-environment happy-dom
@@ -55,9 +55,10 @@ describe('Focusing components', () => {
 
         it('should focus natively', async () => {
             const { input, wrapper } = mountComponent(null, true);
-            await input.element.focus();
 
+            await input.element.focus();
             expect(input.element).toBe(document.activeElement);
+
             emitted(wrapper, 'focused');
         });
 
@@ -65,6 +66,7 @@ describe('Focusing components', () => {
             const { input, wrapper } = mountComponent({ focus: true }, true);
 
             expect(input.element).toBe(document.activeElement);
+
             emitted(wrapper, 'focused');
         });
 
@@ -73,8 +75,21 @@ describe('Focusing components', () => {
             expect(input.element).not.toBe(document.activeElement);
 
             await wrapper.setProps({ focus: true });
-
             expect(input.element).toBe(document.activeElement);
+
+            emitted(wrapper, 'focused');
+        });
+
+        it('should not focus when prop changes if already focused', async () => {
+            const { input, wrapper } = mountComponent(null, true);
+            expect(input.element).not.toBe(document.activeElement);
+
+            await input.element.focus();
+            expect(input.element).toBe(document.activeElement);
+
+            await wrapper.setProps({ focus: true });
+            expect(input.element).toBe(document.activeElement);
+
             emitted(wrapper, 'focused');
         });
     });
@@ -118,11 +133,11 @@ describe('Filtering input', () => {
     it('should not filter out characters if all matches', async () => {
         const { input, wrapper } = mountComponent({ allowedCharacters: '[A-z]' });
 
-        await input.setValue('foo');
-        expect(input.element.value).toBe('foo');
+        await input.setValue('foobar');
+        expect(input.element.value).toBe('foobar');
 
         const emits = emitted(wrapper, 'updated');
-        expect(emits[0].value).toBe('foo');
+        expect(emits[0].value).toBe('foobar');
     });
 
     it('should filter out all characters if nothing matches', async () => {
@@ -227,36 +242,13 @@ describe('Updating input', () => {
     });
 });
 
-describe('Preventing keyboard input', () => {
-
-    it('should allow characters in the regex', async () => {
-        const { wrapper } = mountComponent({ allowedCharacters: '[A-z]' }, true);
-
-        const keyPress = new KeyboardEvent('keydown', { key: 'a' });
-        vi.spyOn(keyPress, 'preventDefault');
-
-        wrapper.find('input').element.dispatchEvent(keyPress);
-        expect(keyPress.preventDefault).not.toHaveBeenCalled();
-    });
-
-    it('should prevent characters not in the regex', async () => {
-        const { wrapper } = mountComponent({ allowedCharacters: '[A-z]' }, true);
-
-        const keyPress = new KeyboardEvent('keydown', { key: '9' });
-        vi.spyOn(keyPress, 'preventDefault');
-
-        wrapper.find('input').element.dispatchEvent(keyPress);
-        expect(keyPress.preventDefault).toHaveBeenCalled();
-    });
-});
-
-function mountComponent(props: { [key: string]: any } = null, attachToDocument: boolean = false): { wrapper: VueWrapper<any>, input: DOMWrapper<HTMLInputElement> } {
-    const options = {
+function mountComponent(props: { [key: string]: string | boolean | null } | null = null, attachToDocument: boolean = false): { wrapper: VueWrapper<any>, input: DOMWrapper<HTMLInputElement> } {
+    const options: { props: object, attachTo?: HTMLElement } = {
         props: Object.assign({}, textProps, props || null)
     };
 
     if (attachToDocument) {
-        options['attachTo'] = document.body;
+        options.attachTo = document.body;
     }
 
     const wrapper = mount(TextInput, options);

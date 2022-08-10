@@ -1,5 +1,5 @@
 import TextField from '@/components/form/fields/input-field/text-field.vue';
-import { FieldData } from '@/composables/types';
+import { FieldData, ValidatedFieldData } from '@/composables/types';
 import { emitted } from '@test/emits';
 import { DOMWrapper, mount, VueWrapper } from '@vue/test-utils';
 import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
@@ -12,7 +12,7 @@ const props = {
     name: 'text-field'
 };
 
-const createdEmit = {
+const createdEmit: ValidatedFieldData = {
     name: props.name,
     value: null,
     valid: true,
@@ -251,7 +251,7 @@ describe('Validating field', () => {
 
         it('should trigger min validation', async () => {
             const wrapper = mount(TextField, {
-                props: Object.assign({}, props, { min: 2 }),
+                props: Object.assign({}, props, { typingDelay: 0, min: 2 }),
                 slots: { min: 'min error' }
             });
 
@@ -271,7 +271,7 @@ describe('Validating field', () => {
 
         it('should trigger max validation', async () => {
             const wrapper = mount(TextField, {
-                props: Object.assign({}, props, { max: 2 }),
+                props: Object.assign({}, props, { typingDelay: 0, max: 2 }),
                 slots: { max: 'max error' }
             });
 
@@ -301,7 +301,7 @@ describe('Validating field', () => {
 
         it('should trigger custom validation', async () => {
             const wrapper = mount(TextField, {
-                props: Object.assign({}, props, { validations: validations }),
+                props: Object.assign({}, props, { typingDelay: 0, validations: validations }),
                 slots: Object.assign({}, { custom: 'custom error' })
             });
 

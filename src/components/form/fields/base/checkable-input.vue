@@ -38,16 +38,16 @@ const state = reactive<CheckableFieldData>({
 const model = computed({
     get: () => state.checked,
     set: () => {
-        state.checked = element.value.checked;
+        state.checked = !!element.value?.checked;
         emit('updated', { ...state });
     }
 });
 
-watch(() => props.checked, (received: boolean) => {
-    state.checked = received;
+watch(() => props.checked, (received?: boolean) => {
+    state.checked = !!received;
 });
 
-const reselect = () => {
+const reselect = (): void => {
     if (props.type !== 'radio' || !state.checked) {
         return;
     }

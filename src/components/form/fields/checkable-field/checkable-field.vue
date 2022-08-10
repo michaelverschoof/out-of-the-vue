@@ -1,7 +1,7 @@
 <template>
     <fieldset class="checkable-field input-field">
 
-        <validatable-input :validations="validationMethods" :trigger-validation="triggerValidation" @created="initialized" @updated="validated">
+        <validator :validations="validationMethods" :trigger-validation="triggerValidation" @created="initialized" @updated="validated">
             <template #default="{ initialize, validate, invalid, showing, showValidity }">
 
                 <header v-if="$slots.label" class="label">
@@ -9,28 +9,28 @@
                 </header>
 
                 <main ref="main" tabindex="-1" @blur.capture="fieldBlurred(showValidity)">
-                    <template v-for="(item, key) of $slots" :key="key">
+                    <template v-for="slot of slots" :key="slot">
 
-                        <label v-if="!nonOptionSlots.includes(key)"
-                               :class="{ focused: focusedItems.has(key), selected: state.value.includes(key), disabled: disabled?.includes(key) }"
+                        <label v-if="!nonOptionSlots.includes(slot) && provided($slots[slot])"
+                               :class="{ focused: focusedItems.has(slot), selected: state.value.includes(slot), disabled: disabled?.includes(slot) }"
                                class="checkable-field-item"
                         >
                             <checkable-input
                                 :class="{ hidden: hideInput }"
                                 :name="`checkable-input-${ name }`"
-                                :value="key"
+                                :value="slot"
                                 :type="type"
-                                :checked="state.value.includes(key)"
-                                :disabled="disabled?.includes(key)"
+                                :checked="state.value.includes(slot)"
+                                :disabled="disabled?.includes(slot)"
                                 tabindex="0"
-                                @focused="focusItem(key)"
-                                @blurred="blurItem(key)"
+                                @focused="focusItem(slot)"
+                                @blurred="blurItem(slot)"
                                 @created="(data) => { created(data); initialize(state); }"
                                 @updated="(data) => { updated(data); validate(state); }"
                             />
 
                             <span class="content">
-                                <slot :name="key" :selected="state.value.includes(key)" />
+                                <slot :name="slot" :selected="state.value.includes(slot)" />
                             </span>
                         </label>
 
@@ -46,17 +46,18 @@
             <template v-for="validation of validationMethods" #[validation.name]>
                 <slot :name="validation.name" />
             </template>
-        </validatable-input>
+        </validator>
 
     </fieldset>
 </template>
 
 <script lang="ts" setup>
 import CheckableInput from '@/components/form/fields/base/checkable-input.vue';
-import ValidatableInput from '@/components/form/fields/base/validatable-input.vue';
-import { CheckableFieldData, ValidatedFieldData, ValidationMethod } from '@/composables/types';
-import { predefinedValidations } from '@/composables/validate-user-input';
-import { onMounted, reactive, ref, watch } from 'vue';
+import { CheckableFieldData, ValidatedFieldData, ValidatedStringArrayFieldData, ValidationMethod } from '@/composables/types';
+import { predefinedValidations } from '@/composables/validate';
+import Validator from '@/functionals/validator.vue';
+import { provided } from '@/util/slots';
+import { computed, onMounted, reactive, ref, useSlots, watch } from 'vue';
 
 const emit = defineEmits<{ (event: 'created' | 'updated', data: ValidatedFieldData): void; }>();
 
@@ -73,37 +74,42 @@ const props = defineProps<{
     hideInput?: boolean;
 }>();
 
-const validationMethods: ValidationMethod[] = [
-    { ...predefinedValidations['required-array'], parameters: [ props.required ] },
-    ...props.validations ?? []
-];
+const validationMethods = computed<ValidationMethod[]>(() => {
+    const validations = [
+        { ...predefinedValidations['required-array'], parameters: [ props.required ] },
+        ...props.validations ?? []
+    ];
 
-if (props.type !== 'radio') {
-    validationMethods.push(
-        { ...predefinedValidations['min-array'], parameters: [ props.min ] },
-        { ...predefinedValidations['max-array'], parameters: [ props.max ] }
-    );
-}
+    if (props.type !== 'radio') {
+        validations.push(
+            { ...predefinedValidations['min-array'], parameters: [ props.min ] },
+            { ...predefinedValidations['max-array'], parameters: [ props.max ] }
+        );
+    }
 
-const nonOptionSlots = [ 'label', 'information', ...validationMethods.map(method => method.name) ];
+    return validations
+});
+
+const slots = Object.keys(useSlots());
+const nonOptionSlots = [ 'label', 'information', ...validationMethods.value.map(method => method.name) ];
 
 const selectedItems = ref<Set<string>>(new Set(filterSelected(props.selected)));
 const focusedItems = ref<Set<string>>(new Set());
 
-const state = reactive<ValidatedFieldData>({
+const state = reactive<ValidatedStringArrayFieldData>({
     name: props.name,
     value: Array.from(selectedItems.value),
     valid: !props.required,
     failed: []
 });
 
-watch(() => props.selected, (received: string[]) => {
+watch(() => props.selected, (received?: string[]) => {
     const filtered = filterSelected(received);
     if (JSON.stringify(filtered) === JSON.stringify(state.value)) {
         return;
     }
 
-    selectedItems.value = new Set(filtered);
+    selectedItems.value = new Set<string>(filtered);
     state.value = Array.from(selectedItems.value);
 });
 
@@ -144,7 +150,7 @@ const blurItem = (item: string): void => {
     focusedItems.value.delete(item);
 };
 
-const main = ref<HTMLElement>(null);
+const main = ref<HTMLElement | null>(null);
 const fieldBlurred = (showValidity: () => void): void => {
     requestAnimationFrame(() => {
         if (!main.value || main.value.contains(document.activeElement)) {
@@ -159,8 +165,8 @@ onMounted(() => {
     emit('created', { ...state });
 });
 
-function filterSelected(selected: string[]): string[] {
-    return (selected || []).filter(item => item !== null && item !== undefined);
+function filterSelected(selected?: (string | null)[]): string[] {
+    return (selected || []).filter(item => item !== null) as string[];
 }
 </script>
 

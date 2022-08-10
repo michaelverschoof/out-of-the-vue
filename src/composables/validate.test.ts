@@ -1,5 +1,5 @@
 import { FieldData } from '@/composables/types';
-import { predefinedValidations, useUserInputValidation } from '@/composables/validate-user-input';
+import { predefinedValidations, useValidate } from '@/composables/validate';
 import { describe, expect, it } from 'vitest';
 
 const data: FieldData = {
@@ -8,7 +8,7 @@ const data: FieldData = {
 };
 
 describe('Single validation', () => {
-    const { validate } = useUserInputValidation();
+    const { validate } = useValidate();
 
     const required = [ { ...predefinedValidations.required, parameters: [ true ] } ];
 
@@ -18,7 +18,7 @@ describe('Single validation', () => {
 
     it('should validate when given no parameter', () => {
         expect(validate(data, [ { ...predefinedValidations.required, parameters: [] } ])).toEqual([]);
-        expect(validate(data, [ { ...predefinedValidations.required, parameters: null } ])).toEqual([]);
+        expect(validate(data, [ { ...predefinedValidations.required, parameters: undefined } ])).toEqual([]);
     });
 
     it('should validate when required is false', () => {
@@ -32,7 +32,7 @@ describe('Single validation', () => {
 });
 
 describe('Multiple validations', () => {
-    const { validate } = useUserInputValidation();
+    const { validate } = useValidate();
 
     const validations = [
         { ...predefinedValidations.required, parameters: [ true ] },

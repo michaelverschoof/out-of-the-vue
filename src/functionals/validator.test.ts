@@ -1,6 +1,6 @@
-import ValidatableInput from '@/components/form/fields/base/validatable-input.vue';
 import { SubmittedSymbol, ValidationMethod } from '@/composables/types';
-import { predefinedValidations } from '@/composables/validate-user-input';
+import { predefinedValidations } from '@/composables/validate';
+import ValidatableInput from '@/functionals/validator.vue';
 import { emitted } from '@test/emits';
 import { MountedComponent } from '@test/types';
 import { mount, MountingOptions } from '@vue/test-utils';
@@ -33,7 +33,7 @@ describe('Mounting component', () => {
     });
 
     it('should mount the component validations', async () => {
-        const { wrapper } = mountComponent(null, validations);
+        const { wrapper } = mountComponent(undefined, validations);
         expect(wrapper.html()).toBe('<div class="invalid">Foo</div>\n<!--v-if-->');
     });
 });
@@ -41,10 +41,10 @@ describe('Mounting component', () => {
 describe('Validating on create event', () => {
 
     it('should validate', async () => {
-        const { element, wrapper } = mountComponent(null, validations);
+        const { element, wrapper } = mountComponent(undefined, validations);
         expect(wrapper.emitted('created')).toBeFalsy();
 
-        await element.trigger('created');
+        await element?.trigger('created');
 
         const emits = emitted(wrapper, 'created');
         expect(emits[0]).toEqual({
@@ -58,7 +58,7 @@ describe('Validating on create event', () => {
         const { element, wrapper } = mountComponent();
         expect(wrapper.emitted('created')).toBeFalsy();
 
-        await element.trigger('created');
+        await element?.trigger('created');
 
         const emits = emitted(wrapper, 'created');
         expect(emits[0]).toEqual({
@@ -72,7 +72,7 @@ describe('Validating on create event', () => {
         const { element, wrapper } = mountComponent('', validations);
         expect(wrapper.emitted('created')).toBeFalsy();
 
-        await element.trigger('created');
+        await element?.trigger('created');
 
         const emits = emitted(wrapper, 'created');
         expect(emits[0]).toEqual({
@@ -87,7 +87,7 @@ describe('Validating on create event', () => {
         const { element, wrapper } = mountComponent('a', validations);
         expect(wrapper.emitted('created')).toBeFalsy();
 
-        await element.trigger('created');
+        await element?.trigger('created');
 
         const emits = emitted(wrapper, 'created');
         expect(emits[0]).toEqual({
@@ -102,7 +102,7 @@ describe('Validating on create event', () => {
         const { element, wrapper } = mountComponent('foobar', validations);
         expect(wrapper.emitted('created')).toBeFalsy();
 
-        await element.trigger('created');
+        await element?.trigger('created');
 
         const emits = emitted(wrapper, 'created');
         expect(emits[0]).toEqual({
@@ -117,10 +117,10 @@ describe('Validating on create event', () => {
 describe('Validating on update event', () => {
 
     it('should validate', async () => {
-        const { element, wrapper } = mountComponent(null, validations);
+        const { element, wrapper } = mountComponent(undefined, validations);
         expect(wrapper.emitted('updated')).toBeFalsy();
 
-        await element.trigger('updated');
+        await element?.trigger('updated');
 
         const emits = emitted(wrapper, 'updated');
         expect(emits[0]).toEqual({
@@ -134,7 +134,7 @@ describe('Validating on update event', () => {
         const { element, wrapper } = mountComponent();
         expect(wrapper.emitted('updated')).toBeFalsy();
 
-        await element.trigger('updated');
+        await element?.trigger('updated');
 
         const emits = emitted(wrapper, 'updated');
         expect(emits[0]).toEqual({
@@ -148,7 +148,7 @@ describe('Validating on update event', () => {
         const { element, wrapper } = mountComponent('a', validations);
         expect(wrapper.emitted('updated')).toBeFalsy();
 
-        await element.trigger('updated');
+        await element?.trigger('updated');
 
         const emits = emitted(wrapper, 'updated');
         expect(emits[0]).toEqual({
@@ -163,7 +163,7 @@ describe('Validating on update event', () => {
         const { element, wrapper } = mountComponent('foobar', validations);
         expect(wrapper.emitted('updated')).toBeFalsy();
 
-        await element.trigger('updated');
+        await element?.trigger('updated');
 
         const emits = emitted(wrapper, 'updated');
         expect(emits[0]).toEqual({
@@ -178,30 +178,30 @@ describe('Validating on update event', () => {
 describe('Show validity', () => {
 
     it('should trigger showing', async () => {
-        const { wrapper, element } = mountComponent(null, validations);
-        await element.trigger('updated');
-        await element.trigger('show');
+        const { wrapper, element } = mountComponent(undefined, validations);
+        await element?.trigger('updated');
+        await element?.trigger('show');
 
-        expect(element.classes()).not.toContain('showing');
-        expect(element.classes()).not.toContain('invalid');
+        expect(element?.classes()).not.toContain('showing');
+        expect(element?.classes()).not.toContain('invalid');
         expect(wrapper.find('strong.validation-error').exists()).toBeFalsy();
     });
 
     it('should show required error', async () => {
         const { element, wrapper } = mountComponent('', validations);
-        await element.trigger('updated');
-        await element.trigger('show');
+        await element?.trigger('updated');
+        await element?.trigger('show');
 
-        expect(element.classes()).toContain('showing');
-        expect(element.classes()).toContain('invalid');
+        expect(element?.classes()).toContain('showing');
+        expect(element?.classes()).toContain('invalid');
         expect(wrapper.find('strong.validation-error').exists()).toBeTruthy();
         expect(wrapper.find('strong.validation-error').text()).toBe('required error');
     });
 
     it('should show max error', async () => {
         const { element, wrapper } = mountComponent('foobar', validations);
-        await element.trigger('updated');
-        await element.trigger('show');
+        await element?.trigger('updated');
+        await element?.trigger('show');
 
         expect(wrapper.find('strong.validation-error').exists()).toBeTruthy();
         expect(wrapper.find('strong.validation-error').text()).toBe('max error');
@@ -209,8 +209,8 @@ describe('Show validity', () => {
 
     it('should show min error', async () => {
         const { element, wrapper } = mountComponent('a', validations);
-        await element.trigger('updated');
-        await element.trigger('show');
+        await element?.trigger('updated');
+        await element?.trigger('show');
 
         expect(wrapper.find('strong.validation-error').exists()).toBeTruthy();
         expect(wrapper.find('strong.validation-error').text()).toBe('min error');
@@ -222,7 +222,7 @@ describe('Triggering validation externally', () => {
     describe('Triggering validation by prop', () => {
 
         it('should show error', async () => {
-            const { wrapper } = mountComponent(null, validations);
+            const { wrapper } = mountComponent(undefined, validations);
 
             await wrapper.setProps({ triggerValidation: 'required' });
 
@@ -233,7 +233,7 @@ describe('Triggering validation externally', () => {
         });
 
         it('should hide error', async () => {
-            const { wrapper } = mountComponent(null, validations);
+            const { wrapper } = mountComponent(undefined, validations);
 
             await wrapper.setProps({ triggerValidation: 'required' });
 
@@ -246,11 +246,39 @@ describe('Triggering validation externally', () => {
         });
 
         it('should return if no existing validation is provided', async () => {
-            const { wrapper } = mountComponent(null, validations);
+            const { wrapper } = mountComponent(undefined, validations);
 
             await wrapper.setProps({ triggerValidation: 'foo' });
 
             expect(wrapper.find('strong.validation-error').exists()).toBeFalsy();
+        });
+
+        it('should update validity on changed validation', async () => {
+            const { wrapper, element } = mountComponent('foo', validations);
+
+            await element?.trigger('created');
+
+            let emits = emitted(wrapper, 'created');
+            expect(emits[0]).toEqual({
+                ...data,
+                valid: true,
+                failed: []
+            });
+
+            const updatedValidations = [
+                { ...predefinedValidations['required'], parameters: [ true ] },
+                { ...predefinedValidations['min-length'], parameters: [ 4 ] },
+                { ...predefinedValidations['max-length'], parameters: [ 5 ] }
+            ];
+
+            await wrapper.setProps({ validations: updatedValidations });
+
+            emits = emitted(wrapper, 'updated');
+            expect(emits[0]).toEqual({
+                ...data,
+                valid: false,
+                failed: [ 'min' ]
+            });
         });
     });
 
@@ -261,7 +289,7 @@ describe('Triggering validation externally', () => {
         });
 
         it('should show error', async () => {
-            const { wrapper } = mountComponent(null, validations, true);
+            const { wrapper } = mountComponent(undefined, validations, true);
             expect(wrapper.find('strong.validation-error').exists()).toBeFalsy();
 
             provided.value = true;
@@ -272,7 +300,7 @@ describe('Triggering validation externally', () => {
         });
 
         it('should hide error', async () => {
-            const { wrapper } = mountComponent(null, validations, true);
+            const { wrapper } = mountComponent(undefined, validations, true);
             expect(wrapper.find('strong.validation-error').exists()).toBeFalsy();
 
             provided.value = true;
@@ -290,7 +318,7 @@ describe('Triggering validation externally', () => {
             const { element, wrapper } = mountComponent('foo', validations, true);
             expect(wrapper.find('strong.validation-error').exists()).toBeFalsy();
 
-            await element.trigger('updated');
+            await element?.trigger('updated');
             expect(wrapper.find('strong.validation-error').exists()).toBeFalsy();
 
             await wrapper.setProps({ triggerValidation: 'max' });
@@ -305,7 +333,7 @@ describe('Triggering validation externally', () => {
         });
 
         it('should return if no value is provided', async () => {
-            const { wrapper } = mountComponent(null, validations);
+            const { wrapper } = mountComponent(undefined, validations);
 
             provided.value = true;
             await wrapper.vm.$nextTick();
@@ -340,7 +368,7 @@ function mountComponent(value?: string, validations?: ValidationMethod[], enable
     if (enableProvide) {
         options.global = {
             provide: {
-                [SubmittedSymbol]: provided
+                [SubmittedSymbol.valueOf()]: provided
             }
         };
     }

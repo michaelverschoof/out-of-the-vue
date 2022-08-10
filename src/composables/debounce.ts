@@ -1,7 +1,7 @@
 const DELAY = 400;
 
-export const useUserInputDebouncing = () => {
-    let timer: number;
+export const useDebounce = () => {
+    let timer: number | null;
 
     /**
      * Delay the callback by the amount provided. Meant for delaying user input processing.
@@ -16,7 +16,7 @@ export const useUserInputDebouncing = () => {
 
         timer = setTimeout((() => {
             callback();
-        }) as TimerHandler, delay ?? DELAY);
+        }) as TimerHandler, delay);
     };
 
     return {

@@ -12,7 +12,7 @@
 
 <script lang="ts" setup>
 import { FieldData, SubmittedSymbol, UpdateEmitType, ValidatedFieldData, ValidationMethod } from '@/composables/types';
-import { useUserInputValidation } from '@/composables/validate-user-input';
+import { useValidate } from '@/composables/validate';
 import { provided } from '@/util/slots';
 import { inject, reactive, ref, watch } from 'vue';
 
@@ -27,7 +27,12 @@ const state = reactive<ValidatedFieldData>({
     failed: []
 });
 
+watch(() => props.validations, () => {
+    revalidate();
+});
+
 const triggeredSubmitValidation = inject(SubmittedSymbol, ref<boolean>(false));
+const { validate: validateInput } = useValidate();
 
 watch(triggeredSubmitValidation, (received: boolean) => {
     if (!received && !props.triggerValidation) {
@@ -35,16 +40,14 @@ watch(triggeredSubmitValidation, (received: boolean) => {
         return;
     }
 
-    const failedValidations = validateInput(state, props.validations);
-    state.valid = !failedValidations.length && !props.triggerValidation;
-    state.failed = [ ...failedValidations, props.triggerValidation ];
+    revalidate();
 
     showing.value = true;
 });
 
-const triggeredValidation = ref<string>(null);
+const triggeredValidation = ref<string | null>(null);
 
-watch(() => props.triggerValidation, (received: string) => {
+watch(() => props.triggerValidation, (received?: string) => {
     if (!received) {
         state.failed = state.failed.filter(item => item !== triggeredValidation.value);
         state.valid = !!state.failed.length;
@@ -57,6 +60,8 @@ watch(() => props.triggerValidation, (received: string) => {
         return;
     }
 
+    triggeredValidation.value = received;
+
     state.valid = false;
     showing.value = true;
     if (!state.failed.includes(received)) {
@@ -65,8 +70,6 @@ watch(() => props.triggerValidation, (received: string) => {
 });
 
 const showing = ref<boolean>(false);
-
-const { validate: validateInput } = useUserInputValidation();
 
 const initialize = (data: FieldData): void => {
     return validateFieldData(data, 'created');
@@ -105,4 +108,16 @@ const validateFieldData = (data: FieldData, event: UpdateEmitType): void => {
 const showValidity = () => {
     showing.value = !state.valid;
 };
+
+function revalidate() {
+    const failedValidations = validateInput(state, props.validations);
+    if (props.triggerValidation) {
+        failedValidations.push(props.triggerValidation);
+    }
+
+    state.valid = !failedValidations.length;
+    state.failed = failedValidations;
+
+    emit('updated', { ...state });
+}
 </script>

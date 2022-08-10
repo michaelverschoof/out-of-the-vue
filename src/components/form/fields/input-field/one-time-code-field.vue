@@ -1,14 +1,14 @@
 <template>
-    <fieldset class="one-time-code-field input-field" @paste.capture.prevent="filterPasteData">
+    <fieldset class="one-time-code-field input-field" @paste.prevent="filterPasteData">
 
-        <validatable-input :validations="fieldValidations" :trigger-validation="triggerValidation" @created="fieldInitialized" @updated="fieldValidated">
+        <validator :validations="fieldValidations" :trigger-validation="triggerValidation" @created="fieldInitialized" @updated="fieldValidated">
             <template #default="{ initialize: initializeState, validate: validateState, invalid: invalidState, showing, showValidity }">
 
                 <header v-if="$slots.label" class="label">
                     <slot name="label" />
                 </header>
 
-                <main ref="main" tabindex="-1" @blur.capture="fieldBlurred(showValidity)">
+                <main ref="main" tabindex="-1" @blur.prevent.capture="fieldBlurred(showValidity)">
                     <template v-for="(number, index) of length">
 
                         <one-time-code-field-item
@@ -19,10 +19,10 @@
                             :show-validation="showing"
                             :validations="inputValidations"
                             :value="state.value[index]"
-                            @cleared="cleared(index)"
                             @focused="focusedElement = index"
                             @created="initializeState(toRaw(state))"
                             @updated="(data) => { inputValidated(index, data); validateState(toRaw(state)) }"
+                            @cleared="cleared(index)"
                         />
 
                     </template>
@@ -37,17 +37,17 @@
             <template v-for="validation of fieldValidations" #[validation.name]>
                 <slot :name="validation.name" />
             </template>
-        </validatable-input>
+        </validator>
 
     </fieldset>
 </template>
 
 <script lang="ts" setup>
-import ValidatableInput from '@/components/form/fields/base/validatable-input.vue';
 import OneTimeCodeFieldItem from '@/components/form/fields/input-field/one-time-code-field-item.vue';
-import { FieldData, UpdateEmitType, ValidatedFieldData, ValidationMethod } from '@/composables/types';
-import { useUserInput } from '@/composables/user-input';
-import { predefinedValidations } from '@/composables/validate-user-input';
+import { FieldData, UpdateEmitType, ValidatedFieldData, ValidatedStringArrayFieldData, ValidatedStringFieldData, ValidationMethod, ValidationMethodParameters } from '@/composables/types';
+import { predefinedValidations } from '@/composables/validate';
+import Validator from '@/functionals/validator.vue';
+import { filter, shorten, transform } from '@/util/strings';
 import { computed, onMounted, reactive, ref, toRaw, watch } from 'vue';
 
 const emit = defineEmits<{ (event: 'created' | 'updated', data: ValidatedFieldData): void; }>();
@@ -65,23 +65,25 @@ const props = withDefaults(
     { type: 'alphanumeric', length: 6 }
 );
 
-const inputValidations: ValidationMethod[] = [
+const inputValidations = computed<ValidationMethod[]>(() => [
     { ...predefinedValidations['required'], parameters: [ props.required ] }
-];
+]);
 
-const fieldValidations: ValidationMethod[] = [
+const fieldValidations = computed<ValidationMethod[]>(() => [
     {
         name: 'required',
         parameters: [ props.required, props.length ],
-        validator: (data: FieldData, required: boolean, length: number): boolean => {
-            const value = <(string | number)[]> data.value;
+        validator: (data: FieldData, ...parameters: ValidationMethodParameters): boolean => {
+            const required = <boolean> parameters[0];
+            const length = <number> parameters[1];
+            const value = <(string | null)[]> data.value;
             return !required || (!!value && value.length === length && value.every(val => val !== null));
         }
     },
     ...props.validations ?? []
-];
+]);
 
-const state = reactive<ValidatedFieldData>({
+const state = reactive<ValidatedStringArrayFieldData>({
     name: props.name,
     value: [],
     valid: !props.required,
@@ -93,29 +95,24 @@ const state = reactive<ValidatedFieldData>({
  * When setting the value to null, the focused item will be determined by the first null value in the list
  * When setting the value to -1, no element will be focused
  */
-const selectedIndex = ref<number>(props.focus ? 0 : -1);
+const selectedIndex = ref<number | null>(props.focus ? 0 : -1);
 const focusedElement = computed({
-    get: () => selectedIndex.value ?? (<string[]> state.value).indexOf(null),
-    set: (index: number) => {
-        selectedIndex.value = index < props.length ? index : null;
+    get: (): number | null => selectedIndex.value ?? state.value.indexOf(null),
+    set: (index: number | null) => {
+        selectedIndex.value = index !== null && index < props.length ? index : null;
     }
 });
 
-watch(() => props.focus, (received: boolean): void => {
-    if (!received) {
-        focusedElement.value = -1;
-        return;
+watch(() => props.focus, (received?: boolean): void => {
+    if (received) {
+        return autoFocus();
     }
 
-    if (focusedElement.value !== null && focusedElement.value !== -1) {
-        return;
-    }
-
-    focusedElement.value = (<string[]> state.value).indexOf(null);
+    focusedElement.value = -1;
 });
 
-const inputValidated = (index: number, data: ValidatedFieldData): void => {
-    state.value[index] = (<string> data.value)?.slice(0, 1) ?? null;
+const inputValidated = (index: number, data: ValidatedStringFieldData): void => {
+    state.value[index] = shorten(data.value, 1);
     if (!data.valid) {
         return;
     }
@@ -135,7 +132,7 @@ const fieldValidated = (data: ValidatedFieldData): void => {
     updatedState('updated');
 };
 
-const main = ref<HTMLElement>(null);
+const main = ref<HTMLElement | null>(null);
 const fieldBlurred = (showValidity: () => void): void => {
     requestAnimationFrame(() => {
         if (!main.value || main.value.contains(document.activeElement)) {
@@ -147,13 +144,26 @@ const fieldBlurred = (showValidity: () => void): void => {
     });
 };
 
+const allowedCharacters = `[${ props.type !== 'numeric' ? 'A-z' : '' }${ props.type !== 'alpha' ? '0-9' : '' }]`;
+const regex = new RegExp(allowedCharacters, 'g');
+
 const filterPasteData = (event: ClipboardEvent): void => {
     const value = event.clipboardData?.getData('text');
     if (!value) {
-        return;
+        return autoFocus();
     }
 
-    convertValueForState(value);
+    const filtered = filter(value, regex);
+    if (!filtered) {
+        setEmptyValueForState();
+        return autoFocus();
+    }
+
+    const transformed = transform(shorten(filtered, props.length), 'uppercase').split('');
+    state.value = [ ...new Array(props.length) ].map((item, index) => transformed[index] ?? null);
+
+    autoFocus();
+    updatedState('updated');
 };
 
 const cleared = (index: number): void => {
@@ -165,34 +175,14 @@ const cleared = (index: number): void => {
     state.value[index] = null;
 };
 
-const { filter } = useUserInput();
-const allowedCharacters = `[${ props.type !== 'numeric' ? 'A-z' : '' }${ props.type !== 'alpha' ? '0-9' : '' }]`;
-const regex = new RegExp(allowedCharacters, 'g');
-
-function convertValueForState(value?: string): void {
-    const stateValue = [ ...new Array(props.length) ];
-    if (!value) {
-        state.value = stateValue.map(() => null);
-        return;
-    }
-
-    const filtered = filter(value, regex).toUpperCase().slice(0, props.length).split('');
-    state.value = stateValue.map((item, index) => filtered[index] ?? null);
-
-    focusedElement.value = null;
+function setEmptyValueForState() {
+    state.value = [ ...new Array(props.length) ].map(() => null);
 }
 
 function updatedState(event: UpdateEmitType): void {
-    const value = (<string[]> state.value).join('');
-
-    let emitValue: string | number = !!value ? value : null;
-    if (props.type === 'numeric' && !!emitValue) {
-        emitValue = Number(emitValue);
-    }
-
     const emitData: ValidatedFieldData = {
         name: state.name,
-        value: emitValue,
+        value: state.value?.join('') || null,
         valid: state.valid,
         failed: state.failed
     };
@@ -200,8 +190,12 @@ function updatedState(event: UpdateEmitType): void {
     emit(event, emitData);
 }
 
+function autoFocus(): void {
+    focusedElement.value = null;
+}
+
 onMounted(() => {
-    convertValueForState();
+    setEmptyValueForState();
     updatedState('created');
 });
 </script>

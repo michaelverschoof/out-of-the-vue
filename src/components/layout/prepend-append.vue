@@ -1,7 +1,6 @@
 <template>
-    <span v-if="provided($slots.prepend) || provided($slots.append)" class="prepend-append">
-
-        <span v-if="provided($slots.prepend)" class="prepend">
+    <span v-if="providedPrepend || providedAppend" class="prepend-append">
+        <span v-if="providedPrepend" class="prepend">
             <slot name="prepend" />
         </span>
 
@@ -9,7 +8,7 @@
             <slot />
         </span>
 
-        <span v-if="provided($slots.append)" class="append">
+        <span v-if="providedAppend" class="append">
             <slot name="append" />
         </span>
     </span>
@@ -21,7 +20,11 @@
 
 <script lang="ts" setup>
 import { provided } from '@/util/slots';
-//
+import { computed, useSlots } from 'vue';
+
+const slots = useSlots();
+const providedPrepend = computed(() => provided(slots.prepend));
+const providedAppend = computed(() => provided(slots.append));
 </script>
 
 <style lang="scss" scoped>

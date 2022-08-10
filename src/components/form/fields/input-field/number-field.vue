@@ -1,10 +1,10 @@
 <template>
     <label class="number-field input-field" v-bind="include($attrs, ['class'])">
 
-        <debounceable-input :delay="typingDelay" @updated="debounced">
+        <debouncer :delay="typingDelay" @updated="debounced">
             <template #default="{ debounce }">
 
-                <validatable-input :validations="validationMethods" :trigger-validation="triggerValidation" @created="initialized" @updated="debounce">
+                <validator :validations="validationMethods" :trigger-validation="triggerValidation" @created="initialized" @updated="debounce">
                     <template #default="{ initialize, validate, invalid, showing, showValidity }">
 
                         <header v-if="$slots.label" class="label">
@@ -43,23 +43,23 @@
                     <template v-for="validation of validationMethods" #[validation.name]>
                         <slot :name="validation.name" />
                     </template>
-                </validatable-input>
+                </validator>
 
             </template>
-        </debounceable-input>
+        </debouncer>
 
     </label>
 </template>
 
 <script lang="ts" setup>
-import PrependAppend from '@/components/form/fields/additions/layout/prepend-append.vue';
-import DebounceableInput from '@/components/form/fields/base/debounceable-input.vue';
 import NumericInput from '@/components/form/fields/base/numeric-input.vue';
-import ValidatableInput from '@/components/form/fields/base/validatable-input.vue';
-import { ValidatedFieldData, ValidationMethod } from '@/composables/types';
-import { predefinedValidations } from '@/composables/validate-user-input';
+import PrependAppend from '@/components/layout/prepend-append.vue';
+import { FieldData, ValidatedFieldData, ValidatedNumberFieldData, ValidationMethod } from '@/composables/types';
+import { predefinedValidations } from '@/composables/validate';
+import Debouncer from '@/functionals/debouncer.vue';
+import Validator from '@/functionals/validator.vue';
 import { exclude, include } from '@/util/attrs';
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 
 const emit = defineEmits<{ (event: 'created' | 'updated', data: ValidatedFieldData): void; }>();
 
@@ -81,19 +81,19 @@ const props = withDefaults(
 
 const focused = ref<boolean>(false);
 
-const validationMethods: ValidationMethod[] = [
+const validationMethods = computed<ValidationMethod[]>(() => [
     { ...predefinedValidations['required'], parameters: [ props.required ?? false ] },
     { ...predefinedValidations['min-amount'], parameters: [ props.min ] },
     { ...predefinedValidations['max-amount'], parameters: [ props.max ] },
     ...props.validations ?? []
-];
+]);
 
-const initialized = (data: ValidatedFieldData): void => {
-    emit('created', { ...data });
+const initialized = (data: FieldData | ValidatedFieldData): void => {
+    emit('created', { ...data as ValidatedNumberFieldData });
 };
 
-const debounced = (data: ValidatedFieldData): void => {
-    emit('updated', { ...data });
+const debounced = (data: FieldData | ValidatedFieldData): void => {
+    emit('updated', { ...data as ValidatedNumberFieldData });
 };
 </script>
 

@@ -1,5 +1,5 @@
 import OneTimeCodeField from '@/components/form/fields/input-field/one-time-code-field.vue';
-import { FieldData } from '@/composables/types';
+import { FieldData, ValidatedFieldData, ValidationMethod } from '@/composables/types';
 import { emitted } from '@test/emits';
 import { DOMWrapper, mount, VueWrapper } from '@vue/test-utils';
 import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -13,7 +13,7 @@ const props = {
     name: 'one-time-code-field'
 };
 
-const createdEmit = {
+const createdEmit: ValidatedFieldData = {
     name: props.name,
     value: null,
     valid: true,
@@ -92,7 +92,7 @@ describe('Give updated value on input', () => {
         expect(input.element.value).toBe('9');
 
         const emits = emitted(wrapper, 'updated');
-        expect(emits[0].value === 9).toBeTruthy();
+        expect(emits[0].value === '9').toBeTruthy();
     });
 });
 
@@ -144,7 +144,6 @@ describe('Focusing components', () => {
             expect(inputs[0].classes().includes('focused')).toBeTruthy();
 
             await wrapper.setProps({ focus: true });
-
             expect(inputs[0].element).toBe(document.activeElement);
             expect(inputs[0].classes().includes('focused')).toBeTruthy();
         });
@@ -153,11 +152,11 @@ describe('Focusing components', () => {
             const { inputs, wrapper } = mountComponent();
             expect(wrapper.find('.focused').exists()).toBeFalsy();
 
-            await inputs[0].trigger('focus');
+            await inputs[0].element.focus();
             expect(inputs[0].element).toBe(document.activeElement);
             expect(inputs[0].classes().includes('focused')).toBeTruthy();
 
-            await inputs[1].trigger('focus');
+            await inputs[1].element.focus();
             expect(inputs[1].element).toBe(document.activeElement);
             expect(inputs[1].classes().includes('focused')).toBeTruthy();
         });
@@ -200,7 +199,7 @@ describe('Jump focus on input', () => {
         const { inputs, wrapper } = mountComponent();
         expect(wrapper.find('.focused').exists()).toBeFalsy();
 
-        await inputs[0].trigger('focus');
+        await inputs[0].element.focus();
         expect(inputs[0].classes().includes('focused')).toBeTruthy();
 
         await inputs[0].setValue('a');
@@ -213,7 +212,7 @@ describe('Jump focus on input', () => {
         const { inputs, wrapper } = mountComponent();
         expect(wrapper.find('.focused').exists()).toBeFalsy();
 
-        await inputs[5].trigger('focus');
+        await inputs[5].element.focus();
         expect(inputs[5].classes().includes('focused')).toBeTruthy();
 
         await inputs[5].setValue('a');
@@ -295,61 +294,6 @@ describe('Jump focus on input', () => {
     });
 });
 
-describe('Preventing keyboard input', () => {
-
-    it('should allow alpha characters', async () => {
-        const wrapper = mount(OneTimeCodeField, {
-            props: Object.assign({}, props, { type: 'alpha' }),
-            attachTo: document.body
-        });
-
-        const myEvent = new KeyboardEvent('keydown', { key: 'a' });
-        vi.spyOn(myEvent, 'preventDefault');
-
-        wrapper.find('input').element.dispatchEvent(myEvent);
-        expect(myEvent.preventDefault).not.toHaveBeenCalled();
-    });
-
-    it('should prevent non-alpha characters', async () => {
-        const wrapper = mount(OneTimeCodeField, {
-            props: Object.assign({}, props, { type: 'alpha' }),
-            attachTo: document.body
-        });
-
-        const myEvent = new KeyboardEvent('keydown', { key: '9' });
-        vi.spyOn(myEvent, 'preventDefault');
-
-        wrapper.find('input').element.dispatchEvent(myEvent);
-        expect(myEvent.preventDefault).toHaveBeenCalled();
-    });
-
-    it('should allow numeric characters', async () => {
-        const wrapper = mount(OneTimeCodeField, {
-            props: Object.assign({}, props, { type: 'numeric' }),
-            attachTo: document.body
-        });
-
-        const myEvent = new KeyboardEvent('keydown', { key: '9' });
-        vi.spyOn(myEvent, 'preventDefault');
-
-        wrapper.find('input').element.dispatchEvent(myEvent);
-        expect(myEvent.preventDefault).not.toHaveBeenCalled();
-    });
-
-    it('should prevent non-numeric characters', async () => {
-        const wrapper = mount(OneTimeCodeField, {
-            props: Object.assign({}, props, { type: 'numeric' }),
-            attachTo: document.body
-        });
-
-        const myEvent = new KeyboardEvent('keydown', { key: 'a' });
-        vi.spyOn(myEvent, 'preventDefault');
-
-        wrapper.find('input').element.dispatchEvent(myEvent);
-        expect(myEvent.preventDefault).toHaveBeenCalled();
-    });
-});
-
 describe('Pasting data', () => {
 
     it('should fill the inputs', async () => {
@@ -378,6 +322,8 @@ describe('Pasting data', () => {
         expect(inputs[3].element.value).toBe('');
         expect(inputs[4].element.value).toBe('');
         expect(inputs[5].element.value).toBe('');
+
+        expect(inputs[3].element).toBe(document.activeElement);
     });
 
     it('should not fill if value is empty or null', async () => {
@@ -389,9 +335,15 @@ describe('Pasting data', () => {
         expect(inputs[0].element.value).toBe('');
         expect(inputs[1].element.value).toBe('');
 
-        await inputs[0].trigger('paste', { clipboardData: { getData: () => null } });
+        await inputs[0].trigger('paste', { clipboardData: { getData: (): null => null } });
         expect(inputs[0].element.value).toBe('');
         expect(inputs[1].element.value).toBe('');
+
+        await inputs[0].trigger('paste', { clipboardData: { getData: () => ' ' } });
+        expect(inputs[0].element.value).toBe('');
+        expect(inputs[1].element.value).toBe('');
+
+        expect(inputs[0].element).toBe(document.activeElement);
     });
 });
 
@@ -415,7 +367,7 @@ describe('Validating field', () => {
         const inputs = wrapper.findAll('input');
         expect(wrapper.find('strong.validation-error').exists()).toBeFalsy();
 
-        await inputs[0].trigger('focus');
+        await inputs[0].element.focus();
         expect(inputs.some(input => input.classes().includes('invalid'))).toBeFalsy();
         expect(wrapper.find('strong.validation-error').exists()).toBeFalsy();
 
@@ -436,7 +388,7 @@ describe('Validating field', () => {
         const inputs = wrapper.findAll('input');
         expect(wrapper.find('strong.validation-error').exists()).toBeFalsy();
 
-        await inputs[0].trigger('focus');
+        await inputs[0].element.focus();
         expect(inputs[0].classes().includes('focused')).toBeTruthy();
 
         await wrapper.find('main').trigger('blur');
@@ -458,7 +410,7 @@ describe('Validating field', () => {
     });
 
     describe('Custom validations', () => {
-        const validations = [
+        const validations: ValidationMethod[] = [
             {
                 name: 'custom',
                 validator: (data: FieldData) => JSON.stringify(data.value) === JSON.stringify([ 'F', 'O', 'O', 'B', 'A', 'R' ]),

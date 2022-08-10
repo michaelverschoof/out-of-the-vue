@@ -1,43 +1,62 @@
 {
     "name": "out-of-the-vue",
     "author": "Michael Verschoof",
-    "version": "0.1.0-rc.1",
+    "description": "Functional UX components built with Vue 3",
+    "version": "0.1.0-rc.35",
     "license": "MIT",
-    "files": [
-        "dist"
-    ],
+    "publishConfig": {
+        "registry": "https://registry.npmjs.org/"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/michaelverschoof/out-of-the-vue.git"
+    },
     "main": "./dist/out-of-the-vue.umd.js",
     "module": "./dist/out-of-the-vue.es.js",
     "types": "./dist/types/index.d.ts",
+    "files": [
+        "dist",
+        "src"
+    ],
     "exports": {
         ".": {
             "import": "./dist/out-of-the-vue.es.js",
             "require": "./dist/out-of-the-vue.umd.js"
         },
-        "./dist/style.css": "./dist/style.css"
+        "./dist/out-of-the-vue.css": "./dist/out-of-the-vue.css"
     },
     "scripts": {
         "serve": "vite",
-        "build": "vite build && vue-tsc --emitDeclarationOnly --project tsconfig.build.json",
+        "build": "vite build",
         "preview": "vite preview",
         "test": "vitest",
-        "test-coverage": "vitest run --coverage"
+        "test:coverage": "vitest run --coverage",
+        "release": "npm install && npm run build && npm publish"
     },
-    "dependencies": {
-        "vue": "^3.2.37"
-    },
+    "bugs": "https://github.com/michaelverschoof/out-of-the-vue/issues",
+    "keywords": [
+        "functional",
+        "UX",
+        "vue",
+        "vue3",
+        "mobile",
+        "frontend",
+        "component",
+        "components"
+    ],
     "devDependencies": {
-        "@types/node": "^17.0.43",
+        "@types/node": "^18.0.0",
         "@vitejs/plugin-vue": "^2.3.3",
-        "@vue/test-utils": "^2.0.1",
+        "@vue/test-utils": "^2.0.0",
         "c8": "^7.11.3",
-        "happy-dom": "^5.3.1",
-        "jsdom": "^19.0.0",
-        "sass": "^1.52.3",
-        "typescript": "^4.7.3",
-        "vite": "^2.9.12",
-        "vitest": "^0.15.1",
-        "vue-tsc": "0.35.2"
+        "happy-dom": "^5.3.2",
+        "jsdom": "^20.0.0",
+        "sass": "^1.53.0",
+        "typescript": "^4.7.4",
+        "vite": "^2.9.13",
+        "vite-plugin-dts": "^1.2.0",
+        "vitest": "^0.16.0",
+        "vue": "^3.2.37"
     },
     "peerDependencies": {
         "vue": "^3"

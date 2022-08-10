@@ -27,18 +27,13 @@ describe('Validate minimum amount', () => {
     it('should not validate if data is under the minimum', () => {
         expect(minimum(amount, 321)).toBe(false);
         expect(minimum({} as FieldData, 321)).toBe(false);
-        expect(minimum(null, 321)).toBe(false);
         expect(minimum(negative, -10)).toBe(false);
         expect(minimum(empty, 10)).toBe(false);
     });
 
     it('should validate if minimum is falsy', () => {
         expect(minimum(amount, 0)).toBe(true);
-        expect(minimum(amount, null)).toBe(true);
-        expect(minimum(negative, null)).toBe(true);
-
         expect(minimum(empty, 0)).toBe(true);
-        expect(minimum(null, 0)).toBe(true);
     });
 });
 
@@ -60,10 +55,6 @@ describe('Validate maximum amount', () => {
 
     it('should validate if maximum is falsy', () => {
         expect(maximum(amount, 0)).toBe(true);
-        expect(maximum(amount, null)).toBe(true);
-        expect(maximum(negative, null)).toBe(true);
-
         expect(maximum(empty, 0)).toBe(true);
-        expect(maximum(null, 0)).toBe(true);
     });
 });

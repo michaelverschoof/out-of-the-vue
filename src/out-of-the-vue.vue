@@ -61,7 +61,7 @@
         </checkable-field>
     </div>
 
-    <modal :opened="modalOpened" @closed="modalOpened = null;">
+    <modal :open="modalOpened" @closed="modalOpened = false;" class="foo">
         <template #opener="{ open }">
             <button @click="open">open modal</button>
         </template>
@@ -81,7 +81,7 @@
         </template>
     </modal>
 
-    <button type="button" @click="modalOpened = 1;">set modal's opened to 1</button>
+    <button type="button" @click="test = true">trigger provide</button>
 </template>
 
 <script lang="ts" setup>
@@ -93,7 +93,7 @@ import Modal from '@/components/modal.vue';
 import { SubmittedSymbol, ValidatedFieldData } from '@/composables/types';
 import { provide, reactive, ref } from 'vue';
 
-const test = ref(false);
+const test = ref<boolean>(false);
 provide(SubmittedSymbol, test);
 
 const items = ref([ 'ddd', 'eee', 'fff', 'ggg', 'hhh' ]);
@@ -122,7 +122,7 @@ const onUpdated = (data: ValidatedFieldData): void => {
     field[data.name] = data;
 };
 
-const modalOpened = ref<number>(null);
+const modalOpened = ref<boolean>(false);
 </script>
 
 <style lang="scss">

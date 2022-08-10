@@ -1,4 +1,4 @@
-import DebounceableInput from '@/components/form/fields/base/debounceable-input.vue';
+import Debouncer from '@/functionals/debouncer.vue';
 import { emitted } from '@test/emits';
 import { MountedComponent } from '@test/types';
 import { mount } from '@vue/test-utils';
@@ -14,7 +14,7 @@ const stringedData = JSON.stringify(data).replace(/"/g, '\'');
 vi.useFakeTimers();
 
 beforeAll(() => {
-    expect(DebounceableInput).toBeTruthy();
+    expect(Debouncer).toBeTruthy();
 });
 
 afterEach(() => {
@@ -29,7 +29,7 @@ it('should mount the component', async () => {
 it('should trigger debounce', async () => {
     const { element, wrapper } = mountComponent();
 
-    await element.trigger('debounce');
+    await element?.trigger('debounce');
     expect(wrapper.emitted('updated')).toBeFalsy();
 
     vi.advanceTimersToNextTimer();
@@ -41,13 +41,13 @@ it('should trigger debounce', async () => {
 it('should trigger debounce immediately without delay set', async () => {
     const { element, wrapper } = mountComponent(0);
 
-    await element.trigger('debounce');
+    await element?.trigger('debounce');
     const emits = emitted(wrapper, 'updated');
     expect(emits[0]).toEqual(data);
 });
 
 function mountComponent(delay: number = 10): MountedComponent {
-    const wrapper = mount(DebounceableInput, {
+    const wrapper = mount(Debouncer, {
         slots: {
             default: `<template #default="{ debounce }">
                         <div @debounce="debounce(${ stringedData })">Foo</div>

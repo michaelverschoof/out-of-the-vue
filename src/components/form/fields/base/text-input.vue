@@ -5,19 +5,20 @@
         ref="element"
         class="text-input"
         :class="{ focused }"
+        :maxLength="max"
         :name="name"
         :value="model"
         @blur="blurElement"
         @focus="focusElement"
         @input="filterInputData"
-        @keydown="preventDisallowedCharacters"
+        @keydown="filterInputData"
         @paste.prevent="filterPasteData"
     />
 </template>
 
 <script lang="ts" setup>
 import { StringFieldData } from '@/composables/types';
-import { useUserInput } from '@/composables/user-input';
+import { filter, shorten, transform } from '@/util/strings';
 import { computed, onMounted, reactive, ref, watch } from 'vue';
 
 const emit = defineEmits<{
@@ -30,11 +31,12 @@ const props = defineProps<{
     value?: string;
     textarea?: boolean;
     focus?: boolean;
+    max?: number;
     allowedCharacters?: string;
     transformInput?: 'uppercase' | 'lowercase';
 }>();
 
-const element = ref<HTMLInputElement | HTMLTextAreaElement>(null);
+const element = ref<HTMLInputElement | HTMLTextAreaElement | null>(null);
 const focused = ref<boolean>(false);
 
 const state = reactive<StringFieldData>({
@@ -44,21 +46,30 @@ const state = reactive<StringFieldData>({
 
 const model = computed({
     get: () => state.value,
-    set: (value: string) => {
-        state.value = value?.trim() ?? null;
+    set: (value: string | null) => {
+        if (value === state.value) {
+            return;
+        }
+
+        state.value = value ?? null;
         emit('updated', { ...state });
     }
 });
 
-watch(() => props.value, (received: string) => {
-    if (received === model.value) {
+watch(() => props.value, (received?: string) => {
+    const value = filterAndTransform(received);
+    if (received === model.value || value === model.value) {
         return;
     }
 
-    model.value = filterAndTransform(received);
+    model.value = value;
 });
 
-watch(() => props.focus, (received: boolean) => {
+watch(() => props.focus, (received?: boolean) => {
+    if (focused.value === received) {
+        return;
+    }
+
     !received ? element.value?.blur() : element.value?.focus();
 });
 
@@ -68,21 +79,10 @@ watch(() => props.focus, (received: boolean) => {
 const inputRegex = !!props.allowedCharacters ? new RegExp(props.allowedCharacters, 'g') : null;
 
 /**
- * Prevent characters other than the allowed to be entered
- */
-const preventDisallowedCharacters = (event: KeyboardEvent): string => {
-    if (!inputRegex || !!event.key.match(inputRegex)) {
-        return event.key;
-    }
-
-    event.preventDefault();
-};
-
-/**
  * Filter the pasted value by the allowed character format
  */
 const filterPasteData = (event: ClipboardEvent): void => {
-    model.value = filterAndTransform(event.clipboardData.getData('text'));
+    model.value = filterAndTransform(event.clipboardData?.getData('text'));
 };
 
 /**
@@ -92,9 +92,13 @@ const filterInputData = (event: Event): void => {
     model.value = filterAndTransform((<HTMLInputElement> event.target).value);
 };
 
-const { filter, transform } = useUserInput();
-const filterAndTransform = (value: string): string => {
-    const filtered = filter(value, inputRegex);
+const filterAndTransform = (value?: string): string | null => {
+    let filtered = filter(value?.trimStart() ?? '', inputRegex ?? '');
+    if (!filtered) {
+        return filtered;
+    }
+
+    filtered = shorten(filtered, props.max);
     if (!props.transformInput) {
         return filtered;
     }
@@ -113,7 +117,7 @@ const blurElement = (): void => {
 };
 
 onMounted(() => {
-    if (props.focus) {
+    if (props.focus && element.value) {
         element.value.focus();
     }
 

@@ -1,10 +1,9 @@
-import { useUserInput } from '@/composables/user-input';
+import { filter, shorten, transform } from '@/util/strings';
 import { describe, expect, it } from 'vitest';
 
 const value = 'Some value with number 123 in it';
 
 describe('Filter value', () => {
-    const { filter } = useUserInput();
 
     it('should filter out values not in the regex', () => {
         expect(filter(value, 'number 123')).toEqual('number 123');
@@ -25,19 +24,14 @@ describe('Filter value', () => {
 
     it('should return the value if there is no regex', () => {
         expect(filter(value, '')).toEqual(value);
-        expect(filter(value, null)).toEqual(value);
-        expect(filter(value, undefined)).toEqual(value);
     });
 
     it('should return null if there is no value', () => {
         expect(filter('', /[A-z ]*/g)).toBeNull();
-        expect(filter(null, /[A-z ]*/g)).toBeNull();
-        expect(filter(undefined, /[A-z ]*/g)).toBeNull();
     });
 });
 
 describe('Transform value', () => {
-    const { transform } = useUserInput();
 
     it('should uppercase given value', () => {
         expect(transform(value, 'uppercase')).toEqual(value.toUpperCase());
@@ -47,14 +41,23 @@ describe('Transform value', () => {
         expect(transform(value, 'lowercase')).toEqual(value.toLowerCase());
     });
 
-    it('should lowercase if no type is given', () => {
-        expect(transform(value, null)).toEqual(value.toLowerCase());
-        expect(transform(value, undefined)).toEqual(value.toLowerCase());
+    it('should return null if there is no value', () => {
+        expect(transform('', 'uppercase')).toBeNull();
+    });
+});
+
+describe('Shorten value', () => {
+
+    it('should shorten given value', () => {
+        expect(shorten(value, 10)).toEqual('Some value');
+    });
+
+    it('should return the value if no length', () => {
+        expect(shorten(value, null)).toEqual(value);
     });
 
     it('should return null if there is no value', () => {
-        expect(transform('', 'uppercase')).toBeNull();
-        expect(transform(null, 'uppercase')).toBeNull();
-        expect(transform(undefined, 'lowercase')).toBeNull();
+        expect(shorten('', 10)).toBeNull();
     });
 });
+
