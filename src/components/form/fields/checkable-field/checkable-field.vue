@@ -57,7 +57,7 @@ import { CheckableFieldData, ValidatedFieldData, ValidatedStringArrayFieldData, 
 import { predefinedValidations } from '@/composables/validate';
 import Validator from '@/functionals/validator.vue';
 import { provided } from '@/util/slots';
-import { onMounted, reactive, ref, useSlots, watch } from 'vue';
+import { computed, onMounted, reactive, ref, useSlots, watch } from 'vue';
 
 const emit = defineEmits<{ (event: 'created' | 'updated', data: ValidatedFieldData): void; }>();
 
@@ -74,20 +74,24 @@ const props = defineProps<{
     hideInput?: boolean;
 }>();
 
-const validationMethods: ValidationMethod[] = [
-    { ...predefinedValidations['required-array'], parameters: [ props.required ] },
-    ...props.validations ?? []
-];
+const validationMethods = computed<ValidationMethod[]>(() => {
+    const validations = [
+        { ...predefinedValidations['required-array'], parameters: [ props.required ] },
+        ...props.validations ?? []
+    ];
 
-if (props.type !== 'radio') {
-    validationMethods.push(
-        { ...predefinedValidations['min-array'], parameters: [ props.min ] },
-        { ...predefinedValidations['max-array'], parameters: [ props.max ] }
-    );
-}
+    if (props.type !== 'radio') {
+        validations.push(
+            { ...predefinedValidations['min-array'], parameters: [ props.min ] },
+            { ...predefinedValidations['max-array'], parameters: [ props.max ] }
+        );
+    }
+
+    return validations
+});
 
 const slots = Object.keys(useSlots());
-const nonOptionSlots = [ 'label', 'information', ...validationMethods.map(method => method.name) ];
+const nonOptionSlots = [ 'label', 'information', ...validationMethods.value.map(method => method.name) ];
 
 const selectedItems = ref<Set<string>>(new Set(filterSelected(props.selected)));
 const focusedItems = ref<Set<string>>(new Set());

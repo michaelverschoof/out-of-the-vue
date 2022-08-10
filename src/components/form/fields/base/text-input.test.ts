@@ -133,11 +133,11 @@ describe('Filtering input', () => {
     it('should not filter out characters if all matches', async () => {
         const { input, wrapper } = mountComponent({ allowedCharacters: '[A-z]' });
 
-        await input.setValue('foo');
-        expect(input.element.value).toBe('foo');
+        await input.setValue('foobar');
+        expect(input.element.value).toBe('foobar');
 
         const emits = emitted(wrapper, 'updated');
-        expect(emits[0].value).toBe('foo');
+        expect(emits[0].value).toBe('foobar');
     });
 
     it('should filter out all characters if nothing matches', async () => {

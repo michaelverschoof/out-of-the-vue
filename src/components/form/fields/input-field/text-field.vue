@@ -1,11 +1,11 @@
 <template>
     <label class="text-field input-field" v-bind="include($attrs, ['class'])">
 
-        <validator :validations="validationMethods" :trigger-validation="triggerValidation" @created="initialized" @updated="validated">
-            <template #default="{ initialize, validate, invalid, showing, showValidity }">
+        <debouncer :delay="typingDelay" @updated="validated">
+            <template #default="{ debounce }">
 
-                <debouncer :delay="typingDelay" @updated="validate">
-                    <template #default="{ debounce }">
+                <validator :validations="validationMethods" :trigger-validation="triggerValidation" @created="initialized" @updated="debounce">
+                    <template #default="{ initialize, validate, invalid, showing, showValidity }">
 
                         <header v-if="$slots.label" class="label">
                             <slot name="label" />
@@ -25,7 +25,7 @@
                                     @focused="focused = true"
                                     @blurred="focused = false; showValidity();"
                                     @created="initialize"
-                                    @updated="debounce"
+                                    @updated="validate"
                                 />
 
                                 <template #append>
@@ -39,14 +39,14 @@
                         </footer>
 
                     </template>
-                </debouncer>
+
+                    <template v-for="validation of validationMethods" #[validation.name]>
+                        <slot :name="validation.name" />
+                    </template>
+                </validator>
 
             </template>
-
-            <template v-for="validation of validationMethods" #[validation.name]>
-                <slot :name="validation.name" />
-            </template>
-        </validator>
+        </debouncer>
 
     </label>
 </template>
@@ -59,7 +59,7 @@ import { predefinedValidations } from '@/composables/validate';
 import Debouncer from '@/functionals/debouncer.vue';
 import Validator from '@/functionals/validator.vue';
 import { exclude, include } from '@/util/attrs';
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 
 const emit = defineEmits<{ (event: 'created' | 'updated', data: FieldData | ValidatedFieldData): void; }>();
 
@@ -77,12 +77,12 @@ const props = defineProps<{
 
 const focused = ref<boolean>(false);
 
-const validationMethods: ValidationMethod[] = [
+const validationMethods = computed<ValidationMethod[]>(() => [
     { ...predefinedValidations['required'], parameters: [ props.required ] },
     { ...predefinedValidations['min-length'], parameters: [ props.min ] },
     { ...predefinedValidations['max-length'], parameters: [ props.max ] },
     ...props.validations ?? []
-];
+]);
 
 const initialized = (data: FieldData | ValidatedFieldData): void => {
     emit('created', { ...data as ValidatedStringFieldData });

@@ -27,8 +27,11 @@ const state = reactive<ValidatedFieldData>({
     failed: []
 });
 
-const triggeredSubmitValidation = inject(SubmittedSymbol, ref<boolean>(false));
+watch(() => props.validations, () => {
+    revalidate();
+});
 
+const triggeredSubmitValidation = inject(SubmittedSymbol, ref<boolean>(false));
 const { validate: validateInput } = useValidate();
 
 watch(triggeredSubmitValidation, (received: boolean) => {
@@ -37,13 +40,7 @@ watch(triggeredSubmitValidation, (received: boolean) => {
         return;
     }
 
-    const failedValidations = validateInput(state, props.validations);
-    if (props.triggerValidation) {
-        failedValidations.push(props.triggerValidation);
-    }
-
-    state.valid = !failedValidations.length;
-    state.failed = failedValidations;
+    revalidate();
 
     showing.value = true;
 });
@@ -111,4 +108,16 @@ const validateFieldData = (data: FieldData, event: UpdateEmitType): void => {
 const showValidity = () => {
     showing.value = !state.valid;
 };
+
+function revalidate() {
+    const failedValidations = validateInput(state, props.validations);
+    if (props.triggerValidation) {
+        failedValidations.push(props.triggerValidation);
+    }
+
+    state.valid = !failedValidations.length;
+    state.failed = failedValidations;
+
+    emit('updated', { ...state });
+}
 </script>

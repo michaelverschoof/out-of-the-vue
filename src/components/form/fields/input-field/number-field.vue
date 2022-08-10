@@ -59,7 +59,7 @@ import { predefinedValidations } from '@/composables/validate';
 import Debouncer from '@/functionals/debouncer.vue';
 import Validator from '@/functionals/validator.vue';
 import { exclude, include } from '@/util/attrs';
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 
 const emit = defineEmits<{ (event: 'created' | 'updated', data: ValidatedFieldData): void; }>();
 
@@ -81,12 +81,12 @@ const props = withDefaults(
 
 const focused = ref<boolean>(false);
 
-const validationMethods: ValidationMethod[] = [
+const validationMethods = computed<ValidationMethod[]>(() => [
     { ...predefinedValidations['required'], parameters: [ props.required ?? false ] },
     { ...predefinedValidations['min-amount'], parameters: [ props.min ] },
     { ...predefinedValidations['max-amount'], parameters: [ props.max ] },
     ...props.validations ?? []
-];
+]);
 
 const initialized = (data: FieldData | ValidatedFieldData): void => {
     emit('created', { ...data as ValidatedNumberFieldData });

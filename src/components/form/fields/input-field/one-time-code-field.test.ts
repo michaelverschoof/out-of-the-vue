@@ -339,6 +339,10 @@ describe('Pasting data', () => {
         expect(inputs[0].element.value).toBe('');
         expect(inputs[1].element.value).toBe('');
 
+        await inputs[0].trigger('paste', { clipboardData: { getData: () => ' ' } });
+        expect(inputs[0].element.value).toBe('');
+        expect(inputs[1].element.value).toBe('');
+
         expect(inputs[0].element).toBe(document.activeElement);
     });
 });

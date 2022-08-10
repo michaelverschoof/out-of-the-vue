@@ -252,6 +252,34 @@ describe('Triggering validation externally', () => {
 
             expect(wrapper.find('strong.validation-error').exists()).toBeFalsy();
         });
+
+        it('should update validity on changed validation', async () => {
+            const { wrapper, element } = mountComponent('foo', validations);
+
+            await element?.trigger('created');
+
+            let emits = emitted(wrapper, 'created');
+            expect(emits[0]).toEqual({
+                ...data,
+                valid: true,
+                failed: []
+            });
+
+            const updatedValidations = [
+                { ...predefinedValidations['required'], parameters: [ true ] },
+                { ...predefinedValidations['min-length'], parameters: [ 4 ] },
+                { ...predefinedValidations['max-length'], parameters: [ 5 ] }
+            ];
+
+            await wrapper.setProps({ validations: updatedValidations });
+
+            emits = emitted(wrapper, 'updated');
+            expect(emits[0]).toEqual({
+                ...data,
+                valid: false,
+                failed: [ 'min' ]
+            });
+        });
     });
 
     describe('Triggering validation by provide', () => {

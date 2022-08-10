@@ -20,8 +20,8 @@
                             :validations="inputValidations"
                             :value="state.value[index]"
                             @focused="focusedElement = index"
-                            @created="initializeState({ ...state })"
-                            @updated="(data) => { inputValidated(index, data); validateState({ ...state }) }"
+                            @created="initializeState(toRaw(state))"
+                            @updated="(data) => { inputValidated(index, data); validateState(toRaw(state)) }"
                             @cleared="cleared(index)"
                         />
 
@@ -48,7 +48,7 @@ import { FieldData, UpdateEmitType, ValidatedFieldData, ValidatedStringArrayFiel
 import { predefinedValidations } from '@/composables/validate';
 import Validator from '@/functionals/validator.vue';
 import { filter, shorten, transform } from '@/util/strings';
-import { computed, onMounted, reactive, ref, watch } from 'vue';
+import { computed, onMounted, reactive, ref, toRaw, watch } from 'vue';
 
 const emit = defineEmits<{ (event: 'created' | 'updated', data: ValidatedFieldData): void; }>();
 
@@ -65,11 +65,11 @@ const props = withDefaults(
     { type: 'alphanumeric', length: 6 }
 );
 
-const inputValidations: ValidationMethod[] = [
+const inputValidations = computed<ValidationMethod[]>(() => [
     { ...predefinedValidations['required'], parameters: [ props.required ] }
-];
+]);
 
-const fieldValidations: ValidationMethod[] = [
+const fieldValidations = computed<ValidationMethod[]>(() => [
     {
         name: 'required',
         parameters: [ props.required, props.length ],
@@ -81,7 +81,7 @@ const fieldValidations: ValidationMethod[] = [
         }
     },
     ...props.validations ?? []
-];
+]);
 
 const state = reactive<ValidatedStringArrayFieldData>({
     name: props.name,
@@ -105,7 +105,7 @@ const focusedElement = computed({
 
 watch(() => props.focus, (received?: boolean): void => {
     if (received) {
-        return;
+        return autoFocus();
     }
 
     focusedElement.value = -1;
@@ -144,14 +144,25 @@ const fieldBlurred = (showValidity: () => void): void => {
     });
 };
 
+const allowedCharacters = `[${ props.type !== 'numeric' ? 'A-z' : '' }${ props.type !== 'alpha' ? '0-9' : '' }]`;
+const regex = new RegExp(allowedCharacters, 'g');
+
 const filterPasteData = (event: ClipboardEvent): void => {
     const value = event.clipboardData?.getData('text');
     if (!value) {
-        autoFocus();
-        return;
+        return autoFocus();
     }
 
-    convertValueForState(value);
+    const filtered = filter(value, regex);
+    if (!filtered) {
+        setEmptyValueForState();
+        return autoFocus();
+    }
+
+    const transformed = transform(shorten(filtered, props.length), 'uppercase').split('');
+    state.value = [ ...new Array(props.length) ].map((item, index) => transformed[index] ?? null);
+
+    autoFocus();
     updatedState('updated');
 };
 
@@ -164,22 +175,8 @@ const cleared = (index: number): void => {
     state.value[index] = null;
 };
 
-const allowedCharacters = `[${ props.type !== 'numeric' ? 'A-z' : '' }${ props.type !== 'alpha' ? '0-9' : '' }]`;
-const regex = new RegExp(allowedCharacters, 'g');
-
-function convertValueForState(value?: string): void {
-    const stateValue = [ ...new Array(props.length) ];
-
-    const filtered = filter(value, regex);
-    if (!filtered) {
-        state.value = stateValue.map(() => null);
-        return autoFocus();
-    }
-
-    const transformed = transform(shorten(filtered, props.length), 'uppercase').split('');
-
-    state.value = stateValue.map((item, index) => transformed[index] ?? null);
-    autoFocus();
+function setEmptyValueForState() {
+    state.value = [ ...new Array(props.length) ].map(() => null);
 }
 
 function updatedState(event: UpdateEmitType): void {
@@ -198,7 +195,7 @@ function autoFocus(): void {
 }
 
 onMounted(() => {
-    convertValueForState();
+    setEmptyValueForState();
     updatedState('created');
 });
 </script>

@@ -51,7 +51,7 @@ const model = computed({
             return;
         }
 
-        state.value = value?.trimStart() ?? null;
+        state.value = value ?? null;
         emit('updated', { ...state });
     }
 });
@@ -93,7 +93,7 @@ const filterInputData = (event: Event): void => {
 };
 
 const filterAndTransform = (value?: string): string | null => {
-    let filtered = filter(value ?? '', inputRegex ?? '');
+    let filtered = filter(value?.trimStart() ?? '', inputRegex ?? '');
     if (!filtered) {
         return filtered;
     }

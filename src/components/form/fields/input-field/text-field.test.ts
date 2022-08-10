@@ -251,7 +251,7 @@ describe('Validating field', () => {
 
         it('should trigger min validation', async () => {
             const wrapper = mount(TextField, {
-                props: Object.assign({}, props, { min: 2 }),
+                props: Object.assign({}, props, { typingDelay: 0, min: 2 }),
                 slots: { min: 'min error' }
             });
 
@@ -271,7 +271,7 @@ describe('Validating field', () => {
 
         it('should trigger max validation', async () => {
             const wrapper = mount(TextField, {
-                props: Object.assign({}, props, { max: 2 }),
+                props: Object.assign({}, props, { typingDelay: 0, max: 2 }),
                 slots: { max: 'max error' }
             });
 
@@ -301,7 +301,7 @@ describe('Validating field', () => {
 
         it('should trigger custom validation', async () => {
             const wrapper = mount(TextField, {
-                props: Object.assign({}, props, { validations: validations }),
+                props: Object.assign({}, props, { typingDelay: 0, validations: validations }),
                 slots: Object.assign({}, { custom: 'custom error' })
             });
 
