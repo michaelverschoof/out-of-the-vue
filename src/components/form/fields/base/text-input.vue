@@ -65,6 +65,15 @@ watch(() => props.value, (received?: string) => {
     model.value = value;
 });
 
+watch([ () => props.allowedCharacters, () => props.transformInput ], () => {
+    const value = filterAndTransform(model.value);
+    if (value === model.value) {
+        return;
+    }
+
+    model.value = value;
+});
+
 watch(() => props.focus, (received?: boolean) => {
     if (focused.value === received) {
         return;
@@ -72,11 +81,6 @@ watch(() => props.focus, (received?: boolean) => {
 
     !received ? element.value?.blur() : element.value?.focus();
 });
-
-/**
- * The regex containing the allowed characters
- */
-const inputRegex = !!props.allowedCharacters ? new RegExp(props.allowedCharacters, 'g') : null;
 
 /**
  * Filter the pasted value by the allowed character format
@@ -93,7 +97,9 @@ const filterInputData = (event: Event): void => {
 };
 
 const filterAndTransform = (value?: string): string | null => {
-    let filtered = filter(value?.trimStart() ?? '', inputRegex ?? '');
+    const regex = !!props.allowedCharacters ? new RegExp(props.allowedCharacters, 'g') : '';
+
+    let filtered = filter(value?.trimStart() ?? '', regex);
     if (!filtered) {
         return filtered;
     }
@@ -119,6 +125,10 @@ const blurElement = (): void => {
 onMounted(() => {
     if (props.focus && element.value) {
         element.value.focus();
+    }
+
+    if (!!props.value && (props.allowedCharacters || props.transformInput)) {
+        filterAndTransform(model.value);
     }
 
     emit('created', { ...state });

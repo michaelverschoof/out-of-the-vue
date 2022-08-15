@@ -162,6 +162,37 @@ describe('Filtering input', () => {
             expect(emits[0].value).toBe('foobar');
         });
     });
+
+    describe('When updating allowed characters', () => {
+
+        it('should filter after updating prop', async () => {
+            const { input, wrapper } = mountComponent({ allowedCharacters: '[A-z,1,3]' });
+
+            await input.setValue('foo123bar');
+            expect(input.element.value).toBe('foo13bar');
+
+            await wrapper.setProps({ allowedCharacters: '[A-z]' });
+            expect(input.element.value).toBe('foobar');
+
+            await wrapper.setProps({ value: 'foo12345bar' });
+            expect(input.element.value).toBe('foobar');
+
+            const emits = emitted(wrapper, 'updated', 2);
+            expect(emits[0].value).toBe('foo13bar');
+            expect(emits[1].value).toBe('foobar');
+        });
+
+        it('should not filter after updating prop when equal value', async () => {
+            const { input, wrapper } = mountComponent({ value: 'foobar', allowedCharacters: '[A-z]' });
+
+            expect(input.element.value).toBe('foobar');
+
+            await wrapper.setProps({ allowedCharacters: '[A-z0-9]' });
+            expect(input.element.value).toBe('foobar');
+
+            emitted(wrapper, 'updated', 0);
+        });
+    });
 });
 
 describe('Transforming input', () => {
@@ -209,6 +240,34 @@ describe('Transforming input', () => {
 
             const emits = emitted(wrapper, 'updated');
             expect(emits[0].value).toBe('FOOBAR');
+        });
+    });
+
+    describe('When updating allowed characters', () => {
+
+        it('should transform after updating prop', async () => {
+            const { input, wrapper } = mountComponent({ transformInput: 'uppercase' });
+
+            await input.setValue('fooBAR');
+            expect(input.element.value).toBe('FOOBAR');
+
+            await wrapper.setProps({ transformInput: 'lowercase' });
+            expect(input.element.value).toBe('foobar');
+
+            const emits = emitted(wrapper, 'updated', 2);
+            expect(emits[0].value).toBe('FOOBAR');
+            expect(emits[1].value).toBe('foobar');
+        });
+
+        it('should not transform after updating prop when equal value', async () => {
+            const { input, wrapper } = mountComponent({ value: 'FOOBAR' });
+
+            expect(input.element.value).toBe('FOOBAR');
+
+            await wrapper.setProps({ transformInput: 'uppercase' });
+            expect(input.element.value).toBe('FOOBAR');
+
+            emitted(wrapper, 'updated', 0);
         });
     });
 });

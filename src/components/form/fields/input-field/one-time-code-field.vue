@@ -144,8 +144,7 @@ const fieldBlurred = (showValidity: () => void): void => {
     });
 };
 
-const allowedCharacters = `[${ props.type !== 'numeric' ? 'A-z' : '' }${ props.type !== 'alpha' ? '0-9' : '' }]`;
-const regex = new RegExp(allowedCharacters, 'g');
+const allowedCharacters = computed(() => `[${ props.type !== 'numeric' ? 'A-z' : '' }${ props.type !== 'alpha' ? '0-9' : '' }]`);
 
 const filterPasteData = (event: ClipboardEvent): void => {
     const value = event.clipboardData?.getData('text');
@@ -153,7 +152,7 @@ const filterPasteData = (event: ClipboardEvent): void => {
         return autoFocus();
     }
 
-    const filtered = filter(value, regex);
+    const filtered = filter(value, new RegExp(allowedCharacters.value, 'g'));
     if (!filtered) {
         setEmptyValueForState();
         return autoFocus();
