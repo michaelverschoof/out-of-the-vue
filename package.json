@@ -2,7 +2,7 @@
     "name": "out-of-the-vue",
     "author": "Michael Verschoof",
     "description": "Functional UX components built with Vue 3",
-    "version": "0.1.0-rc.35",
+    "version": "0.1.0-rc.36",
     "license": "MIT",
     "publishConfig": {
         "registry": "https://registry.npmjs.org/"
