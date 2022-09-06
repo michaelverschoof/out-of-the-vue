@@ -1,14 +1,22 @@
 <template>
     <div>
-        <text-field name="fff" foo="bar" required @updated="onUpdated" class="ff">
+        <text-field name="fff" :value="something.text" required @created="onUpdated" @updated="onUpdated" class="ff"
+                    :min="min"
+                    :max="255"
+        >
             <template #label>test</template>
 
-            <template #append>test</template>
+            <template #append>
+                <counter :count="2">test</counter>
+            </template>
         </text-field>
     </div>
 
+    <button @click="min = 5">Change</button>
+
     <div>
-        <one-time-code-field name="myOneTimeCode" required @updated="onUpdated">
+        {{ field.myOneTimeCode }}
+        <one-time-code-field name="myOneTimeCode" required @updated="onUpdated" type="numeric">
             <template #label>
                 Some field label
             </template>
@@ -22,7 +30,7 @@
     </div>
 
     <div>
-        <number-field :typing-delay="1000" name="myNumberField" required @updated="onUpdated" :min="2" :max="500" maxlength="3">
+        <number-field :typing-delay="1000" name="myNumberField" required @updated="onUpdated" :min="2" :max="50000" maxlength="30">
             <template #label>
                 Some field label
             </template>
@@ -52,7 +60,7 @@
             </template>
 
             <template v-for="item of items" #[item]>
-                {{ item }}
+                <span v-html="item"></span>
             </template>
 
             <template #required>This field is required</template>
@@ -85,6 +93,7 @@
 </template>
 
 <script lang="ts" setup>
+import Counter from '@/components/counter/counter.vue';
 import CheckableField from '@/components/form/fields/checkable-field/checkable-field.vue';
 import NumberField from '@/components/form/fields/input-field/number-field.vue';
 import OneTimeCodeField from '@/components/form/fields/input-field/one-time-code-field.vue';
@@ -93,33 +102,35 @@ import Modal from '@/components/modal.vue';
 import { SubmittedSymbol, ValidatedFieldData } from '@/composables/types';
 import { provide, reactive, ref } from 'vue';
 
+const min = ref(2);
+
 const test = ref<boolean>(false);
 provide(SubmittedSymbol, test);
 
 const items = ref([ 'ddd', 'eee', 'fff', 'ggg', 'hhh' ]);
 const trigger = ref(false);
 const toggle = () => {
-    if (!trigger) {
+    if (trigger.value) {
         items.value = [ 'ddd', 'eee', 'fff', 'ggg', 'hhh' ];
+        trigger.value = false;
         return;
     }
 
     items.value = [ 'ddd', 'eee', 'fff' ];
-    // test.value = !test.value;
-
-    // if (!trigger.value) {
-    //     trigger.value = 'required';
-    //     return;
-    // }
-    //
-    // trigger.value = null;
+    trigger.value = true;
 };
 
-const field = reactive([] as ValidatedFieldData[]);
+const field = reactive<{ [name: string]: ValidatedFieldData }>({});
+
+const something = reactive({
+    text: null
+});
 
 const onUpdated = (data: ValidatedFieldData): void => {
-    console.log(data);
     field[data.name] = data;
+    console.log(data);
+
+    something.text = data.value;
 };
 
 const modalOpened = ref<boolean>(false);
@@ -151,6 +162,10 @@ body {
     width: 100%;
     max-width: 25em;
     padding: 1em;
+}
+
+input {
+    border: 1px solid #777 !important;
 }
 
 fieldset {

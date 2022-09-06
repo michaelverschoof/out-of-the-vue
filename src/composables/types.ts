@@ -13,6 +13,7 @@ export type ModalEmitType = 'opened' | 'closed';
 
 /**
  * Provide / inject Symbols
+ * TODO: Change the type so it can be triggered more than once
  */
 export const SubmittedSymbol: InjectionKey<Ref<boolean>> = Symbol('submitted');
 
@@ -32,6 +33,16 @@ export interface NumberFieldData extends FieldData {
     value: number | null;
 }
 
+/**
+ * Form state emitted from validating-form
+ */
+export interface ValidatedFormData {
+    fields: Map<string, FieldData | ValidatedFieldData>;
+    name: string;
+    valid: boolean;
+}
+
+// TODO: Can we removed the checked value and set value to null if not checked?
 export interface CheckableFieldData extends FieldData {
     value: string;
     checked: boolean;
