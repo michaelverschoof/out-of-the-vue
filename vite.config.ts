@@ -1,7 +1,11 @@
+/// <reference types="vitest" />
+/// <reference types="histoire" />
+
 import vue from '@vitejs/plugin-vue';
 import { resolve } from 'path';
 import dts from 'vite-plugin-dts';
-import { defineConfig } from 'vitest/config';
+import { defineConfig } from "vite";
+import { HstVue } from "@histoire/plugin-vue";
 
 const src = resolve(__dirname, 'src');
 const test = resolve(__dirname, 'test');
@@ -39,6 +43,8 @@ export default defineConfig({
             rollupTypes: true
         })
     ],
+
+    // Vitest Configuration
     test: {
         coverage: {
             reporter: [ 'text', 'lcov' ]
@@ -47,5 +53,10 @@ export default defineConfig({
             const path = testPath.split('/').splice(-2);
             return `${ snapshots }/${ path[0] }/${ path[1] }${ snapExtension }`;
         }
+    },
+
+    // Histoire configuration
+    histoire: {
+        plugins: [ HstVue() ],
     }
 });

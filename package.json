@@ -4,6 +4,7 @@
     "description": "Functional UX components built with Vue 3",
     "version": "0.1.0-rc.36",
     "license": "MIT",
+    "type": "module",
     "publishConfig": {
         "registry": "https://registry.npmjs.org/"
     },
@@ -31,7 +32,10 @@
         "preview": "vite preview",
         "test": "vitest",
         "test:coverage": "vitest run --coverage",
-        "release": "npm install && npm run build && npm publish"
+        "release": "npm install && npm run build && npm publish",
+        "story": "histoire build",
+        "story:watch": "histoire dev",
+        "story:preview": "histoire preview"
     },
     "bugs": "https://github.com/michaelverschoof/out-of-the-vue/issues",
     "keywords": [
@@ -45,11 +49,13 @@
         "components"
     ],
     "devDependencies": {
+        "@histoire/plugin-vue": "^0.10.7",
         "@types/node": "^18.0.0",
         "@vitejs/plugin-vue": "^2.3.3",
         "@vue/test-utils": "^2.0.0",
         "c8": "^7.11.3",
         "happy-dom": "^5.3.2",
+        "histoire": "^0.10.7",
         "jsdom": "^20.0.0",
         "sass": "^1.53.0",
         "typescript": "^4.7.4",
