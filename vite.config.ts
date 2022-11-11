@@ -4,8 +4,8 @@
 import vue from '@vitejs/plugin-vue';
 import { resolve } from 'path';
 import dts from 'vite-plugin-dts';
-import { defineConfig } from "vite";
-import { HstVue } from "@histoire/plugin-vue";
+import { defineConfig } from 'vite';
+import { HstVue } from '@histoire/plugin-vue';
 
 const src = resolve(__dirname, 'src');
 const test = resolve(__dirname, 'test');
@@ -21,11 +21,11 @@ export default defineConfig({
     build: {
         target: 'esnext',
         lib: {
-            entry: `${ src }/index.ts`,
+            entry: `${src}/index.ts`,
             name: 'OutOfTheVue'
         },
         rollupOptions: {
-            external: [ 'vue' ],
+            external: ['vue'],
             output: {
                 exports: 'named',
                 assetFileNames: 'out-of-the-vue.[ext]',
@@ -47,16 +47,17 @@ export default defineConfig({
     // Vitest Configuration
     test: {
         coverage: {
-            reporter: [ 'text', 'lcov' ]
+            reporter: ['text', 'lcov']
         },
         resolveSnapshotPath: (testPath, snapExtension) => {
             const path = testPath.split('/').splice(-2);
-            return `${ snapshots }/${ path[0] }/${ path[1] }${ snapExtension }`;
+            return `${snapshots}/${path[0]}/${path[1]}${snapExtension}`;
         }
     },
 
     // Histoire configuration
     histoire: {
-        plugins: [ HstVue() ],
+        setupFile: './histoire/setup.ts',
+        plugins: [HstVue()]
     }
 });

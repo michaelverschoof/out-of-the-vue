@@ -1,0 +1,18 @@
+[data-test-id='sandbox-render'] {
+    *,
+    *:before,
+    *:after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+
+    [data-v-app] > * {
+        display: inline-block;
+        box-shadow: inset 0 0 0 1px #aa23bb;
+
+        > * {
+            box-shadow: inset 0 0 0 1px #00bab3;
+        }
+    }
+}
