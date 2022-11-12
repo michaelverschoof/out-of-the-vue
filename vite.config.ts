@@ -6,6 +6,7 @@ import { resolve } from 'path';
 import dts from 'vite-plugin-dts';
 import { defineConfig } from 'vite';
 import { HstVue } from '@histoire/plugin-vue';
+import { defaultColors } from 'histoire';
 
 const src = resolve(__dirname, 'src');
 const test = resolve(__dirname, 'test');
@@ -57,7 +58,13 @@ export default defineConfig({
 
     // Histoire configuration
     histoire: {
+        plugins: [HstVue()],
         setupFile: './histoire/setup.ts',
-        plugins: [HstVue()]
+        theme: {
+            title: 'Out of the Vue',
+            colors: {
+                primary: defaultColors.orange
+            }
+        }
     }
 });

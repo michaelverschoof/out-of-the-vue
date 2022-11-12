@@ -69,7 +69,7 @@ watch(
     }
 );
 
-watch([() => props.allowedCharacters, () => props.transformInput], () => {
+watch([() => props.allowedCharacters, () => props.transformInput, () => props.max], () => {
     characterRegex.value = getRegex(props.allowedCharacters);
 
     const value = filterAndTransform(model.value);
@@ -82,7 +82,7 @@ watch([() => props.allowedCharacters, () => props.transformInput], () => {
 
 watch(
     () => props.focus,
-    (received?: boolean) => {
+    (received: boolean) => {
         if (focused.value === received) {
             return;
         }
