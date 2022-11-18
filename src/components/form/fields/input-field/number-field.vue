@@ -1,12 +1,9 @@
 <template>
     <label class="number-field input-field" v-bind="include($attrs, ['class'])">
-
         <debouncer :delay="typingDelay" @updated="debounced">
             <template #default="{ debounce }">
-
                 <validator :validations="validationMethods" :trigger-validation="triggerValidation" @created="initialized" @updated="debounce">
                     <template #default="{ initialize, validate, invalid, showing, showValidity }">
-
                         <header v-if="$slots.label" class="label">
                             <slot name="label" />
                         </header>
@@ -24,7 +21,10 @@
                                     :allow-decimals="allowDecimals"
                                     :allow-negative="allowNegative"
                                     @focused="focused = true"
-                                    @blurred="focused = false; showValidity();"
+                                    @blurred="
+                                        focused = false;
+                                        showValidity();
+                                    "
                                     @created="initialize"
                                     @updated="validate"
                                 />
@@ -44,10 +44,8 @@
                         <slot :name="validation.name" />
                     </template>
                 </validator>
-
             </template>
         </debouncer>
-
     </label>
 </template>
 
@@ -61,7 +59,7 @@ import Validator from '@/functionals/validator.vue';
 import { exclude, include } from '@/util/attrs';
 import { computed, ref } from 'vue';
 
-const emit = defineEmits<{ (event: 'created' | 'updated', data: ValidatedFieldData): void; }>();
+const emit = defineEmits<{ (event: 'created' | 'updated', data: ValidatedFieldData): void }>();
 
 const props = withDefaults(
     defineProps<{
@@ -82,18 +80,18 @@ const props = withDefaults(
 const focused = ref<boolean>(false);
 
 const validationMethods = computed<ValidationMethod[]>(() => [
-    { ...predefinedValidations['required'], parameters: [ props.required ?? false ] },
-    { ...predefinedValidations['min-amount'], parameters: [ props.min ] },
-    { ...predefinedValidations['max-amount'], parameters: [ props.max ] },
-    ...props.validations ?? []
+    { ...predefinedValidations['required'], parameters: [props.required ?? false] },
+    { ...predefinedValidations['min-amount'], parameters: [props.min] },
+    { ...predefinedValidations['max-amount'], parameters: [props.max] },
+    ...(props.validations ?? [])
 ]);
 
 const initialized = (data: FieldData | ValidatedFieldData): void => {
-    emit('created', { ...data as ValidatedNumberFieldData });
+    emit('created', { ...(data as ValidatedNumberFieldData) });
 };
 
 const debounced = (data: FieldData | ValidatedFieldData): void => {
-    emit('updated', { ...data as ValidatedNumberFieldData });
+    emit('updated', { ...(data as ValidatedNumberFieldData) });
 };
 </script>
 
@@ -103,6 +101,6 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
-@use "../input-field";
+<style scoped>
+@import '../input-field';
 </style>

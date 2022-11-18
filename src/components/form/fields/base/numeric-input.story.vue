@@ -37,9 +37,10 @@
 </template>
 
 <script lang="ts" setup>
-import { reactive, ref } from 'vue';
-import NumericInput from './numeric-input.vue';
 import { logEvent } from 'histoire/client';
+import { reactive, ref } from 'vue';
+import { toggleDecimalInValue, toggleMinusInValue } from '../../../../../test/functions/numbers';
+import NumericInput from './numeric-input.vue';
 
 const state = reactive({
     value: -123.45,
@@ -49,40 +50,19 @@ const state = reactive({
 
 const previousDecimal = ref<number>(null);
 const toggleDecimal = () => {
-    const current = state.value.toString().replace(',', '.');
-    const index = current.indexOf('.');
-    if (index === -1) {
-        if (previousDecimal.value && current.length > previousDecimal.value) {
-            state.value = Number(injectDecimal(current, previousDecimal.value));
-            return;
-        }
-
-        state.value = Number(current.length > 2 ? injectDecimal(current, -2) : current + '.12');
-        return;
-    }
-
+    const { value, index } = toggleDecimalInValue(state.value, previousDecimal.value);
+    state.value = value;
     previousDecimal.value = index;
-    state.value = Number(current.replace('.', ''));
 };
 
 const toggleMinus = () => {
-    const current = state.value.toString();
-    if (current.startsWith('-')) {
-        state.value = Number(current.slice(1));
-        return;
-    }
-
-    state.value = Number('-' + current);
+    state.value = toggleMinusInValue(state.value);
 };
 
 const update = (event: any) => {
     state.value = event.value;
     logEvent('updated', event);
 };
-
-function injectDecimal(value: string, index: number) {
-    return value.slice(0, index) + '.' + value.slice(index);
-}
 </script>
 
 <docs lang="md">

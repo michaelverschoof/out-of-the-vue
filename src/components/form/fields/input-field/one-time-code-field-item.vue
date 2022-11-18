@@ -1,7 +1,6 @@
 <template>
     <validator :validations="validations" @created="(data) => emit('created', data)" @updated="(data) => emit('updated', data)">
         <template #default="{ initialize, validate, invalid }">
-
             <text-input
                 class="input"
                 transform-input="uppercase"
@@ -16,7 +15,6 @@
                 @updated="validate"
                 @keydown.delete.prevent="emit('cleared')"
             />
-
         </template>
     </validator>
 </template>
@@ -32,7 +30,7 @@ const emit = defineEmits<{
     (event: 'cleared'): void;
 }>();
 
-const props = defineProps<{
+defineProps<{
     index: number;
     name: string;
     value?: string;
@@ -43,7 +41,7 @@ const props = defineProps<{
 }>();
 </script>
 
-<style lang="scss" scoped>
+<style scoped>
 input.input {
     font-size: 1.5em;
     height: 2.25em;

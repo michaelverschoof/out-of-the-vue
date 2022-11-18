@@ -3,7 +3,6 @@
 
     <teleport :to="parent ?? 'body'">
         <transition name="modal">
-
             <div v-if="showing" ref="element" class="backdrop" tabindex="-1" @click.self="closeModal" @keydown.esc="closeModal">
                 <div v-bind="$attrs" class="modal">
                     <header v-if="$slots.header">
@@ -17,7 +16,6 @@
                     </footer>
                 </div>
             </div>
-
         </transition>
     </teleport>
 </template>
@@ -25,20 +23,23 @@
 <script lang="ts" setup>
 import { onMounted, onUnmounted, ref, watch } from 'vue';
 
-const emit = defineEmits<{ (event: 'opened' | 'closed'): void; }>();
+const emit = defineEmits<{ (event: 'opened' | 'closed'): void }>();
 
-const props = defineProps<{ parent?: string; open?: boolean; }>();
+const props = defineProps<{ parent?: string; open?: boolean }>();
 
 const element = ref<HTMLElement | null>(null);
 const showing = ref<boolean>(false);
 
-watch(() => props.open, (received?: boolean) => {
-    if (received === showing.value) {
-        return;
-    }
+watch(
+    () => props.open,
+    (received?: boolean) => {
+        if (received === showing.value) {
+            return;
+        }
 
-    !!received ? openModal() : closeModal();
-});
+        !!received ? openModal() : closeModal();
+    }
+);
 
 const openModal = (): void => {
     showing.value = true;
@@ -73,7 +74,7 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style scoped>
 .backdrop {
     align-items: center;
     display: flex;

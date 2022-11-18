@@ -1,16 +1,13 @@
 <template>
     <fieldset class="one-time-code-field input-field" @paste.prevent="filterPasteData">
-
         <validator :validations="fieldValidations" :trigger-validation="triggerValidation" @created="fieldInitialized" @updated="fieldValidated">
             <template #default="{ initialize: initializeState, validate: validateState, invalid: invalidState, showing, showValidity }">
-
                 <header v-if="$slots.label" class="label">
                     <slot name="label" />
                 </header>
 
                 <main ref="main" tabindex="-1" @blur.prevent.capture="fieldBlurred(showValidity)">
                     <template v-for="(number, index) of length">
-
                         <one-time-code-field-item
                             :index="index"
                             :name="name"
@@ -21,36 +18,46 @@
                             :value="state.value[index]"
                             @focused="focusedElement = index"
                             @created="initializeState(toRaw(state))"
-                            @updated="(data) => { inputValidated(index, data); validateState(toRaw(state)) }"
+                            @updated="
+                                (data) => {
+                                    inputValidated(index, data);
+                                    validateState(toRaw(state));
+                                }
+                            "
                             @cleared="cleared(index)"
                         />
-
                     </template>
                 </main>
 
                 <footer v-if="$slots.information && !(invalidState && showing)" class="information">
                     <slot name="information" />
                 </footer>
-
             </template>
 
             <template v-for="validation of fieldValidations" #[validation.name]>
                 <slot :name="validation.name" />
             </template>
         </validator>
-
     </fieldset>
 </template>
 
 <script lang="ts" setup>
 import OneTimeCodeFieldItem from '@/components/form/fields/input-field/one-time-code-field-item.vue';
-import { FieldData, UpdateEmitType, ValidatedFieldData, ValidatedStringArrayFieldData, ValidatedStringFieldData, ValidationMethod, ValidationMethodParameters } from '@/composables/types';
+import {
+    FieldData,
+    UpdateEmitType,
+    ValidatedFieldData,
+    ValidatedStringArrayFieldData,
+    ValidatedStringFieldData,
+    ValidationMethod,
+    ValidationMethodParameters
+} from '@/composables/types';
 import { predefinedValidations } from '@/composables/validate';
 import Validator from '@/functionals/validator.vue';
 import { filter, shorten, transform } from '@/util/strings';
 import { computed, onMounted, reactive, ref, toRaw, watch } from 'vue';
 
-const emit = defineEmits<{ (event: 'created' | 'updated', data: ValidatedFieldData): void; }>();
+const emit = defineEmits<{ (event: 'created' | 'updated', data: ValidatedFieldData): void }>();
 
 const props = withDefaults(
     defineProps<{
@@ -65,29 +72,27 @@ const props = withDefaults(
     { type: 'alphanumeric', length: 6 }
 );
 
-const inputValidations = computed<ValidationMethod[]>(() => [
-    { ...predefinedValidations['required'], parameters: [ props.required ] }
-]);
+const inputValidations = computed<ValidationMethod[]>(() => [{ ...predefinedValidations['required'], parameters: [props.required] }]);
 
 const fieldValidations = computed<ValidationMethod[]>(() => [
     {
         name: 'required',
-        parameters: [ props.required, props.length ],
+        parameters: [props.required, props.length],
         validator: (data: FieldData, ...parameters: ValidationMethodParameters): boolean => {
-            const required = <boolean> parameters[0];
-            const length = <number> parameters[1];
-            const value = <(string | null)[]> data.value;
-            return !required || (!!value && value.length === length && value.every(val => val !== null));
+            const required = <boolean>parameters[0];
+            const length = <number>parameters[1];
+            const value = <(string | null)[]>data.value;
+            return !required || (!!value && value.length === length && value.every((val) => val !== null));
         }
     },
-    ...props.validations ?? []
+    ...(props.validations ?? [])
 ]);
 
 const state = reactive<ValidatedStringArrayFieldData>({
     name: props.name,
     value: [],
     valid: !props.required,
-    failed: props.required ? [ 'required' ] : []
+    failed: props.required ? ['required'] : []
 });
 
 /**
@@ -103,13 +108,16 @@ const focusedElement = computed({
     }
 });
 
-watch(() => props.focus, (received?: boolean): void => {
-    if (received) {
-        return autoFocus();
-    }
+watch(
+    () => props.focus,
+    (received?: boolean): void => {
+        if (received) {
+            return autoFocus();
+        }
 
-    focusedElement.value = -1;
-});
+        focusedElement.value = -1;
+    }
+);
 
 const inputValidated = (index: number, data: ValidatedStringFieldData): void => {
     state.value[index] = shorten(data.value, 1);
@@ -144,7 +152,7 @@ const fieldBlurred = (showValidity: () => void): void => {
     });
 };
 
-const allowedCharacters = computed(() => `[${ props.type !== 'numeric' ? 'A-z' : '' }${ props.type !== 'alpha' ? '0-9' : '' }]`);
+const allowedCharacters = computed(() => `[${props.type !== 'numeric' ? 'A-z' : ''}${props.type !== 'alpha' ? '0-9' : ''}]`);
 
 const filterPasteData = (event: ClipboardEvent): void => {
     const value = event.clipboardData?.getData('text');
@@ -159,7 +167,7 @@ const filterPasteData = (event: ClipboardEvent): void => {
     }
 
     const transformed = transform(shorten(filtered, props.length), 'uppercase').split('');
-    state.value = [ ...new Array(props.length) ].map((item, index) => transformed[index] ?? null);
+    state.value = [...new Array(props.length)].map((item, index) => transformed[index] ?? null);
 
     autoFocus();
     updatedState('updated');
@@ -175,7 +183,7 @@ const cleared = (index: number): void => {
 };
 
 function setEmptyValueForState() {
-    state.value = [ ...new Array(props.length) ].map(() => null);
+    state.value = [...new Array(props.length)].map(() => null);
 }
 
 function updatedState(event: UpdateEmitType): void {
@@ -199,10 +207,10 @@ onMounted(() => {
 });
 </script>
 
-<style lang="scss" scoped>
-@use "../input-field";
+<style scoped>
+@import '../input-field';
 
 .one-time-code-field main {
-    grid-template-columns: repeat(v-bind("props.length"), 1fr);
+    grid-template-columns: repeat(v-bind('props.length'), 1fr);
 }
 </style>

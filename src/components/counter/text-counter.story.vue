@@ -49,9 +49,3 @@ This counter can be set to count characters or words (separated by space).
 
 When the limit is exceeded, an `exceeded`-class is added to the element.
 </docs>
-
-<style lang="scss" scoped>
-.counter.exceeded {
-    color: orangered;
-}
-</style>

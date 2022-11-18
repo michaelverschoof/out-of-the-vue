@@ -1,12 +1,12 @@
 /// <reference types="vitest" />
 /// <reference types="histoire" />
 
-import vue from '@vitejs/plugin-vue';
-import { resolve } from 'path';
-import dts from 'vite-plugin-dts';
-import { defineConfig } from 'vite';
 import { HstVue } from '@histoire/plugin-vue';
+import vue from '@vitejs/plugin-vue';
 import { defaultColors } from 'histoire';
+import { resolve } from 'path';
+import { defineConfig } from 'vite';
+import dts from 'vite-plugin-dts';
 
 const src = resolve(__dirname, 'src');
 const test = resolve(__dirname, 'test');

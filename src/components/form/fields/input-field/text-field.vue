@@ -1,19 +1,16 @@
 <template>
     <label class="text-field input-field" v-bind="include($attrs, ['class'])">
-
         <debouncer :delay="typingDelay" @updated="validated">
             <template #default="{ debounce }">
-
                 <validator :validations="validationMethods" :trigger-validation="triggerValidation" @created="initialized" @updated="debounce">
                     <template #default="{ initialize, validate, invalid, showing, showValidity }">
-
                         <header v-if="$slots.label" class="label">
                             <slot name="label" />
                         </header>
 
                         <main class="input" :class="{ focused, invalid: invalid && showing }">
                             <prepend-append>
-                                <template #prepend>
+                                <template v-if="providedPrepend" #prepend>
                                     <slot name="prepend" />
                                 </template>
 
@@ -23,12 +20,15 @@
                                     :value="value"
                                     :allowed-characters="allowedCharacters"
                                     @focused="focused = true"
-                                    @blurred="focused = false; showValidity();"
+                                    @blurred="
+                                        focused = false;
+                                        showValidity();
+                                    "
                                     @created="initialize"
                                     @updated="validate"
                                 />
 
-                                <template #append>
+                                <template v-if="providedAppend" #append>
                                     <slot name="append" />
                                 </template>
                             </prepend-append>
@@ -37,17 +37,14 @@
                         <footer v-if="$slots.information && !(invalid && showing)" class="information">
                             <slot name="information" />
                         </footer>
-
                     </template>
 
                     <template v-for="validation of validationMethods" #[validation.name]>
                         <slot :name="validation.name" />
                     </template>
                 </validator>
-
             </template>
         </debouncer>
-
     </label>
 </template>
 
@@ -59,9 +56,10 @@ import { predefinedValidations } from '@/composables/validate';
 import Debouncer from '@/functionals/debouncer.vue';
 import Validator from '@/functionals/validator.vue';
 import { exclude, include } from '@/util/attrs';
-import { computed, ref } from 'vue';
+import { computed, ref, useSlots, watch } from 'vue';
+import { provided } from '@/util/slots';
 
-const emit = defineEmits<{ (event: 'created' | 'updated', data: FieldData | ValidatedFieldData): void; }>();
+const emit = defineEmits<{ (event: 'created' | 'updated', data: FieldData | ValidatedFieldData): void }>();
 
 const props = defineProps<{
     name: string;
@@ -78,19 +76,23 @@ const props = defineProps<{
 const focused = ref<boolean>(false);
 
 const validationMethods = computed<ValidationMethod[]>(() => [
-    { ...predefinedValidations['required'], parameters: [ props.required ] },
-    { ...predefinedValidations['min-length'], parameters: [ props.min ] },
-    { ...predefinedValidations['max-length'], parameters: [ props.max ] },
-    ...props.validations ?? []
+    { ...predefinedValidations['required'], parameters: [props.required] },
+    { ...predefinedValidations['min-length'], parameters: [props.min] },
+    { ...predefinedValidations['max-length'], parameters: [props.max] },
+    ...(props.validations ?? [])
 ]);
 
 const initialized = (data: FieldData | ValidatedFieldData): void => {
-    emit('created', { ...data as ValidatedStringFieldData });
+    emit('created', { ...(data as ValidatedStringFieldData) });
 };
 
 const validated = (data: FieldData | ValidatedFieldData): void => {
-    emit('updated', { ...data as ValidatedStringFieldData });
+    emit('updated', { ...(data as ValidatedStringFieldData) });
 };
+
+const slots = useSlots();
+const providedPrepend = computed(() => provided(slots.prepend));
+const providedAppend = computed(() => provided(slots.append));
 </script>
 
 <script lang="ts">
@@ -99,6 +101,6 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
-@use "../input-field";
+<style scoped>
+@import '../input-field';
 </style>

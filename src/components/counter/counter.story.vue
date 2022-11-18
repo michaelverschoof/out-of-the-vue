@@ -39,9 +39,3 @@ Built for adding a counter to input fields, but usable in other places as well.
 
 When the limit is exceeded, an `exceeded`-class is added to the element.
 </docs>
-
-<style lang="scss" scoped>
-.counter.exceeded {
-    color: orangered;
-}
-</style>

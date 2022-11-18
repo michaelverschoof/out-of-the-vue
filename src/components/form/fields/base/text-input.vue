@@ -164,7 +164,7 @@ onMounted(() => {
 });
 </script>
 
-<style lang="scss" scoped>
+<style scoped>
 .text-input {
     border: none;
     color: inherit;
