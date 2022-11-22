@@ -41,7 +41,7 @@ defineProps<{
 }>();
 </script>
 
-<style scoped>
+<style lang="postcss" scoped>
 input.input {
     font-size: 1.5em;
     height: 2.25em;

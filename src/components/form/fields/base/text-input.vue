@@ -164,7 +164,7 @@ onMounted(() => {
 });
 </script>
 
-<style scoped>
+<style lang="postcss" scoped>
 .text-input {
     border: none;
     color: inherit;

@@ -8,7 +8,6 @@ body.show-grid-lines {
             @apply border-cyan-500;
             margin: 3px;
             padding: 3px;
-            /* padding-right: 3px; */
         }
     }
 }

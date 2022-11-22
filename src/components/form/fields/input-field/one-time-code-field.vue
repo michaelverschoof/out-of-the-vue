@@ -207,8 +207,8 @@ onMounted(() => {
 });
 </script>
 
-<style scoped>
-@import '../input-field';
+<style lang="postcss" scoped>
+@import '@/components/form/fields/input-field';
 
 .one-time-code-field main {
     grid-template-columns: repeat(v-bind('props.length'), 1fr);

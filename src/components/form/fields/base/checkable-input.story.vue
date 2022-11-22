@@ -20,9 +20,9 @@
 </template>
 
 <script lang="ts" setup>
-import { reactive } from 'vue';
-import CheckableInput from './checkable-input.vue';
+import CheckableInput from '@/components/form/fields/base/checkable-input.vue';
 import { logEvent } from 'histoire/client';
+import { reactive } from 'vue';
 
 interface State {
     value: string;

@@ -25,9 +25,9 @@
 </template>
 
 <script lang="ts" setup>
-import { reactive } from 'vue';
-import TextInput from './text-input.vue';
+import TextInput from '@/components/form/fields/base/text-input.vue';
 import { logEvent } from 'histoire/client';
+import { reactive } from 'vue';
 
 const types = [
     { label: 'Input', value: 'input' },

@@ -17,7 +17,7 @@
             </text-field>
         </variant>
 
-        <variant title="With prepend and append">
+        <variant title="With inner icons">
             <text-field name="histoire-text-field-3" :value="state.value" @created="logEvent('created', $event)" @updated="logEvent('updated', $event)">
                 <template #label>Field label</template>
                 <template #information>Helpful text on how to fill in the field</template>
@@ -26,7 +26,18 @@
             </text-field>
         </variant>
 
-        <variant title="Inside another prepend and append for outer icons">
+        <variant title="With outer icons">
+            <prepend-append>
+                <text-field name="histoire-text-field-3" :value="state.value" @created="logEvent('created', $event)" @updated="logEvent('updated', $event)">
+                    <template #label>Field label</template>
+                    <template #information>Helpful text on how to fill in the field</template>
+                </text-field>
+                <template #prepend><icon icon="mdi:airballoon" /></template>
+                <template #append><icon icon="mdi:airplane" /></template>
+            </prepend-append>
+        </variant>
+
+        <variant title="With inner and outer icons">
             <prepend-append>
                 <text-field name="histoire-text-field-3" :value="state.value" @created="logEvent('created', $event)" @updated="logEvent('updated', $event)">
                     <template #label>Field label</template>
@@ -34,8 +45,8 @@
                     <template #prepend><icon icon="mdi:airballoon" /></template>
                     <template #append><icon icon="mdi:airplane" /></template>
                 </text-field>
-                <template #prepend><icon icon="mdi:airballoon" width="3rem" /></template>
-                <template #append><icon icon="mdi:airplane" width="3rem" /></template>
+                <template #prepend><icon icon="mdi:airballoon" /></template>
+                <template #append><icon icon="mdi:airplane" /></template>
             </prepend-append>
         </variant>
 
@@ -53,12 +64,12 @@
 </template>
 
 <script lang="ts" setup>
+import TextField from '@/components/form/fields/input-field/text-field.vue';
+import PrependAppend from '@/components/layout/prepend-append.vue';
 import { Icon } from '@iconify/vue';
+import ShowGridLines from '@test/components/show-grid-lines.vue';
 import { logEvent } from 'histoire/client';
 import { reactive } from 'vue';
-import ShowGridLines from '../../../../../test/components/show-grid-lines.vue';
-import PrependAppend from '../../../layout/prepend-append.vue';
-import TextField from './text-field.vue';
 
 const state = reactive({
     value: 'Some value',
@@ -78,5 +89,3 @@ It also contains the structure to add a label above the input,
 hint information below the input, error messages and prepended/appended icons.
 All of these can be any text or HTML that you want so you can build the field how you want it.
 </docs>
-
-<style scoped></style>

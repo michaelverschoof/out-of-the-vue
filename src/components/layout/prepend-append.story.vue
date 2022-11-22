@@ -34,7 +34,7 @@
             </prepend-append>
         </variant>
 
-        <variant title="Empty" icon="lucide:arrow-left">
+        <variant title="Empty">
             <prepend-append>
                 <span class="text">Content in a span</span>
             </prepend-append>
@@ -47,9 +47,9 @@
 </template>
 
 <script lang="ts" setup>
+import PrependAppend from '@/components/layout/prepend-append.vue';
 import { Icon } from '@iconify/vue';
-import ShowGridLines from '../../../test/components/show-grid-lines.vue';
-import PrependAppend from './prepend-append.vue';
+import ShowGridLines from '@test/components/show-grid-lines.vue';
 </script>
 
 <docs lang="md">

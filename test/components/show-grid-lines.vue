@@ -18,7 +18,7 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, ref, watch } from 'vue';
+import { ref, watch } from 'vue';
 
 const props = defineProps<{ show?: boolean }>();
 
@@ -38,7 +38,7 @@ watch(
 );
 </script>
 
-<style scoped>
+<style lang="postcss" scoped>
 .container {
     @apply border-b;
     @apply border-gray-600;

@@ -28,7 +28,7 @@
             </number-field>
         </variant>
 
-        <variant title="With prepend and append">
+        <variant title="With inner icons">
             <number-field
                 name="histoire-text-field-prepend-append"
                 :value="state.value"
@@ -45,7 +45,25 @@
             </number-field>
         </variant>
 
-        <variant title="Inside another prepend and append for outer icons">
+        <variant title="With outer icons">
+            <prepend-append>
+                <number-field
+                    name="histoire-text-field-nested-prepend-append"
+                    :value="state.value"
+                    :allow-decimals="true"
+                    :allow-negative="true"
+                    @created="logEvent('created', $event)"
+                    @updated="update"
+                >
+                    <template #label>Field label</template>
+                    <template #information>Helpful text on how to fill in the field</template>
+                </number-field>
+                <template #prepend><icon icon="mdi:airballoon" /></template>
+                <template #append><icon icon="mdi:airplane" /></template>
+            </prepend-append>
+        </variant>
+
+        <variant title="With inner and outer icons">
             <prepend-append>
                 <number-field
                     name="histoire-text-field-nested-prepend-append"
@@ -60,8 +78,8 @@
                     <template #prepend><icon icon="mdi:airballoon" /></template>
                     <template #append><icon icon="mdi:airplane" /></template>
                 </number-field>
-                <template #prepend><icon icon="mdi:airballoon" width="3rem" /></template>
-                <template #append><icon icon="mdi:airplane" width="3rem" /></template>
+                <template #prepend><icon icon="mdi:airballoon" /></template>
+                <template #append><icon icon="mdi:airplane" /></template>
             </prepend-append>
         </variant>
 
@@ -127,14 +145,14 @@
 </template>
 
 <script lang="ts" setup>
+import NumberField from '@/components/form/fields/input-field/number-field.vue';
+import PrependAppend from '@/components/layout/prepend-append.vue';
 import { SubmittedSymbol } from '@/composables/types';
 import { Icon } from '@iconify/vue';
+import ShowGridLines from '@test/components/show-grid-lines.vue';
+import { toggleDecimalInValue, toggleMinusInValue } from '@test/functions/numbers';
 import { logEvent } from 'histoire/client';
 import { provide, reactive, ref } from 'vue';
-import ShowGridLines from '../../../../../test/components/show-grid-lines.vue';
-import { toggleDecimalInValue, toggleMinusInValue } from '../../../../../test/functions/numbers';
-import PrependAppend from '../../../layout/prepend-append.vue';
-import NumberField from './number-field.vue';
 
 const validate = ref<boolean>(false);
 provide(SubmittedSymbol, validate);
@@ -167,13 +185,11 @@ const update = (event: any) => {
 </script>
 
 <docs lang="md">
-# Text field
+# Number field
 
-The text field provides a structured way of building form fields.
+The number field provides a structured way of building form fields.
 This field allows for validations with pre-built validations enabled by default.
 It also contains the structure to add a label above the input,
 hint information below the input, error messages and prepended/appended icons.
 All of these can be any text or HTML that you want so you can build the field how you want it.
 </docs>
-
-<style scoped></style>

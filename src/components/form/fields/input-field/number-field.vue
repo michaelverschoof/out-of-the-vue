@@ -101,6 +101,6 @@ export default {
 };
 </script>
 
-<style scoped>
-@import '../input-field';
+<style lang="postcss" scoped>
+@import '@/components/form/fields/input-field';
 </style>

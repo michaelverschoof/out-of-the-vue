@@ -51,15 +51,15 @@
 <script lang="ts" setup>
 import TextInput from '@/components/form/fields/base/text-input.vue';
 import PrependAppend from '@/components/layout/prepend-append.vue';
-import { FieldData, ValidatedFieldData, ValidatedStringFieldData, ValidationMethod } from '@/composables/types';
+import { FieldData, ValidatedFieldData, ValidationMethod } from '@/composables/types';
 import { predefinedValidations } from '@/composables/validate';
 import Debouncer from '@/functionals/debouncer.vue';
 import Validator from '@/functionals/validator.vue';
 import { exclude, include } from '@/util/attrs';
-import { computed, ref, useSlots, watch } from 'vue';
 import { provided } from '@/util/slots';
+import { computed, ref, useSlots } from 'vue';
 
-const emit = defineEmits<{ (event: 'created' | 'updated', data: FieldData | ValidatedFieldData): void }>();
+const emit = defineEmits<{ (event: 'created' | 'updated', data: ValidatedFieldData): void }>();
 
 const props = defineProps<{
     name: string;
@@ -83,11 +83,11 @@ const validationMethods = computed<ValidationMethod[]>(() => [
 ]);
 
 const initialized = (data: FieldData | ValidatedFieldData): void => {
-    emit('created', { ...(data as ValidatedStringFieldData) });
+    emit('created', { ...(data as ValidatedFieldData) });
 };
 
 const validated = (data: FieldData | ValidatedFieldData): void => {
-    emit('updated', { ...(data as ValidatedStringFieldData) });
+    emit('updated', { ...(data as ValidatedFieldData) });
 };
 
 const slots = useSlots();
@@ -101,6 +101,6 @@ export default {
 };
 </script>
 
-<style scoped>
-@import '../input-field';
+<style lang="postcss" scoped>
+@import '@/components/form/fields/input-field';
 </style>

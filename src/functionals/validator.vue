@@ -3,7 +3,7 @@
 
     <template v-if="!state.valid && showing">
         <template v-for="validation of validations">
-            <strong v-if="provided($slots[validation.name]) && state.failed[0] === validation.name" class="validation-error">
+            <strong v-if="provided($slots[validation.name]) && state.failed[0] === validation.name" class="validation-error" :class="validation.name">
                 <slot :name="validation.name" />
             </strong>
         </template>
@@ -16,9 +16,9 @@ import { useValidate } from '@/composables/validate';
 import { provided } from '@/util/slots';
 import { inject, reactive, ref, watch } from 'vue';
 
-const emit = defineEmits<{ (event: 'created' | 'updated', data: ValidatedFieldData): void; }>();
+const emit = defineEmits<{ (event: 'created' | 'updated', data: ValidatedFieldData): void }>();
 
-const props = defineProps<{ validations?: ValidationMethod[]; triggerValidation?: string; }>();
+const props = defineProps<{ validations?: ValidationMethod[]; triggerValidation?: string }>();
 
 const state = reactive<ValidatedFieldData>({
     name: null,
@@ -27,47 +27,58 @@ const state = reactive<ValidatedFieldData>({
     failed: []
 });
 
-watch(() => props.validations, () => {
-    revalidate();
-});
+watch(
+    () => props.validations,
+    () => {
+        revalidate();
+    }
+);
 
 const triggeredSubmitValidation = inject(SubmittedSymbol, ref<boolean>(false));
 const { validate: validateInput } = useValidate();
 
-watch(triggeredSubmitValidation, (received: boolean) => {
-    if (!received && !props.triggerValidation) {
-        showing.value = false;
-        return;
+watch(
+    () => triggeredSubmitValidation.value,
+    (received: boolean) => {
+        console.log('hi');
+
+        if (!received && !props.triggerValidation) {
+            showing.value = false;
+            return;
+        }
+
+        revalidate();
+
+        showing.value = true;
     }
-
-    revalidate();
-
-    showing.value = true;
-});
+);
 
 const triggeredValidation = ref<string | null>(null);
 
-watch(() => props.triggerValidation, (received?: string) => {
-    if (!received) {
-        state.failed = state.failed.filter(item => item !== triggeredValidation.value);
-        state.valid = !!state.failed.length;
-        showing.value = !state.valid;
-        return;
-    }
+watch(
+    () => props.triggerValidation,
+    (received?: string) => {
+        if (!received) {
+            state.failed = state.failed.filter((item) => item !== triggeredValidation.value);
+            state.valid = !!state.failed.length;
+            showing.value = !state.valid;
+            return;
+        }
 
-    const validation = props.validations?.find(validation => validation.name === received);
-    if (!validation) {
-        return;
-    }
+        const validation = props.validations?.find((validation) => validation.name === received);
+        if (!validation) {
+            return;
+        }
 
-    triggeredValidation.value = received;
+        triggeredValidation.value = received;
 
-    state.valid = false;
-    showing.value = true;
-    if (!state.failed.includes(received)) {
-        state.failed.push(received);
+        state.valid = false;
+        showing.value = true;
+        if (!state.failed.includes(received)) {
+            state.failed.push(received);
+        }
     }
-});
+);
 
 const showing = ref<boolean>(false);
 

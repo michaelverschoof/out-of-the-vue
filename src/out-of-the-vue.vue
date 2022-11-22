@@ -107,7 +107,7 @@ const onUpdated = (data: ValidatedFieldData): void => {
 const modalOpened = ref<boolean>(false);
 </script>
 
-<style>
+<style lang="postcss">
 *,
 *:before,
 *:after {

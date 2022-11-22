@@ -37,10 +37,10 @@
 </template>
 
 <script lang="ts" setup>
+import NumericInput from '@/components/form/fields/base/numeric-input.vue';
+import { toggleDecimalInValue, toggleMinusInValue } from '@test/functions/numbers';
 import { logEvent } from 'histoire/client';
 import { reactive, ref } from 'vue';
-import { toggleDecimalInValue, toggleMinusInValue } from '../../../../../test/functions/numbers';
-import NumericInput from './numeric-input.vue';
 
 const state = reactive({
     value: -123.45,

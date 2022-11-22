@@ -27,7 +27,7 @@ const providedPrepend = computed(() => provided(slots.prepend));
 const providedAppend = computed(() => provided(slots.append));
 </script>
 
-<style scoped>
+<style lang="postcss" scoped>
 .prepend-append {
     align-items: stretch;
     display: grid;

@@ -175,8 +175,8 @@ function filterSelected(selected?: (string | null)[]): string[] {
 }
 </script>
 
-<style scoped>
-@import '../input-field.css';
+<style lang="postcss" scoped>
+@import '@/components/form/fields/input-field';
 
 .checkable-field-item {
     align-items: center;

@@ -16,8 +16,8 @@
 </template>
 
 <script lang="ts" setup>
+import TextCounter from '@/components/counter/text-counter.vue';
 import { reactive, watch } from 'vue';
-import TextCounter from './text-counter.vue';
 
 const state = reactive({
     value: 'some value',

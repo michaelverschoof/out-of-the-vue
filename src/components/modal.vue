@@ -74,7 +74,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style lang="postcss" scoped>
 .backdrop {
     align-items: center;
     display: flex;

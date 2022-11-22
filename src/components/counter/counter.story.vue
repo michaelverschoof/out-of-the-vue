@@ -10,8 +10,8 @@
 </template>
 
 <script lang="ts" setup>
+import Counter from '@/components/counter/counter.vue';
 import { reactive, watch } from 'vue';
-import Counter from './counter.vue';
 
 const state = reactive({
     value: 'some value',
