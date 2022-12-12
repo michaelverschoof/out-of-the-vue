@@ -71,10 +71,10 @@ const state = reactive({
 <docs lang="md">
 # Text field
 
-The text field provides a structured way of building form fields.
+The one time code field provides a structured way of building form fields.
 
-This field allows for debouncing input and custom validations with pre-built validations enabled by default.
-It also contains the structure to add a label above the input, hint information below the input, error messages and prepended/appended icons.
+This field allows for custom validations with pre-built validations enabled by default.
+It also contains the structure to add a label above the input, hint information below the input and error messages.
 
 All of these can be any text or HTML that you want so you can build the field how you want it.
 </docs>
