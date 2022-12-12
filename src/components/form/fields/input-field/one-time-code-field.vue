@@ -119,8 +119,8 @@ watch(
     }
 );
 
-const inputValidated = (index: number, data: ValidatedStringFieldData): void => {
-    state.value[index] = shorten(data.value, 1);
+const inputValidated = (index: number, data: ValidatedFieldData): void => {
+    state.value[index] = shorten((data as ValidatedStringFieldData).value, 1);
     if (!data.valid) {
         return;
     }
@@ -187,7 +187,7 @@ function setEmptyValueForState() {
 }
 
 function updatedState(event: UpdateEmitType): void {
-    const emitData: ValidatedFieldData = {
+    const emitData: ValidatedStringFieldData = {
         name: state.name,
         value: state.value?.join('') || null,
         valid: state.valid,

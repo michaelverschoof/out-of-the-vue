@@ -37,21 +37,16 @@ watch(
 const triggeredSubmitValidation = inject(SubmittedSymbol, ref<boolean>(false));
 const { validate: validateInput } = useValidate();
 
-watch(
-    () => triggeredSubmitValidation.value,
-    (received: boolean) => {
-        console.log('hi');
-
-        if (!received && !props.triggerValidation) {
-            showing.value = false;
-            return;
-        }
-
-        revalidate();
-
-        showing.value = true;
+watch(triggeredSubmitValidation, (received: boolean) => {
+    if (!received && !props.triggerValidation) {
+        showing.value = false;
+        return;
     }
-);
+
+    revalidate();
+
+    showing.value = true;
+});
 
 const triggeredValidation = ref<string | null>(null);
 

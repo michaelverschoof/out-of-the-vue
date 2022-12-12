@@ -19,6 +19,7 @@
                                     :name="name"
                                     :value="value"
                                     :allowed-characters="allowedCharacters"
+                                    :max="maxLength"
                                     @focused="focused = true"
                                     @blurred="
                                         focused = false;
@@ -66,9 +67,10 @@ const props = defineProps<{
     value?: string;
     typingDelay?: number;
     allowedCharacters?: string;
-    required?: boolean;
-    min?: number;
+    maxLength?: number;
     max?: number;
+    min?: number;
+    required?: boolean;
     validations?: ValidationMethod[];
     triggerValidation?: string;
 }>();

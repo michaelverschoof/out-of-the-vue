@@ -26,11 +26,6 @@ body.show-grid-lines {
     }
 
     [data-v-app] {
-        p {
-            font-size: 1rem;
-            padding-bottom: 0.5rem;
-        }
-
         svg {
             @apply text-emerald-600;
             min-height: 1.5rem;
@@ -49,11 +44,21 @@ body.show-grid-lines {
 
 [data-test-id='story-controls'] {
     h3 {
+        @apply font-medium;
+        @apply mb-2;
+        @apply mt-4;
         @apply px-2;
         @apply text-base;
-        @apply font-medium;
-        @apply mt-4;
-        @apply mb-2;
         @apply text-gray-500;
+    }
+
+    i {
+        @apply block;
+        @apply italic;
+        @apply mb-2;
+        @apply px-2;
+        @apply text-base;
+        @apply text-gray-500;
+        @apply text-sm;
     }
 }

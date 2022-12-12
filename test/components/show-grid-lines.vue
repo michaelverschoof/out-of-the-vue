@@ -14,6 +14,7 @@
                 </span>
             </span>
         </label>
+        <i>This adds dashed borders to the first two levels of elements in order to show the structure of the elements.</i>
     </div>
 </template>
 
