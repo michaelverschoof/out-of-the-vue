@@ -6,9 +6,9 @@
 import { useDebounce } from '@/composables/debounce';
 import { FieldData, ValidatedFieldData } from '@/composables/types';
 
-const emit = defineEmits<{ (event: 'created' | 'updated', data: FieldData | ValidatedFieldData): void; }>();
+const emit = defineEmits<{ (event: 'created' | 'updated', data: FieldData | ValidatedFieldData): void }>();
 
-const props = defineProps<{ delay?: number; }>();
+const props = defineProps<{ delay?: number }>();
 
 const { debounce: debounceInput } = useDebounce();
 

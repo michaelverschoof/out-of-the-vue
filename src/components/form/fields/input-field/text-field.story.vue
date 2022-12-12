@@ -2,7 +2,7 @@
     <story title="Components/Input field/Text field" :layout="{ type: 'grid', width: 400 }" auto-props-disabled>
         <variant title="Simple">
             <text-field
-                name="histoire-text-field"
+                name="histoire-text-field-simple"
                 :value="state.value"
                 :typing-delay="state.delay"
                 :max-length="state.maxLength"
@@ -13,7 +13,7 @@
 
         <variant title="With label and information">
             <text-field
-                name="histoire-text-field-2"
+                name="histoire-text-field-labels"
                 :value="state.value"
                 :typing-delay="state.delay"
                 :max-length="state.maxLength"
@@ -27,7 +27,7 @@
 
         <variant title="With inner icons">
             <text-field
-                name="histoire-text-field-3"
+                name="histoire-text-field-inner-icons"
                 :typing-delay="state.delay"
                 :max-length="state.maxLength"
                 :value="state.value"
@@ -44,7 +44,7 @@
         <variant title="With outer icons">
             <prepend-append>
                 <text-field
-                    name="histoire-text-field-3"
+                    name="histoire-text-field-outer-icons"
                     :typing-delay="state.delay"
                     :max-length="state.maxLength"
                     :value="state.value"
@@ -62,7 +62,7 @@
         <variant title="With inner and outer icons">
             <prepend-append>
                 <text-field
-                    name="histoire-text-field-3"
+                    name="histoire-text-field-inner-and-outer-icons"
                     :typing-delay="state.delay"
                     :max-length="state.maxLength"
                     :value="state.value"
@@ -81,13 +81,13 @@
 
         <variant title="With validations">
             <text-field
-                name="histoire-text-field-2"
+                name="histoire-text-field-validations"
                 :value="state.value"
                 :typing-delay="state.delay"
                 :max="state.max"
                 :min="state.min"
                 @created="logEvent('created', $event)"
-                @updated="update"
+                @updated="logEvent('updated', $event)"
             >
                 <template #label>Field label</template>
                 <template #information><i>Helpful text on how to fill in the field</i></template>
@@ -129,6 +129,11 @@ import { reactive, ref } from 'vue';
 
 const validate = ref<boolean>(false);
 
+const submit = () => {
+    console.log('submit');
+    console.log(state.value);
+};
+
 const state = reactive({
     value: 'Some value',
     delay: 200,
@@ -137,19 +142,15 @@ const state = reactive({
     max: 15,
     maxLength: 25
 });
-
-const update = (event: any) => {
-    state.value = event.value;
-    logEvent('updated', event);
-};
 </script>
 
 <docs lang="md">
 # Text field
 
 The text field provides a structured way of building form fields.
-This field allows for validations with pre-built validations enabled by default.
-It also contains the structure to add a label above the input,
-hint information below the input, error messages and prepended/appended icons.
+
+This field allows for debouncing input and custom validations with pre-built validations enabled by default.
+It also contains the structure to add a label above the input, hint information below the input, error messages and prepended/appended icons.
+
 All of these can be any text or HTML that you want so you can build the field how you want it.
 </docs>

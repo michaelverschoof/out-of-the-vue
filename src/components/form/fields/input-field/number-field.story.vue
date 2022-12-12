@@ -2,26 +2,26 @@
     <story title="Components/Input field/Number field" :layout="{ type: 'grid', width: 400 }" auto-props-disabled>
         <variant title="Simple">
             <number-field
-                name="histoire-text-field-simple"
+                name="histoire-number-field-simple"
                 :value="state.value"
                 :typing-delay="state.delay"
                 :allow-decimals="true"
                 :allow-negative="true"
                 required
                 @created="logEvent('created', $event)"
-                @updated="update"
+                @updated="logEvent('updated', $event)"
             />
         </variant>
 
         <variant title="With label and information">
             <number-field
-                name="histoire-text-field-labels"
+                name="histoire-number-field-labels"
                 :value="state.value"
                 :allow-decimals="true"
                 :allow-negative="true"
                 required
                 @created="logEvent('created', $event)"
-                @updated="update"
+                @updated="logEvent('updated', $event)"
             >
                 <template #label>Field label</template>
                 <template #information><i>Helpful text on how to fill in the field</i></template>
@@ -30,13 +30,13 @@
 
         <variant title="With inner icons">
             <number-field
-                name="histoire-text-field-prepend-append"
+                name="histoire-number-field-inner-icons"
                 :value="state.value"
                 :allow-decimals="true"
                 :allow-negative="true"
                 required
                 @created="logEvent('created', $event)"
-                @updated="update"
+                @updated="logEvent('updated', $event)"
             >
                 <template #label>Field label</template>
                 <template #information>Helpful text on how to fill in the field</template>
@@ -48,12 +48,12 @@
         <variant title="With outer icons">
             <prepend-append>
                 <number-field
-                    name="histoire-text-field-nested-prepend-append"
+                    name="histoire-number-field-outer-icons"
                     :value="state.value"
                     :allow-decimals="true"
                     :allow-negative="true"
                     @created="logEvent('created', $event)"
-                    @updated="update"
+                    @updated="logEvent('updated', $event)"
                 >
                     <template #label>Field label</template>
                     <template #information>Helpful text on how to fill in the field</template>
@@ -66,12 +66,12 @@
         <variant title="With inner and outer icons">
             <prepend-append>
                 <number-field
-                    name="histoire-text-field-nested-prepend-append"
+                    name="histoire-number-field-inner-and-outer-icons"
                     :value="state.value"
                     :allow-decimals="true"
                     :allow-negative="true"
                     @created="logEvent('created', $event)"
-                    @updated="update"
+                    @updated="logEvent('updated', $event)"
                 >
                     <template #label>Field label</template>
                     <template #information>Helpful text on how to fill in the field</template>
@@ -86,7 +86,7 @@
         <variant title="With validations">
             <template #default>
                 <number-field
-                    name="histoire-text-field-validations"
+                    name="histoire-number-field-validations"
                     :value="state.value"
                     :allow-decimals="true"
                     :allow-negative="true"
@@ -94,7 +94,7 @@
                     :max="state.max"
                     required
                     @created="logEvent('created', $event)"
-                    @updated="update"
+                    @updated="logEvent('updated', $event)"
                 >
                     <template #label>Field label</template>
                     <template #information>Helpful text on how to fill in the field</template>
@@ -177,19 +177,15 @@ const toggleDecimal = () => {
 const toggleMinus = () => {
     state.value = toggleMinusInValue(state.value);
 };
-
-const update = (event: any) => {
-    state.value = event.value;
-    logEvent('updated', event);
-};
 </script>
 
 <docs lang="md">
 # Number field
 
 The number field provides a structured way of building form fields.
-This field allows for validations with pre-built validations enabled by default.
-It also contains the structure to add a label above the input,
-hint information below the input, error messages and prepended/appended icons.
+
+This field allows for debouncing input and custom validations with pre-built validations enabled by default.
+It also contains the structure to add a label above the input, hint information below the input, error messages and prepended/appended icons.
+
 All of these can be any text or HTML that you want so you can build the field how you want it.
 </docs>
