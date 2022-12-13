@@ -21,12 +21,6 @@ label.input-field {
         padding-top: 0.25em;
     }
 
-    main {
-        display: grid;
-        column-gap: 0.5em;
-        row-gap: 0.5em;
-    }
-
     main,
     fieldset {
         &.input,

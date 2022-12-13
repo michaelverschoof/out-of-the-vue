@@ -10,8 +10,17 @@
                     <template v-for="key of keys" :key="key">
                         <label
                             v-if="!nonOptionSlots.includes(key) && provided(slots[key])"
-                            :class="{ focused: focusedItems.has(key), selected: state.value.includes(key), disabled: disabled?.includes(key) }"
                             class="checkable-field-item"
+                            tabindex="0"
+                            :aria-checked="state.value.includes(key)"
+                            :class="{ focused: focusedItems.has(key), selected: state.value.includes(key), disabled: disabled?.includes(key) }"
+                            :role="type"
+                            @keypress.space.enter="
+                                () => {
+                                    select(key);
+                                    validate(state);
+                                }
+                            "
                         >
                             <checkable-input
                                 :class="{ hidden: hideInput }"
@@ -20,7 +29,7 @@
                                 :type="type"
                                 :checked="state.value.includes(key)"
                                 :disabled="disabled?.includes(key)"
-                                tabindex="0"
+                                tabindex="-1"
                                 @focused="focusItem(key)"
                                 @blurred="blurItem(key)"
                                 @created="
@@ -129,12 +138,32 @@ const created = (data: CheckableFieldData): void => {
 };
 
 const updated = (data: CheckableFieldData): void => {
-    if (props.type === 'radio' && data.checked) {
-        selectedItems.value.clear();
+    if (props.type === 'radio') {
+        if (selectedItems.value.has(data.value)) {
+            return;
+        }
+
+        if (data.checked) {
+            selectedItems.value.clear();
+        }
     }
 
     data.checked ? selectedItems.value.add(data.value) : selectedItems.value.delete(data.value);
     state.value = Array.from(selectedItems.value);
+};
+
+const select = (key: string) => {
+    if (!!props.disabled && props.disabled.includes(key)) {
+        return;
+    }
+
+    const data: CheckableFieldData = {
+        name: state.name,
+        value: key,
+        checked: !selectedItems.value.has(key)
+    };
+
+    updated(data);
 };
 
 const initialized = (data: ValidatedFieldData): void => {
@@ -180,23 +209,29 @@ function filterSelected(selected?: (string | null)[]): string[] {
 <style lang="postcss" scoped>
 @import '@/components/form/fields/input-field';
 
-.checkable-field-item {
-    align-items: center;
-    cursor: pointer;
-    display: flex;
-    column-gap: 1em;
-    min-height: 3.375em;
+.checkable-field main {
+    display: grid;
+    column-gap: 0.5em;
+    row-gap: 0.5em;
 
-    &.disabled {
-        cursor: not-allowed;
-    }
+    .checkable-field-item {
+        align-items: center;
+        cursor: pointer;
+        display: flex;
+        column-gap: 1em;
+        min-height: 3.375em;
 
-    .hidden {
-        display: none;
-    }
+        &.disabled {
+            cursor: not-allowed;
+        }
 
-    .content {
-        flex-grow: 1;
+        .hidden {
+            display: none;
+        }
+
+        .content {
+            flex-grow: 1;
+        }
     }
 }
 </style>

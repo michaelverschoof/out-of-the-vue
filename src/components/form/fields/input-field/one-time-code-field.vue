@@ -212,5 +212,8 @@ onMounted(() => {
 
 .one-time-code-field main {
     grid-template-columns: repeat(v-bind('props.length'), 1fr);
+    display: grid;
+    column-gap: 0.5em;
+    row-gap: 0.5em;
 }
 </style>

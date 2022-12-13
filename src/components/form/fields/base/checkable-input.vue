@@ -1,9 +1,9 @@
 <template>
     <input
+        v-model="model"
         autocomplete="off"
         class="checkable-input"
         ref="element"
-        v-model="model"
         :checked="state.checked"
         :class="{ focused }"
         :id="`${name}-${value}`"
