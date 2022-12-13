@@ -49,30 +49,27 @@
         "components"
     ],
     "devDependencies": {
-        "@histoire/plugin-vue": "^0.11.6",
-        "@iconify/vue": "^4.0.0",
-        "@types/node": "^18.11.9",
+        "@histoire/plugin-vue": "^0.11.9",
+        "@iconify/vue": "^4.0.2",
+        "@types/node": "^18.11.14",
         "@vitejs/plugin-vue": "^3.2.0",
         "@vitest/coverage-c8": "^0.25.7",
-        "@vue/test-utils": "^2.2.1",
+        "@vue/test-utils": "^2.2.6",
         "c8": "^7.12.0",
-        "happy-dom": "^7.6.7",
-        "histoire": "^0.11.6",
-        "jsdom": "^20.0.2",
-        "prettier": "^2.7.1",
-        "prettier-plugin-tailwindcss": "^0.1.13",
-        "sass": "^1.56.1",
+        "happy-dom": "^8.1.0",
+        "histoire": "^0.11.9",
+        "jsdom": "^20.0.3",
+        "prettier": "^2.8.1",
+        "prettier-plugin-tailwindcss": "^0.2.1",
         "tailwindcss": "^3.2.4",
-        "typescript": "^4.8.4",
+        "typescript": "^4.9.4",
         "vite": "^3.2.3",
-        "vite-plugin-dts": "^1.7.0",
-        "vitest": "^0.25.1",
-        "vue": "^3.2.44"
+        "vite-plugin-dts": "^1.7.1",
+        "vitest": "^0.25.7",
+        "vue": "^3.2.45",
+        "autoprefixer": "^10.4.13"
     },
     "peerDependencies": {
         "vue": "^3"
-    },
-    "dependencies": {
-        "autoprefixer": "^10.4.13"
     }
 }
