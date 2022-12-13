@@ -1,5 +1,5 @@
 <template>
-    <story title="Components/Input field/One time code field" :layout="{ type: 'grid', width: 400 }" auto-props-disabled>
+    <story title="Components/Form/Fields/One time code field" :layout="{ type: 'grid', width: 400 }" auto-props-disabled>
         <variant title="Simple">
             <one-time-code-field
                 name="histoire-one-time-code-field-simple"

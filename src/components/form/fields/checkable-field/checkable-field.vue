@@ -2,27 +2,27 @@
     <fieldset class="checkable-field input-field">
         <validator :validations="validationMethods" :trigger-validation="triggerValidation" @created="initialized" @updated="validated">
             <template #default="{ initialize, validate, invalid, showing, showValidity }">
-                <header v-if="$slots.label" class="label">
+                <header v-if="provided(slots.label)" class="label">
                     <slot name="label" />
                 </header>
 
                 <main ref="main" tabindex="-1" @blur.capture="fieldBlurred(showValidity)">
-                    <template v-for="slot of slots" :key="slot">
+                    <template v-for="key of keys" :key="key">
                         <label
-                            v-if="!nonOptionSlots.includes(slot) && provided($slots[slot])"
-                            :class="{ focused: focusedItems.has(slot), selected: state.value.includes(slot), disabled: disabled?.includes(slot) }"
+                            v-if="!nonOptionSlots.includes(key) && provided(slots[key])"
+                            :class="{ focused: focusedItems.has(key), selected: state.value.includes(key), disabled: disabled?.includes(key) }"
                             class="checkable-field-item"
                         >
                             <checkable-input
                                 :class="{ hidden: hideInput }"
                                 :name="`checkable-input-${name}`"
-                                :value="slot"
+                                :value="key"
                                 :type="type"
-                                :checked="state.value.includes(slot)"
-                                :disabled="disabled?.includes(slot)"
+                                :checked="state.value.includes(key)"
+                                :disabled="disabled?.includes(key)"
                                 tabindex="0"
-                                @focused="focusItem(slot)"
-                                @blurred="blurItem(slot)"
+                                @focused="focusItem(key)"
+                                @blurred="blurItem(key)"
                                 @created="
                                     (data) => {
                                         created(data);
@@ -38,13 +38,13 @@
                             />
 
                             <span class="content">
-                                <slot :name="slot" :selected="state.value.includes(slot)" />
+                                <slot :name="key" :selected="state.value.includes(key)" />
                             </span>
                         </label>
                     </template>
                 </main>
 
-                <footer v-if="$slots.information && !(invalid && showing)" class="information">
+                <footer v-if="provided(slots.information) && !(invalid && showing)" class="information">
                     <slot name="information" />
                 </footer>
             </template>
@@ -92,7 +92,9 @@ const validationMethods = computed<ValidationMethod[]>(() => {
     return validations;
 });
 
-const slots = Object.keys(useSlots());
+const slots = useSlots();
+const keys = Object.keys(slots);
+
 const nonOptionSlots = ['label', 'information', ...validationMethods.value.map((method) => method.name)];
 
 const selectedItems = ref<Set<string>>(new Set(filterSelected(props.selected)));

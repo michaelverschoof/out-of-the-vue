@@ -9,6 +9,12 @@ body.show-grid-lines {
             margin: 3px;
             padding: 3px;
         }
+
+        .checkable-field-item {
+            border: 2px dashed;
+            @apply border-cyan-300;
+            padding: 3px;
+        }
     }
 }
 
