@@ -63,8 +63,6 @@
                         {{ item.label }}
                     </prepend-append>
                 </template>
-                <template #label> Field label </template>
-                <template #information><i>Helpful text on how to fill in the field</i></template>
             </checkable-field>
         </variant>
 
@@ -138,10 +136,9 @@ const update = (event: any) => {
 <docs lang="md">
 # Text field
 
-The text field provides a structured way of building form fields.
+The checkable field provides a structured way of building form fields.
 
-This field allows for debouncing input and custom validations with pre-built validations enabled by default.
-It also contains the structure to add a label above the input, hint information below the input, error messages and prepended/appended icons.
+This field allows you to build selectors using your own templating with HTML and CSS. You can choose to show or hide the input and add any HTML as items.
 
-All of these can be any text or HTML that you want so you can build the field how you want it.
+In this example a `<prepend-append>` element is used where an icon is shown, creating a custom select box.
 </docs>
