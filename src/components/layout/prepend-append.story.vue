@@ -1,5 +1,5 @@
 <template>
-    <story title="Components/Layout/Prepend append" :layout="{ type: 'grid', width: 400 }" auto-props-disabled>
+    <story title="Layout/Prepend append" :layout="{ type: 'grid', width: 400 }" auto-props-disabled>
         <variant title="Prepend" icon="lucide:arrow-left">
             <prepend-append>
                 <template #prepend><icon icon="mdi:airballoon" color="" /></template>

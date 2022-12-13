@@ -1,5 +1,5 @@
 <template>
-    <story title="Components/Counter/Text counter" :layout="{ type: 'grid', width: 400 }">
+    <story title="Counter/Text counter" :layout="{ type: 'grid', width: 400 }">
         <variant title="Character count">
             <text-counter :value="state.value" :limit="state.characterLimit" type="character" />
         </variant>

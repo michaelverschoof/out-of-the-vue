@@ -1,16 +1,5 @@
 <template>
-    <story title="Components/Form/Fields/Checkable field" :layout="{ type: 'grid', width: 400 }" auto-props-disabled>
-        <!-- type: 'radio' | 'checkbox';
-        name: string;
-        selected?: string[];
-        disabled?: string[];
-        required?: boolean;
-        min?: number;
-        max?: number;
-        validations?: ValidationMethod[];
-        triggerValidation?: string;
-        hideInput?: boolean; -->
-
+    <story title="Form/Fields/Checkable field" :layout="{ type: 'grid', width: 400 }" auto-props-disabled>
         <variant title="Simple">
             <checkable-field
                 name="histoire-checkable-field-simple"

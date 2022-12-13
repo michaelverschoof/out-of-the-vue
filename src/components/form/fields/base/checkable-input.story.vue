@@ -1,5 +1,5 @@
 <template>
-    <story title="Components/Form/Fields/Base/Checkable input" :layout="{ type: 'grid', width: 400 }" auto-props-disabled>
+    <story title="Form/Fields/Base/Checkable input" :layout="{ type: 'grid', width: 400 }" auto-props-disabled>
         <checkable-input
             name="histoire-checkable-input"
             :value="state.value"

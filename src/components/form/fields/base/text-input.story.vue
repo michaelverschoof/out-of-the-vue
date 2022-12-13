@@ -1,5 +1,5 @@
 <template>
-    <story title="Components/Form/Fields/Base/Text input" :layout="{ type: 'grid', width: 400 }" auto-props-disabled>
+    <story title="Form/Fields/Base/Text input" :layout="{ type: 'grid', width: 400 }" auto-props-disabled>
         <text-input
             name="histoire-text-input"
             :value="state.value"

@@ -1,5 +1,5 @@
 <template>
-    <story title="Components/Counter/Counter" :layout="{ type: 'grid', width: 400 }">
+    <story title="Counter/Counter" :layout="{ type: 'grid', width: 400 }">
         <counter :count="state.value.length" :limit="state.limit" />
 
         <template #controls>

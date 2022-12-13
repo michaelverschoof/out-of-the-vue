@@ -1,5 +1,5 @@
 <template>
-    <story title="Components/Form/Fields/Text field" :layout="{ type: 'grid', width: 400 }" auto-props-disabled>
+    <story title="Form/Fields/Text field" :layout="{ type: 'grid', width: 400 }" auto-props-disabled>
         <variant title="Simple">
             <text-field
                 name="histoire-text-field-simple"

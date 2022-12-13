@@ -1,5 +1,5 @@
 <template>
-    <story title="Components/Form/Fields/Base/Numeric input" :layout="{ type: 'grid', width: 400 }" auto-props-disabled>
+    <story title="Form/Fields/Base/Numeric input" :layout="{ type: 'grid', width: 400 }" auto-props-disabled>
         <numeric-input
             name="histoire-numeric-input"
             :value="state.value"
