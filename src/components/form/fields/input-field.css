@@ -1,8 +1,3 @@
-label.input-field {
-    display: block;
-    flex-grow: 1;
-}
-
 .input-field {
     header.label,
     footer.information,
@@ -28,4 +23,12 @@ label.input-field {
             height: 3.375em;
         }
     }
+}
+
+label.input-field {
+    display: block;
+}
+
+.prepend-append label.input-field {
+    flex-grow: 1;
 }
