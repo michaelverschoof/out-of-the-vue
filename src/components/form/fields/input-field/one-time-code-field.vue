@@ -211,7 +211,7 @@ onMounted(() => {
 @import '@/components/form/fields/input-field';
 
 .one-time-code-field main {
-    grid-template-columns: repeat(v-bind('props.length'), 1fr);
+    grid-template-columns: repeat(v-bind('props.length.toString()'), 1fr);
     display: grid;
     column-gap: 0.5em;
     row-gap: 0.5em;

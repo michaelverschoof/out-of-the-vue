@@ -21,6 +21,5 @@
         "lib": ["esnext", "dom"],
         "skipLibCheck": true
     },
-    "include": ["env.d.ts", "src/**/*.ts", "src/**/*.d.ts", "src/**/*.vue"],
-    "exclude": ["node_modules", "src/**/*.story.vue"]
+    "include": ["env.d.ts", "src/**/*.ts", "src/**/*.d.ts", "src/**/*.vue"]
 }
