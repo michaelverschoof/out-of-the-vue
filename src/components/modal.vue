@@ -5,13 +5,13 @@
         <transition name="modal">
             <div v-if="showing" ref="element" class="backdrop" tabindex="-1" @click.self="closeModal" @keydown.esc="closeModal">
                 <div v-bind="$attrs" class="modal">
-                    <header v-if="provided($slots.header)">
+                    <header v-if="$slots.header">
                         <slot name="header" :close="closeModal" />
                     </header>
                     <main>
                         <slot :close="closeModal" />
                     </main>
-                    <footer v-if="provided($slots.footer)">
+                    <footer v-if="$slots.footer">
                         <slot name="footer" :close="closeModal" />
                     </footer>
                 </div>
@@ -21,7 +21,6 @@
 </template>
 
 <script lang="ts" setup>
-import { provided } from '@/util/slots';
 import { onMounted, onUnmounted, ref, watch } from 'vue';
 
 const emit = defineEmits<{ (event: 'opened' | 'closed'): void }>();

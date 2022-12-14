@@ -2,7 +2,7 @@
     "name": "out-of-the-vue",
     "author": "Michael Verschoof",
     "description": "Functional UX components built with Vue 3",
-    "version": "0.1.0-rc.38",
+    "version": "0.1.0-rc.42",
     "license": "MIT",
     "type": "module",
     "publishConfig": {
@@ -12,19 +12,21 @@
         "type": "git",
         "url": "https://github.com/michaelverschoof/out-of-the-vue.git"
     },
-    "main": "./dist/out-of-the-vue.umd.js",
-    "module": "./dist/out-of-the-vue.es.js",
+    "main": "./dist/out-of-the-vue.umd.cjs",
+    "module": "./dist/out-of-the-vue.js",
     "types": "./dist/types/index.d.ts",
     "files": [
         "dist",
         "src",
         "!**/*.story.vue",
-        "!**/*.test.ts"
+        "!**/*.test.ts",
+        "!src/main.ts",
+        "!src/out-of-the-vue.vue"
     ],
     "exports": {
         ".": {
-            "import": "./dist/out-of-the-vue.es.js",
-            "require": "./dist/out-of-the-vue.umd.js"
+            "import": "./dist/out-of-the-vue.js",
+            "require": "./dist/out-of-the-vue.umd.cjs"
         },
         "./dist/out-of-the-vue.css": "./dist/out-of-the-vue.css"
     },
