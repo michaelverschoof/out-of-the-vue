@@ -1,6 +1,6 @@
 label.input-field {
     display: block;
-    width: 100%;
+    flex-grow: 1;
 }
 
 .input-field {
