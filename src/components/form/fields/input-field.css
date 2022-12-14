@@ -1,5 +1,6 @@
 label.input-field {
     display: block;
+    width: 100%;
 }
 
 .input-field {
@@ -7,13 +8,17 @@ label.input-field {
     footer.information,
     :deep(strong.validation-error) {
         font-size: 0.875em;
+    }
+
+    header.label {
         line-height: 2em;
     }
 
-    main {
-        display: grid;
-        column-gap: 0.5em;
-        row-gap: 0.5em;
+    footer.information,
+    :deep(strong.validation-error) {
+        display: flex;
+        justify-content: space-between;
+        padding-top: 0.25em;
     }
 
     main,
@@ -22,11 +27,5 @@ label.input-field {
         & .input {
             height: 3.375em;
         }
-    }
-
-    footer.information,
-    :deep(strong.validation-error) {
-        display: flex;
-        justify-content: space-between;
     }
 }

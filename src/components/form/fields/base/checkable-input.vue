@@ -1,10 +1,10 @@
 <template>
     <input
+        v-model="model"
         autocomplete="off"
         class="checkable-input"
         ref="element"
-        v-model="model"
-        :checked="checked"
+        :checked="state.checked"
         :class="{ focused }"
         :id="`${name}-${value}`"
         :name="name"
@@ -24,7 +24,7 @@ const emit = defineEmits<{
     (event: 'created' | 'updated', data: CheckableFieldData): void;
 }>();
 
-const props = defineProps<{ type: 'radio' | 'checkbox'; name: string; value: string; checked?: boolean; }>();
+const props = defineProps<{ type: 'radio' | 'checkbox'; name: string; value: string; checked?: boolean }>();
 
 const element = ref<HTMLInputElement>();
 const focused = ref<boolean>(false);
@@ -35,7 +35,7 @@ const state = reactive<CheckableFieldData>({
     checked: props.checked ?? false
 });
 
-const model = computed({
+const model = computed<boolean>({
     get: () => state.checked,
     set: () => {
         state.checked = !!element.value?.checked;
@@ -43,9 +43,12 @@ const model = computed({
     }
 });
 
-watch(() => props.checked, (received?: boolean) => {
-    state.checked = !!received;
-});
+watch(
+    () => props.checked,
+    (received?: boolean) => {
+        state.checked = !!received;
+    }
+);
 
 const reselect = (): void => {
     if (props.type !== 'radio' || !state.checked) {

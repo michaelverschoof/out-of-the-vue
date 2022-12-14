@@ -2,8 +2,9 @@
     "name": "out-of-the-vue",
     "author": "Michael Verschoof",
     "description": "Functional UX components built with Vue 3",
-    "version": "0.1.0-rc.36",
+    "version": "0.1.0-rc.38",
     "license": "MIT",
+    "type": "module",
     "publishConfig": {
         "registry": "https://registry.npmjs.org/"
     },
@@ -16,7 +17,9 @@
     "types": "./dist/types/index.d.ts",
     "files": [
         "dist",
-        "src"
+        "src",
+        "!**/*.story.vue",
+        "!**/*.test.ts"
     ],
     "exports": {
         ".": {
@@ -31,7 +34,10 @@
         "preview": "vite preview",
         "test": "vitest",
         "test:coverage": "vitest run --coverage",
-        "release": "npm install && npm run build && npm publish"
+        "release": "npm install && npm run build && npm publish",
+        "story": "histoire dev",
+        "story:build": "histoire build",
+        "story:preview": "histoire preview"
     },
     "bugs": "https://github.com/michaelverschoof/out-of-the-vue/issues",
     "keywords": [
@@ -45,18 +51,24 @@
         "components"
     ],
     "devDependencies": {
-        "@types/node": "^18.0.0",
-        "@vitejs/plugin-vue": "^2.3.3",
-        "@vue/test-utils": "^2.0.0",
-        "c8": "^7.11.3",
-        "happy-dom": "^5.3.2",
-        "jsdom": "^20.0.0",
-        "sass": "^1.53.0",
-        "typescript": "^4.7.4",
-        "vite": "^2.9.13",
-        "vite-plugin-dts": "^1.2.0",
-        "vitest": "^0.16.0",
-        "vue": "^3.2.37"
+        "@histoire/plugin-vue": "^0.11.9",
+        "@iconify/vue": "^4.0.2",
+        "@types/node": "^18.11.14",
+        "@vitejs/plugin-vue": "^3.2.0",
+        "@vue/test-utils": "^2.2.6",
+        "autoprefixer": "^10.4.13",
+        "c8": "^7.12.0",
+        "happy-dom": "^8.1.0",
+        "histoire": "^0.11.9",
+        "jsdom": "^20.0.3",
+        "prettier": "^2.8.1",
+        "prettier-plugin-tailwindcss": "^0.2.1",
+        "tailwindcss": "^3.2.4",
+        "typescript": "^4.9.4",
+        "vite": "^3.2.3",
+        "vite-plugin-dts": "1.7.1",
+        "vitest": "0.16.0",
+        "vue": "^3.2.45"
     },
     "peerDependencies": {
         "vue": "^3"

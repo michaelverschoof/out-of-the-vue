@@ -8,10 +8,10 @@ exports[`Mounting components > should mount the component 1`] = `
 exports[`Mounting components > should mount the component in opened state 1`] = `
 <div
   class="modal"
-  data-v-0eaeaf66=""
+  data-v-ecc9e0c3=""
 >
   <header
-    data-v-0eaeaf66=""
+    data-v-ecc9e0c3=""
   >
     
     <button
@@ -22,7 +22,7 @@ exports[`Mounting components > should mount the component in opened state 1`] = 
     
   </header>
   <main
-    data-v-0eaeaf66=""
+    data-v-ecc9e0c3=""
   >
     
     <button
@@ -33,7 +33,7 @@ exports[`Mounting components > should mount the component in opened state 1`] = 
     
   </main>
   <footer
-    data-v-0eaeaf66=""
+    data-v-ecc9e0c3=""
   >
     
     <button
@@ -49,11 +49,11 @@ exports[`Mounting components > should mount the component in opened state 1`] = 
 exports[`Mounting components > should mount the component in opened state without a header and footer 1`] = `
 <div
   class="modal"
-  data-v-0eaeaf66=""
+  data-v-ecc9e0c3=""
 >
   <!--v-if-->
   <main
-    data-v-0eaeaf66=""
+    data-v-ecc9e0c3=""
   >
     
     <button
@@ -76,10 +76,10 @@ exports[`Mounting components > should mount the component with an opener 1`] = `
 exports[`Opening and closing modal > should close using prop 1`] = `
 <div
   class="modal"
-  data-v-0eaeaf66=""
+  data-v-ecc9e0c3=""
 >
   <header
-    data-v-0eaeaf66=""
+    data-v-ecc9e0c3=""
   >
     
     <button
@@ -90,7 +90,7 @@ exports[`Opening and closing modal > should close using prop 1`] = `
     
   </header>
   <main
-    data-v-0eaeaf66=""
+    data-v-ecc9e0c3=""
   >
     
     <button
@@ -101,7 +101,7 @@ exports[`Opening and closing modal > should close using prop 1`] = `
     
   </main>
   <footer
-    data-v-0eaeaf66=""
+    data-v-ecc9e0c3=""
   >
     
     <button
@@ -117,10 +117,10 @@ exports[`Opening and closing modal > should close using prop 1`] = `
 exports[`Opening and closing modal > should close using prop 2`] = `
 <div
   class="modal"
-  data-v-0eaeaf66=""
+  data-v-ecc9e0c3=""
 >
   <header
-    data-v-0eaeaf66=""
+    data-v-ecc9e0c3=""
   >
     
     <button
@@ -131,7 +131,7 @@ exports[`Opening and closing modal > should close using prop 2`] = `
     
   </header>
   <main
-    data-v-0eaeaf66=""
+    data-v-ecc9e0c3=""
   >
     
     <button
@@ -142,7 +142,7 @@ exports[`Opening and closing modal > should close using prop 2`] = `
     
   </main>
   <footer
-    data-v-0eaeaf66=""
+    data-v-ecc9e0c3=""
   >
     
     <button
@@ -162,10 +162,10 @@ exports[`Opening and closing modal > should not open using prop if already opene
 exports[`Opening and closing modal > should not open using prop if already opened 3`] = `
 <div
   class="modal"
-  data-v-0eaeaf66=""
+  data-v-ecc9e0c3=""
 >
   <header
-    data-v-0eaeaf66=""
+    data-v-ecc9e0c3=""
   >
     
     <button
@@ -176,7 +176,7 @@ exports[`Opening and closing modal > should not open using prop if already opene
     
   </header>
   <main
-    data-v-0eaeaf66=""
+    data-v-ecc9e0c3=""
   >
     
     <button
@@ -187,7 +187,7 @@ exports[`Opening and closing modal > should not open using prop if already opene
     
   </main>
   <footer
-    data-v-0eaeaf66=""
+    data-v-ecc9e0c3=""
   >
     
     <button

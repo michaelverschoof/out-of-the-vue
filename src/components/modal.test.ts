@@ -43,7 +43,6 @@ afterEach(() => {
 });
 
 describe('Mounting components', () => {
-
     it('should mount the component', async () => {
         const wrapper = await mountComponent();
         expect(wrapper.html()).toMatchSnapshot();
@@ -68,7 +67,6 @@ describe('Mounting components', () => {
 });
 
 describe('Opening and closing modal', async () => {
-
     it('should open using opener', async () => {
         const wrapper = await mountComponent(all);
 
@@ -125,7 +123,7 @@ describe('Opening and closing modal', async () => {
         const wrapper = await mountComponent(all, true);
 
         let modal = await getModalElement(wrapper);
-        (<HTMLButtonElement> modal.querySelector('#header')).click();
+        (<HTMLButtonElement>modal.querySelector('#header')).click();
 
         modal = await getModalElement(wrapper);
         expect(modal).toBeNull();
@@ -137,7 +135,7 @@ describe('Opening and closing modal', async () => {
         const wrapper = await mountComponent(all, true);
 
         let modal = await getModalElement(wrapper);
-        (<HTMLButtonElement> modal.querySelector('#content')).click();
+        (<HTMLButtonElement>modal.querySelector('#content')).click();
 
         modal = await getModalElement(wrapper);
         expect(modal).toBeNull();
@@ -149,7 +147,7 @@ describe('Opening and closing modal', async () => {
         const wrapper = await mountComponent(all, true);
 
         let modal = await getModalElement(wrapper);
-        (<HTMLButtonElement> modal.querySelector('#footer')).click();
+        (<HTMLButtonElement>modal.querySelector('#footer')).click();
 
         modal = await getModalElement(wrapper);
         expect(modal).toBeNull();
@@ -195,7 +193,7 @@ it('should unmount the component', async () => {
     const wrapper = await mountComponent();
     expect(wrapper.html()).toMatchSnapshot();
 
-    await wrapper.unmount();
+    wrapper.unmount();
     expect(wrapper.html()).not.toMatchSnapshot();
 });
 

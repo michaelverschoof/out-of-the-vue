@@ -9,5 +9,10 @@ export function provided(slot?: Slot) {
         return false;
     }
 
-    return slot().some(content => !!content.el || !!content.children?.length || !!content.props?.innerHTML);
+    return slot().some(
+        (content) =>
+            !!content.el ||
+            (!!content.children && !!Object.keys(content.children).length) ||
+            (!!content.props && Object.keys(content.props).some((key) => key !== 'key'))
+    );
 }

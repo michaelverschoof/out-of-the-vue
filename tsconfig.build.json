@@ -1,9 +1,4 @@
 {
     "extends": "./tsconfig.json",
-    "exclude": [
-        "node_modules",
-        "src/**/*.test.ts",
-        "src/out-of-the-vue.vue",
-        "src/main.ts"
-    ]
+    "exclude": ["node_modules", "src/**/*.test.ts", "src/**/*.story.vue", "src/out-of-the-vue.vue", "src/main.ts"]
 }

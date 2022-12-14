@@ -27,16 +27,18 @@ const providedPrepend = computed(() => provided(slots.prepend));
 const providedAppend = computed(() => provided(slots.append));
 </script>
 
-<style lang="scss" scoped>
+<style lang="postcss" scoped>
 .prepend-append {
     align-items: stretch;
     display: grid;
-    grid-template-areas: "prepend content append";
+    grid-template-areas: 'prepend content append';
     grid-template-columns: max-content 1fr max-content;
     height: 100%;
     width: 100%;
 
-    .prepend, .append {
+    .prepend,
+    .content,
+    .append {
         display: flex;
         align-items: center;
     }

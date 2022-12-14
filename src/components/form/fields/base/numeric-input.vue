@@ -17,14 +17,14 @@ import { exclude } from '@/util/attrs';
 import { filter, parse } from '@/util/numbers';
 import { computed, reactive, ref, watch } from 'vue';
 
-const emit = defineEmits<{ (event: 'created' | 'updated', data: NumberFieldData): void; }>();
+const emit = defineEmits<{ (event: 'created' | 'updated', data: NumberFieldData): void }>();
 
-const props = withDefaults(
-    defineProps<{ name: string; value?: number; allowDecimals?: boolean; allowNegative?: boolean; }>(),
-    { allowDecimals: true, allowNegative: true }
-);
+const props = withDefaults(defineProps<{ name: string; value?: number; allowDecimals?: boolean; allowNegative?: boolean }>(), {
+    allowDecimals: true,
+    allowNegative: true
+});
 
-const regex = computed(() => `[0-9${ props.allowDecimals ? '.,' : '' }${ props.allowNegative ? '-' : '' }]`);
+const regex = computed(() => `[0-9${props.allowDecimals ? '.,' : ''}${props.allowNegative ? '-' : ''}]`);
 
 const model = ref<string | null>(props.value?.toString() ?? null);
 
@@ -33,14 +33,17 @@ const state = reactive<NumberFieldData>({
     value: props.value ?? null
 });
 
-watch(() => props.value, (received?: number) => {
-    if (received === state.value) {
-        return;
-    }
+watch(
+    () => props.value,
+    (received: number) => {
+        if (received === state.value) {
+            return;
+        }
 
-    state.value = received ?? null;
-    model.value = state.value?.toString() ?? null;
-});
+        state.value = received ?? null;
+        model.value = state.value?.toString() ?? null;
+    }
+);
 
 const parseNumber = (data: StringFieldData): void => {
     const filtered = filter(data.value ?? '', props.allowDecimals, props.allowNegative);

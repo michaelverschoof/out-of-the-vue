@@ -19,6 +19,5 @@ export function minimum(data: FieldData, minimum: number): boolean {
  * @returns true if the value is smaller or equal to the maximum amount
  */
 export function maximum(data: FieldData, maximum: number): boolean {
-    return !maximum
-        || (data?.value || 0) <= maximum;
+    return !maximum || (data?.value || 0) <= maximum;
 }
