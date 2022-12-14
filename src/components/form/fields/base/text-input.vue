@@ -42,43 +42,73 @@ const characterRegex = ref<RegExp>(getRegex(props.allowedCharacters));
 
 const state = reactive<StringFieldData>({
     name: props.name,
-    value: !!props.value ? (!!props.max ? props.value.slice(0, props.max) : props.value) : null
+    value: props.value ?? null
 });
 
 const model = computed({
     get: () => state.value,
     set: (value: string | null) => {
-        if (value === state.value) {
-            return;
-        }
-
-        state.value = value ?? null;
-        emit('updated', { ...state });
+        state.value = value;
     }
 });
 
-watch(
-    () => props.value,
-    (received?: string) => {
-        const value = filterAndTransform(received);
-        if (received === model.value || value === model.value) {
-            return;
-        }
-
-        model.value = value;
-    }
-);
-
-watch([() => props.allowedCharacters, () => props.transformInput, () => props.max], () => {
-    characterRegex.value = getRegex(props.allowedCharacters);
-
-    const value = filterAndTransform(model.value);
-    if (value === model.value) {
+function update(value?: string | null) {
+    if (value === null) {
+        model.value = null;
+        emit('updated', { ...state });
         return;
     }
 
-    model.value = value;
+    const prepared = filterAndTransform(value ?? state.value);
+    if (prepared === state.value) {
+        return;
+    }
+
+    model.value = prepared;
+    emit('updated', { ...state });
+}
+
+watch(
+    () => props.value,
+    () => {
+        update(props.value);
+    }
+);
+
+watch(
+    () => props.allowedCharacters,
+    () => {
+        characterRegex.value = getRegex(props.allowedCharacters);
+        update();
+    }
+);
+
+watch([() => props.transformInput, () => props.max], () => {
+    update();
 });
+
+/**
+ * Filter the pasted value by the allowed character format
+ */
+const filterPasteData = (event: ClipboardEvent): void => {
+    update(event.clipboardData?.getData('text'));
+};
+
+/**
+ * Filter the user's inputted value by the allowed character format
+ */
+const filterInputData = (event: Event): void => {
+    update((<HTMLInputElement>event.target).value);
+};
+
+/**
+ * Prevent any unallowed characters
+ */
+const preventUnallowedCharacters = (event: KeyboardEvent): void => {
+    if (characterRegex.value && !characterRegex.value.test(event.key)) {
+        event.preventDefault();
+    }
+};
 
 watch(
     () => props.focus,
@@ -92,33 +122,10 @@ watch(
 );
 
 /**
- * Filter the pasted value by the allowed character format
- */
-const filterPasteData = (event: ClipboardEvent): void => {
-    model.value = filterAndTransform(event.clipboardData?.getData('text'));
-};
-
-/**
- * Prevent any unallowed characters
- */
-const preventUnallowedCharacters = (event: KeyboardEvent): void => {
-    if (characterRegex.value && !characterRegex.value.test(event.key)) {
-        event.preventDefault();
-    }
-};
-
-/**
- * Filter the user's inputted value by the allowed character format
- */
-const filterInputData = (event: Event): void => {
-    model.value = filterAndTransform((<HTMLInputElement>event.target).value);
-};
-
-/**
  * Filter and transform the provided value
  */
 function filterAndTransform(value?: string): string {
-    let filtered = filter(value?.trimStart() ?? '', characterRegex.value);
+    let filtered = filter(value?.trimStart(), characterRegex.value);
     if (!filtered) {
         return filtered;
     }
@@ -156,8 +163,8 @@ onMounted(() => {
         element.value.focus();
     }
 
-    if (!!props.value && (props.allowedCharacters || props.transformInput)) {
-        filterAndTransform(model.value);
+    if (!!props.value && (props.allowedCharacters || props.transformInput || props.max)) {
+        model.value = filterAndTransform(props.value);
     }
 
     emit('created', { ...state });

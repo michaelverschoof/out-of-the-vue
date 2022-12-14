@@ -2,7 +2,7 @@
     "name": "out-of-the-vue",
     "author": "Michael Verschoof",
     "description": "Functional UX components built with Vue 3",
-    "version": "0.1.0-rc.36",
+    "version": "0.1.0-rc.37",
     "license": "MIT",
     "type": "module",
     "publishConfig": {
@@ -53,8 +53,8 @@
         "@iconify/vue": "^4.0.2",
         "@types/node": "^18.11.14",
         "@vitejs/plugin-vue": "^3.2.0",
-        "@vitest/coverage-c8": "^0.25.7",
         "@vue/test-utils": "^2.2.6",
+        "autoprefixer": "^10.4.13",
         "c8": "^7.12.0",
         "happy-dom": "^8.1.0",
         "histoire": "^0.11.9",
@@ -65,9 +65,8 @@
         "typescript": "^4.9.4",
         "vite": "^3.2.3",
         "vite-plugin-dts": "^1.7.1",
-        "vitest": "^0.25.7",
-        "vue": "^3.2.45",
-        "autoprefixer": "^10.4.13"
+        "vitest": "0.16.0",
+        "vue": "^3.2.45"
     },
     "peerDependencies": {
         "vue": "^3"

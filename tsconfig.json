@@ -13,30 +13,14 @@
         "resolveJsonModule": true,
         "esModuleInterop": true,
         "useDefineForClassFields": true,
-        "types": [
-            "node",
-            "vue",
-            "vitest/globals",
-            "vite/client"
-        ],
+        "types": ["node", "vue", "vitest/globals", "vite/client"],
         "paths": {
-            "@/*": [
-                "src/*"
-            ],
-            "@test/*": [
-                "test/*"
-            ]
+            "@/*": ["src/*"],
+            "@test/*": ["test/*"]
         },
-        "lib": [
-            "esnext",
-            "dom"
-        ],
+        "lib": ["esnext", "dom"],
         "skipLibCheck": true
     },
-    "include": [
-        "env.d.ts",
-        "src/**/*.ts",
-        "src/**/*.d.ts",
-        "src/**/*.vue"
-    ]
+    "include": ["env.d.ts", "src/**/*.ts", "src/**/*.d.ts", "src/**/*.vue"],
+    "exclude": ["node_modules", "src/**/*.story.vue"]
 }
