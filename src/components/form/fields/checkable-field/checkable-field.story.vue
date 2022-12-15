@@ -10,7 +10,7 @@
                 @created="logEvent('created', $event)"
                 @updated="update"
             >
-                <template v-for="item of items" #[item.value]>
+                <template v-for="item of filteredItems" #[item.value]>
                     {{ item.label }}
                 </template>
             </checkable-field>
@@ -26,8 +26,8 @@
                 @created="logEvent('created', $event)"
                 @updated="update"
             >
-                <template v-for="item of items" #[item.value]>
-                    {{ item.label }}
+                <template v-for="item of filteredItems" #[item.value]>
+                    <span>{{ item.label }}</span>
                 </template>
                 <template #label>Field label</template>
                 <template #information><i>Helpful text on how to fill in the field</i></template>
@@ -44,7 +44,7 @@
                 @created="logEvent('created', $event)"
                 @updated="update"
             >
-                <template v-for="item of items" #[item.value]>
+                <template v-for="item of filteredItems" #[item.value]>
                     <prepend-append :key="item.value">
                         <template #prepend>
                             <icon icon="mdi:airballoon" />
@@ -62,6 +62,7 @@
             <hst-radio v-if="'radio' === state.type" v-model="state.selected[0]" title="Selected" :options="items" />
             <hst-checkbox-list v-else v-model="state.selected" title="Selected" :options="items" />
             <hst-checkbox v-model="state.hideInput" title="Hide input" />
+            <hst-checkbox v-model="state.filter" title="Filter items" />
         </template>
     </story>
 </template>
@@ -71,20 +72,32 @@ import CheckableField from '@/components/form/fields/checkable-field/checkable-f
 import PrependAppend from '@/components/layout/prepend-append.vue';
 import { Icon } from '@iconify/vue';
 import ShowGridLines from '@test/components/show-grid-lines.vue';
+import { computed } from '@vue/reactivity';
 import { logEvent } from 'histoire/client';
 import { reactive, watch } from 'vue';
 
 const items = [
     { value: 'one', label: 'First item' },
     { value: 'two', label: 'Second item' },
-    { value: 'three', label: 'Third item' }
+    { value: 'three', label: 'Third item' },
+    { value: 'four', label: 'Fourth item' },
+    { value: 'five', label: 'Fifth item' }
 ];
+
+const filteredItems = computed(() => {
+    if (!state.filter) {
+        return items;
+    }
+
+    return [items[0], items[2], items[4]];
+});
 
 const state = reactive({
     type: 'radio' as 'radio' | 'checkbox',
     selected: [items[0].value],
     disabled: [items[2].value],
-    hideInput: false
+    hideInput: false,
+    filter: false
 });
 
 watch(
