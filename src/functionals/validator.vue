@@ -55,7 +55,7 @@ watch(
     (received?: string) => {
         if (!received) {
             state.failed = state.failed.filter((item) => item !== triggeredValidation.value);
-            state.valid = !!state.failed.length;
+            state.valid = !state.failed.length;
             showing.value = !state.valid;
             return;
         }
@@ -87,7 +87,7 @@ const validate = (data: FieldData): void => {
 
 // TODO: Move to composable for non-component use
 const validateFieldData = (data: FieldData, event: UpdateEmitType): void => {
-    if (state.value === data.value && state.name === data.name) {
+    if (state.name === data.name && JSON.stringify(state.value) === JSON.stringify(data.value)) {
         return;
     }
 

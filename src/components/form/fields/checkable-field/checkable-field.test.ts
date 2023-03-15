@@ -147,8 +147,9 @@ describe('Ticking radio items', () => {
         await check(items[1]);
         await items[1].trigger('keypress.space');
 
-        const emits = emitted(wrapper, 'updated', 1) as ValidatedFieldData[];
+        const emits = emitted(wrapper, 'updated', 2) as ValidatedFieldData[];
         expect(emits[0]).toEqual(validSingleUpdate);
+        expect(emits[1]).toEqual(validSingleUpdate);
     });
 
     it('should not tick the radio item with space key if disabled', async () => {

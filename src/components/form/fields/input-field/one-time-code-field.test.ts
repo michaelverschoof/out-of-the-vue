@@ -25,11 +25,10 @@ beforeAll(() => {
 });
 
 describe('Mounting components', () => {
-
     it('should mount the component', async () => {
         const { inputs, wrapper } = mountComponent();
         expect(inputs.length).toBe(6);
-        expect(inputs.every(input => input.attributes().name.startsWith(props.name))).toBeTruthy();
+        expect(inputs.every((input) => input.attributes().name.startsWith(props.name))).toBeTruthy();
 
         const emits = emitted(wrapper, 'created');
         expect(emits[0]).toEqual(createdEmit);
@@ -64,7 +63,6 @@ describe('Mounting components', () => {
 });
 
 describe('Give updated value on input', () => {
-
     it('should emit on input', async () => {
         const wrapper = mount(OneTimeCodeField, {
             props: Object.assign({}, props, { type: 'alpha' }),
@@ -73,8 +71,12 @@ describe('Give updated value on input', () => {
 
         const input = wrapper.find('input');
 
+        // console.log(input.html());
+
         await input.setValue('a');
         expect(input.element.value).toBe('A');
+
+        // console.log(wrapper.emitted('updated'));
 
         const emits = emitted(wrapper, 'updated');
         expect(emits[0].value === 'A').toBeTruthy();
@@ -97,9 +99,7 @@ describe('Give updated value on input', () => {
 });
 
 describe('Focusing components', () => {
-
     describe('On focus', () => {
-
         it('should focus natively', async () => {
             const { inputs, wrapper } = mountComponent();
             expect(wrapper.find('.focused').exists()).toBeFalsy();
@@ -163,7 +163,6 @@ describe('Focusing components', () => {
     });
 
     describe('On blur', () => {
-
         it('should blur natively', async () => {
             const { inputs, wrapper } = mountComponent();
 
@@ -194,7 +193,6 @@ describe('Focusing components', () => {
 });
 
 describe('Jump focus on input', () => {
-
     it('should jump focus to next', async () => {
         const { inputs, wrapper } = mountComponent();
         expect(wrapper.find('.focused').exists()).toBeFalsy();
@@ -295,7 +293,6 @@ describe('Jump focus on input', () => {
 });
 
 describe('Pasting data', () => {
-
     it('should fill the inputs', async () => {
         const { inputs, wrapper } = mountComponent();
 
@@ -348,14 +345,11 @@ describe('Pasting data', () => {
 });
 
 describe('Validating field', () => {
-
     beforeEach(() => {
-        vi.spyOn(window, 'requestAnimationFrame').mockImplementation(
-            (callback: FrameRequestCallback): number => {
-                callback(100);
-                return 0;
-            }
-        );
+        vi.spyOn(window, 'requestAnimationFrame').mockImplementation((callback: FrameRequestCallback): number => {
+            callback(100);
+            return 0;
+        });
     });
 
     it('should show a validation error', async () => {
@@ -368,11 +362,11 @@ describe('Validating field', () => {
         expect(wrapper.find('strong.validation-error').exists()).toBeFalsy();
 
         await inputs[0].element.focus();
-        expect(inputs.some(input => input.classes().includes('invalid'))).toBeFalsy();
+        expect(inputs.some((input) => input.classes().includes('invalid'))).toBeFalsy();
         expect(wrapper.find('strong.validation-error').exists()).toBeFalsy();
 
         await inputs[0].trigger('blur');
-        expect(inputs.every(input => input.classes().includes('invalid'))).toBeTruthy();
+        expect(inputs.every((input) => input.classes().includes('invalid'))).toBeTruthy();
 
         expect(wrapper.find('strong.validation-error').exists()).toBeTruthy();
         expect(wrapper.find('strong.validation-error').text()).toBe('required error');
@@ -392,7 +386,7 @@ describe('Validating field', () => {
         expect(inputs[0].classes().includes('focused')).toBeTruthy();
 
         await wrapper.find('main').trigger('blur');
-        expect(inputs.some(input => input.classes().includes('invalid'))).toBeFalsy();
+        expect(inputs.some((input) => input.classes().includes('invalid'))).toBeFalsy();
         expect(wrapper.find('strong.validation-error').exists()).toBeFalsy();
     });
 
@@ -413,7 +407,7 @@ describe('Validating field', () => {
         const validations: ValidationMethod[] = [
             {
                 name: 'custom',
-                validator: (data: FieldData) => JSON.stringify(data.value) === JSON.stringify([ 'F', 'O', 'O', 'B', 'A', 'R' ]),
+                validator: (data: FieldData) => JSON.stringify(data.value) === JSON.stringify(['F', 'O', 'O', 'B', 'A', 'R']),
                 parameters: null
             }
         ];
@@ -447,7 +441,7 @@ describe('Validating field', () => {
     });
 });
 
-function mountComponent(): { wrapper: VueWrapper<any>, inputs: DOMWrapper<HTMLInputElement>[] } {
+function mountComponent(): { wrapper: VueWrapper<any>; inputs: DOMWrapper<HTMLInputElement>[] } {
     const wrapper = mount(OneTimeCodeField, {
         props: props,
         attachTo: document.body

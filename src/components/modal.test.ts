@@ -6,6 +6,7 @@ import { afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 
 /**
  * @vitest-environment jsdom
+ * Used instead of happy-dom to get the `document.activeElement` working
  */
 
 const opener = {
@@ -75,6 +76,11 @@ describe('Opening and closing modal', async () => {
 
         await wrapper.find('#opener').trigger('click');
         expect(modal).toMatchSnapshot();
+
+        await wrapper.vm.$nextTick();
+
+        const backdrop = document.querySelector('.backdrop') as HTMLDivElement;
+        expect(backdrop).toBe(document.activeElement);
 
         emitted(wrapper, 'opened');
     });

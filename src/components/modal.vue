@@ -21,13 +21,13 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, onUnmounted, ref, watch } from 'vue';
+import { nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
 
 const emit = defineEmits<{ (event: 'opened' | 'closed'): void }>();
 
 const props = defineProps<{ parent?: string; open?: boolean }>();
 
-const element = ref<HTMLElement | null>(null);
+const element = ref<HTMLElement>(null);
 const showing = ref<boolean>(false);
 
 watch(
@@ -41,13 +41,12 @@ watch(
     }
 );
 
-const openModal = (): void => {
+const openModal = async (): Promise<void> => {
     showing.value = true;
     emit('opened');
 
-    requestAnimationFrame(() => {
-        element.value?.focus();
-    });
+    await nextTick();
+    element.value?.focus();
 };
 
 const closeModal = (): void => {

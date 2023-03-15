@@ -11,7 +11,9 @@
                 @updated="update"
             >
                 <template v-for="item of filteredItems" #[item.value]>
-                    {{ item.label }}
+                    <template v-if="!state.filterDisabled || !state.disabled.includes(item.value)">
+                        {{ item.label }}
+                    </template>
                 </template>
             </checkable-field>
         </variant>
@@ -63,6 +65,7 @@
             <hst-checkbox-list v-else v-model="state.selected" title="Selected" :options="items" />
             <hst-checkbox v-model="state.hideInput" title="Hide input" />
             <hst-checkbox v-model="state.filter" title="Filter items" />
+            <hst-checkbox v-model="state.filterDisabled" title="Filter disabled items" />
         </template>
     </story>
 </template>
@@ -97,7 +100,8 @@ const state = reactive({
     selected: [items[0].value],
     disabled: [items[2].value],
     hideInput: false,
-    filter: false
+    filter: false,
+    filterDisabled: false
 });
 
 watch(

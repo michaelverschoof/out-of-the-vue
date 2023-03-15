@@ -14,8 +14,8 @@
                             :allowed-characters="allowedCharacters"
                             :focus="index === focusedElement"
                             :show-validation="showing"
-                            :validations="inputValidations"
                             :value="state.value[index]"
+                            :validations="inputValidations"
                             @focused="focusedElement = index"
                             @created="initializeState(toRaw(state))"
                             @updated="
@@ -101,7 +101,7 @@ const state = reactive<ValidatedStringArrayFieldData>({
  * When setting the value to -1, no element will be focused
  */
 const selectedIndex = ref<number | null>(props.focus ? 0 : -1);
-const focusedElement = computed({
+const focusedElement = computed<number>({
     get: (): number | null => selectedIndex.value ?? state.value.indexOf(null),
     set: (index: number | null) => {
         selectedIndex.value = index !== null && index < props.length ? index : null;

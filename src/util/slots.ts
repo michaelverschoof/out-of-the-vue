@@ -9,10 +9,13 @@ export function provided(slot?: Slot) {
         return false;
     }
 
-    return slot().some(
-        (content) =>
-            !!content.el ||
-            (!!content.children && !!Object.keys(content.children).length) ||
-            (!!content.props && Object.keys(content.props).some((key) => key !== 'key'))
-    );
+    return slot().some((content) => !!content.el || hasChildContent(content.children) || hasPropContent(content.props));
+}
+
+function hasChildContent(children: any): boolean {
+    return !!children && !(children === 'v-if') && !!Object.keys(children).length;
+}
+
+function hasPropContent(props: any): boolean {
+    return !!props && Object.keys(props).some((key) => key !== 'key');
 }

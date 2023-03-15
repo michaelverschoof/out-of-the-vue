@@ -23,8 +23,8 @@ import { provided } from '@/util/slots';
 import { computed, useSlots } from 'vue';
 
 const slots = useSlots();
-const providedPrepend = computed(() => provided(slots.prepend));
-const providedAppend = computed(() => provided(slots.append));
+const providedPrepend = computed<boolean>(() => provided(slots.prepend));
+const providedAppend = computed<boolean>(() => provided(slots.append));
 </script>
 
 <style lang="postcss" scoped>

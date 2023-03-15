@@ -140,7 +140,7 @@ const created = (data: CheckableFieldData): void => {
 const updated = (data: CheckableFieldData): void => {
     if (props.type === 'radio') {
         if (selectedItems.value.has(data.value)) {
-            return;
+            return emit('updated', { ...state });
         }
 
         if (data.checked) {
