@@ -1,28 +1,28 @@
 <template>
-    <story title="Layout/Prepend append" :layout="{ type: 'grid', width: 400 }" auto-props-disabled>
-        <variant title="Prepend" icon="lucide:arrow-left">
+    <Story title="Layout/Prepend append" :layout="{ type: 'grid', width: 400 }" auto-props-disabled>
+        <Variant title="Prepend" icon="lucide:arrow-left">
             <prepend-append>
                 <template #prepend><icon icon="mdi:airballoon" color="" /></template>
                 Content as text
             </prepend-append>
-        </variant>
+        </Variant>
 
-        <variant title="Append" icon="lucide:arrow-right">
+        <Variant title="Append" icon="lucide:arrow-right">
             <prepend-append>
                 <template #append><icon icon="mdi:airplane" /></template>
                 <span>Content in a span</span>
             </prepend-append>
-        </variant>
+        </Variant>
 
-        <variant title="Prepend and append" icon="lucide:arrow-left-right">
+        <Variant title="Prepend and append" icon="lucide:arrow-left-right">
             <prepend-append>
                 <template #prepend><icon icon="mdi:airballoon" /></template>
                 <template #append><icon icon="mdi:airplane" /></template>
                 <span>Content in a span</span>
             </prepend-append>
-        </variant>
+        </Variant>
 
-        <variant title="Nested prepend and append" icon="lucide:chevrons-right-left">
+        <Variant title="Nested prepend and append" icon="lucide:chevrons-right-left">
             <prepend-append>
                 <template #prepend><icon icon="mdi:airballoon" /></template>
                 <template #append><icon icon="mdi:airplane" /></template>
@@ -32,18 +32,18 @@
                     Content as text
                 </prepend-append>
             </prepend-append>
-        </variant>
+        </Variant>
 
-        <variant title="Empty">
+        <Variant title="Empty">
             <prepend-append>
                 <span class="text">Content in a span</span>
             </prepend-append>
-        </variant>
+        </Variant>
 
         <template #controls>
             <show-grid-lines show />
         </template>
-    </story>
+    </Story>
 </template>
 
 <script lang="ts" setup>

@@ -1,6 +1,6 @@
 <template>
-    <story title="Form/Fields/Text field" :layout="{ type: 'grid', width: 400 }" auto-props-disabled>
-        <variant title="Simple">
+    <Story title="Form/Fields/Text field" :layout="{ type: 'grid', width: 400 }" auto-props-disabled>
+        <Variant title="Simple">
             <text-field
                 name="histoire-text-field-simple"
                 :value="state.value"
@@ -9,9 +9,9 @@
                 @created="logEvent('created', $event)"
                 @updated="logEvent('updated', $event)"
             />
-        </variant>
+        </Variant>
 
-        <variant title="With label and information">
+        <Variant title="With label and information">
             <text-field
                 name="histoire-text-field-labels"
                 :value="state.value"
@@ -23,9 +23,9 @@
                 <template #label>Field label</template>
                 <template #information><i>Helpful text on how to fill in the field</i></template>
             </text-field>
-        </variant>
+        </Variant>
 
-        <variant title="With inner icons">
+        <Variant title="With inner icons">
             <text-field
                 name="histoire-text-field-inner-icons"
                 :typing-delay="state.delay"
@@ -39,9 +39,9 @@
                 <template #prepend><icon icon="mdi:airballoon" /></template>
                 <template #append><icon icon="mdi:airplane" /></template>
             </text-field>
-        </variant>
+        </Variant>
 
-        <variant title="With outer icons">
+        <Variant title="With outer icons">
             <prepend-append>
                 <text-field
                     name="histoire-text-field-outer-icons"
@@ -57,9 +57,9 @@
                 <template #prepend><icon icon="mdi:airballoon" /></template>
                 <template #append><icon icon="mdi:airplane" /></template>
             </prepend-append>
-        </variant>
+        </Variant>
 
-        <variant title="With inner and outer icons">
+        <Variant title="With inner and outer icons">
             <prepend-append>
                 <text-field
                     name="histoire-text-field-inner-and-outer-icons"
@@ -77,9 +77,9 @@
                 <template #prepend><icon icon="mdi:airballoon" /></template>
                 <template #append><icon icon="mdi:airplane" /></template>
             </prepend-append>
-        </variant>
+        </Variant>
 
-        <variant title="With validations">
+        <Variant title="With validations">
             <text-field
                 name="histoire-text-field-validations"
                 :value="state.value"
@@ -108,7 +108,7 @@
                     </span>
                 </label>
             </template>
-        </variant>
+        </Variant>
 
         <template #controls>
             <show-grid-lines show />
@@ -116,7 +116,7 @@
             <hst-slider v-model="state.maxLength" :step="1" :min="0" :max="30" title="Maximum length" />
             <hst-slider v-model="state.delay" :step="100" :min="0" :max="1000" title="Typing delay" />
         </template>
-    </story>
+    </Story>
 </template>
 
 <script lang="ts" setup>

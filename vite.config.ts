@@ -48,6 +48,7 @@ export default defineConfig({
     // Vitest Configuration
     test: {
         coverage: {
+            provider: 'c8',
             reporter: ['text', 'lcov']
         },
         resolveSnapshotPath: (path: string, extension: string) => {

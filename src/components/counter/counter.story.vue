@@ -1,12 +1,12 @@
 <template>
-    <story title="Counter/Counter" :layout="{ type: 'grid', width: 400 }">
+    <Story title="Counter/Counter" :layout="{ type: 'grid', width: 400 }">
         <counter :count="state.value.length" :limit="state.limit" />
 
         <template #controls>
             <hst-text v-model="state.value" title="Value" />
             <hst-checkbox v-model="state.exceeded" title="Exceed limit" />
         </template>
-    </story>
+    </Story>
 </template>
 
 <script lang="ts" setup>

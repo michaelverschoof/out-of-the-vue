@@ -1,6 +1,6 @@
 <template>
-    <story title="Modal" :layout="{ type: 'grid', width: 400 }">
-        <variant title="Simple">
+    <Story title="Modal" :layout="{ type: 'grid', width: 400 }">
+        <Variant title="Simple">
             <modal parent=".histoire-story-viewer" :open="state.open" @opened="open" @closed="close">
                 <template #opener="{ open }">
                     <hst-button color="primary" class="p-2" @click="open"> Open modal </hst-button>
@@ -43,13 +43,13 @@
     }
 }
             </pre>
-        </variant>
+        </Variant>
 
         <template #controls>
             <hst-checkbox v-model="state.open" title="Open" />
             <hst-checkbox v-model="state.animation" title="Add transition styling" />
         </template>
-    </story>
+    </Story>
 </template>
 
 <script lang="ts" setup>

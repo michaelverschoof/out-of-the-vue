@@ -1,5 +1,5 @@
 <template>
-    <story title="Form/Fields/Base/Text input" :layout="{ type: 'grid', width: 400 }" auto-props-disabled>
+    <Story title="Form/Fields/Base/Text input" :layout="{ type: 'grid', width: 400 }" auto-props-disabled>
         <text-input
             name="histoire-text-input"
             :value="state.value"
@@ -20,8 +20,9 @@
             <hst-button-group v-model="state.transform" title="Transform value" :options="transformOptions" />
             <hst-checkbox v-model="state.focus" title="Focus" />
             <hst-slider v-model="state.max" :step="1" :min="0" :max="20" title="Maximum length" />
+            <hst-radio v-model="state.characters" title="Allowed characters" :options="allowedCharacters" />
         </template>
-    </story>
+    </Story>
 </template>
 
 <script lang="ts" setup>
@@ -37,6 +38,12 @@ const types = [
 const transformOptions = [
     { label: 'Uppercase', value: 'uppercase' },
     { label: 'Lowercase', value: 'lowercase' }
+];
+
+const allowedCharacters = [
+    { label: 'All', value: '' },
+    { label: 'Letters', value: 'letters' },
+    { label: 'Numbers', value: 'numbers' }
 ];
 
 const state = reactive({

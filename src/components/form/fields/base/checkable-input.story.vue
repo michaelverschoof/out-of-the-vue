@@ -1,5 +1,5 @@
 <template>
-    <story title="Form/Fields/Base/Checkable input" :layout="{ type: 'grid', width: 400 }" auto-props-disabled>
+    <Story title="Form/Fields/Base/Checkable input" :layout="{ type: 'grid', width: 400 }" auto-props-disabled>
         <checkable-input
             name="histoire-checkable-input"
             :value="state.value"
@@ -16,7 +16,7 @@
             <hst-button-group v-model="state.type" title="Input type" :options="types" />
             <hst-checkbox v-model="state.checked" title="Checked" />
         </template>
-    </story>
+    </Story>
 </template>
 
 <script lang="ts" setup>

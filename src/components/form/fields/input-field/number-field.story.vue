@@ -1,6 +1,6 @@
 <template>
-    <story title="Form/Fields/Number field" :layout="{ type: 'grid', width: 400 }" auto-props-disabled>
-        <variant title="Simple">
+    <Story title="Form/Fields/Number field" :layout="{ type: 'grid', width: 400 }" auto-props-disabled>
+        <Variant title="Simple">
             <number-field
                 name="histoire-number-field-simple"
                 :value="state.value"
@@ -11,9 +11,9 @@
                 @created="logEvent('created', $event)"
                 @updated="logEvent('updated', $event)"
             />
-        </variant>
+        </Variant>
 
-        <variant title="With label and information">
+        <Variant title="With label and information">
             <number-field
                 name="histoire-number-field-labels"
                 :value="state.value"
@@ -26,9 +26,9 @@
                 <template #label>Field label</template>
                 <template #information><i>Helpful text on how to fill in the field</i></template>
             </number-field>
-        </variant>
+        </Variant>
 
-        <variant title="With inner icons">
+        <Variant title="With inner icons">
             <number-field
                 name="histoire-number-field-inner-icons"
                 :value="state.value"
@@ -43,9 +43,9 @@
                 <template #prepend><icon icon="mdi:airballoon" /></template>
                 <template #append><icon icon="mdi:airplane" /></template>
             </number-field>
-        </variant>
+        </Variant>
 
-        <variant title="With outer icons">
+        <Variant title="With outer icons">
             <prepend-append>
                 <number-field
                     name="histoire-number-field-outer-icons"
@@ -61,9 +61,9 @@
                 <template #prepend><icon icon="mdi:airballoon" /></template>
                 <template #append><icon icon="mdi:airplane" /></template>
             </prepend-append>
-        </variant>
+        </Variant>
 
-        <variant title="With inner and outer icons">
+        <Variant title="With inner and outer icons">
             <prepend-append>
                 <number-field
                     name="histoire-number-field-inner-and-outer-icons"
@@ -81,9 +81,9 @@
                 <template #prepend><icon icon="mdi:airballoon" /></template>
                 <template #append><icon icon="mdi:airplane" /></template>
             </prepend-append>
-        </variant>
+        </Variant>
 
-        <variant title="With validations">
+        <Variant title="With validations">
             <template #default>
                 <number-field
                     name="histoire-number-field-validations"
@@ -115,7 +115,7 @@
                     </span>
                 </label>
             </template>
-        </variant>
+        </Variant>
 
         <template #controls>
             <show-grid-lines show />
@@ -141,7 +141,7 @@
                 </span>
             </label>
         </template>
-    </story>
+    </Story>
 </template>
 
 <script lang="ts" setup>

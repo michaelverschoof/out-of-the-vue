@@ -1,18 +1,18 @@
 <template>
-    <story title="Counter/Text counter" :layout="{ type: 'grid', width: 400 }">
-        <variant title="Character count">
+    <Story title="Counter/Text counter" :layout="{ type: 'grid', width: 400 }">
+        <Variant title="Character count">
             <text-counter :value="state.value" :limit="state.characterLimit" type="character" />
-        </variant>
+        </Variant>
 
-        <variant title="Word count">
+        <Variant title="Word count">
             <text-counter :value="state.value" :limit="state.wordLimit" type="word" />
-        </variant>
+        </Variant>
 
         <template #controls>
             <hst-text v-model="state.value" title="Value" />
             <hst-checkbox v-model="state.exceeded" title="Exceed limit" />
         </template>
-    </story>
+    </Story>
 </template>
 
 <script lang="ts" setup>

@@ -1,5 +1,5 @@
 <template>
-    <story title="Form/Fields/Base/Numeric input" :layout="{ type: 'grid', width: 400 }" auto-props-disabled>
+    <Story title="Form/Fields/Base/Numeric input" :layout="{ type: 'grid', width: 400 }" auto-props-disabled>
         <numeric-input
             name="histoire-numeric-input"
             :value="state.value"
@@ -17,7 +17,7 @@
             <label class="histoire-wrapper htw-p-2 htw-flex htw-gap-2 htw-flex-wrap">
                 <span class="htw-w-28 htw-shrink-0" />
                 <span class="htw-grow htw-max-w-full htw-flex htw-items-center htw-gap-1">
-                    <hst-button :disabled="!state.allowDecimals" class="htw-p-2" :color="!state.allowDecimals || 'primary'" @click="toggleDecimal">
+                    <hst-button :disabled="!state.allowDecimals" class="htw-p-2" :color="state.allowDecimals ? 'primary' : 'default'" @click="toggleDecimal">
                         Toggle decimal
                     </hst-button>
                 </span>
@@ -27,13 +27,13 @@
             <label class="histoire-wrapper htw-p-2 htw-flex htw-gap-2 htw-flex-wrap">
                 <span class="htw-w-28 htw-shrink-0" />
                 <span class="htw-grow htw-max-w-full htw-flex htw-items-center htw-gap-1">
-                    <hst-button :disabled="!state.allowNegative" class="htw-p-2" :color="state.allowNegative ? 'primary' : ''" @click="toggleMinus">
+                    <hst-button :disabled="!state.allowNegative" class="htw-p-2" :color="state.allowNegative ? 'primary' : 'default'" @click="toggleMinus">
                         Toggle minus sign
                     </hst-button>
                 </span>
             </label>
         </template>
-    </story>
+    </Story>
 </template>
 
 <script lang="ts" setup>

@@ -1,6 +1,6 @@
 <template>
-    <story title="Form/Fields/Checkable field" :layout="{ type: 'grid', width: 400 }" auto-props-disabled>
-        <variant title="Simple">
+    <Story title="Form/Fields/Checkable field" :layout="{ type: 'grid', width: 400 }" auto-props-disabled>
+        <Variant title="Simple">
             <checkable-field
                 name="histoire-checkable-field-simple"
                 :type="state.type"
@@ -16,9 +16,9 @@
                     </template>
                 </template>
             </checkable-field>
-        </variant>
+        </Variant>
 
-        <variant title="With label and information">
+        <Variant title="With label and information">
             <checkable-field
                 name="histoire-checkable-field-labels"
                 :type="state.type"
@@ -34,9 +34,9 @@
                 <template #label>Field label</template>
                 <template #information><i>Helpful text on how to fill in the field</i></template>
             </checkable-field>
-        </variant>
+        </Variant>
 
-        <variant title="With inner icons">
+        <Variant title="With inner icons">
             <checkable-field
                 name="histoire-checkable-field-inner-icons"
                 hide-input
@@ -55,7 +55,7 @@
                     </prepend-append>
                 </template>
             </checkable-field>
-        </variant>
+        </Variant>
 
         <template #controls>
             <show-grid-lines show />
@@ -67,7 +67,7 @@
             <hst-checkbox v-model="state.filter" title="Filter items" />
             <hst-checkbox v-model="state.filterDisabled" title="Filter disabled items" />
         </template>
-    </story>
+    </Story>
 </template>
 
 <script lang="ts" setup>

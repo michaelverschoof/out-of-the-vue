@@ -1,6 +1,6 @@
 <template>
-    <story title="Form/Fields/One time code field" :layout="{ type: 'grid', width: 400 }" auto-props-disabled>
-        <variant title="Simple">
+    <Story title="Form/Fields/One time code field" :layout="{ type: 'grid', width: 400 }" auto-props-disabled>
+        <Variant title="Simple">
             <one-time-code-field
                 name="histoire-one-time-code-field-simple"
                 :focus="state.focus"
@@ -9,9 +9,9 @@
                 @created="logEvent('created', $event)"
                 @updated="logEvent('updated', $event)"
             />
-        </variant>
+        </Variant>
 
-        <variant title="With label and information">
+        <Variant title="With label and information">
             <one-time-code-field
                 name="histoire-one-time-code-field-labels"
                 :focus="state.focus"
@@ -23,9 +23,9 @@
                 <template #label>Field label</template>
                 <template #information><i>Helpful text on how to fill in the field</i></template>
             </one-time-code-field>
-        </variant>
+        </Variant>
 
-        <variant title="With outer icons">
+        <Variant title="With outer icons">
             <prepend-append>
                 <one-time-code-field
                     name="histoire-one-time-code-field-labels"
@@ -41,7 +41,7 @@
                 <template #prepend><icon icon="mdi:airballoon" /></template>
                 <template #append><icon icon="mdi:airplane" /></template>
             </prepend-append>
-        </variant>
+        </Variant>
 
         <template #controls>
             <show-grid-lines show />
@@ -50,7 +50,7 @@
             <hst-slider v-model="state.length" :step="1" :min="1" :max="10" title="Length" />
             <hst-button-group v-model="state.type" title="Input type" :options="['alpha', 'numeric', 'alphanumeric']" />
         </template>
-    </story>
+    </Story>
 </template>
 
 <script lang="ts" setup>
