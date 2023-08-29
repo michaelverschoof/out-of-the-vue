@@ -17,7 +17,6 @@ beforeAll(() => {
 });
 
 describe('Mounting component', () => {
-
     it('should mount the input component', async () => {
         const { input, wrapper } = mountComponent();
 
@@ -64,7 +63,6 @@ describe('Mounting component', () => {
 });
 
 describe('Updating input', () => {
-
     it('should update value from props', async () => {
         const { input, wrapper } = mountComponent();
 
@@ -77,12 +75,12 @@ describe('Updating input', () => {
 
     it('should not update value from props if value is undefined', async () => {
         const { input, wrapper } = mountComponent();
+        expect(input.element.value).toBe('123.45');
 
         await wrapper.setProps({ value: undefined });
-        expect(input.element.value).toBe('');
+        expect(input.element.value).toBe('123.45');
 
-        const emits = emitted(wrapper, 'updated');
-        expect(emits[0].value).toBe(null);
+        emitted(wrapper, 'updated', 0);
     });
 
     it('should update value from input', async () => {
@@ -122,7 +120,7 @@ describe('Updating input', () => {
     });
 });
 
-function mountComponent(props: { [key: string]: number | boolean | null } | null = null): { wrapper: VueWrapper<any>, input: DOMWrapper<HTMLInputElement> } {
+function mountComponent(props: { [key: string]: number | boolean | null } | null = null): { wrapper: VueWrapper<any>; input: DOMWrapper<HTMLInputElement> } {
     const options = {
         props: Object.assign({}, numberProps, props || null)
     };

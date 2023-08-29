@@ -2,10 +2,11 @@ import TextField from '@/components/form/fields/input-field/text-field.vue';
 import { FieldData, ValidatedFieldData } from '@/composables/types';
 import { emitted } from '@test/emits';
 import { DOMWrapper, mount, VueWrapper } from '@vue/test-utils';
-import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
 /**
- * @vitest-environment happy-dom
+ * @vitest-environment jsdom
+ * Used instead of happy-dom to get the `main.value.includes(document.activeElement)` working
  */
 
 const props = {
@@ -30,7 +31,6 @@ afterEach(() => {
 });
 
 describe('Mounting components', () => {
-
     it('should mount the component', async () => {
         const { input, wrapper } = mountComponent();
 
@@ -78,9 +78,7 @@ describe('Mounting components', () => {
 });
 
 describe('Focusing components', () => {
-
     describe('On focus', () => {
-
         it('should focus natively', async () => {
             const wrapper = mount(TextField, {
                 props: props,
@@ -109,7 +107,6 @@ describe('Focusing components', () => {
     });
 
     describe('On blur', () => {
-
         it('should blur natively', async () => {
             const wrapper = mount(TextField, {
                 props: props,
@@ -149,7 +146,6 @@ describe('Focusing components', () => {
 });
 
 describe('Updating input', () => {
-
     it('should update value from props', async () => {
         const { input, wrapper } = mountComponent();
 
@@ -180,7 +176,6 @@ describe('Updating input', () => {
 });
 
 describe('Debouncing input', () => {
-
     it('should trigger debounce', async () => {
         const { input, wrapper } = mountComponent();
 
@@ -205,18 +200,29 @@ describe('Debouncing input', () => {
 });
 
 describe('Validating field', () => {
+    beforeEach(() => {
+        vi.spyOn(window, 'requestAnimationFrame').mockImplementation((callback: FrameRequestCallback): number => {
+            callback(100);
+            return 0;
+        });
+    });
 
     it('should show a validation error', async () => {
         const wrapper = mount(TextField, {
             props: Object.assign({}, props, { required: true }),
-            slots: { required: 'required error' }
+            slots: { required: 'required error' },
+            attachTo: document.body
         });
 
-        const input = wrapper.find('input');
         expect(wrapper.find('strong.validation-error').exists()).toBeFalsy();
 
-        await input.trigger('blur');
+        const input = wrapper.find('input');
+        await input.element.focus();
+        expect(wrapper.find('strong.validation-error').exists()).toBeFalsy();
 
+        await input.element.blur();
+        await wrapper.vm.$nextTick();
+        await wrapper.vm.$nextTick();
         expect(wrapper.find('strong.validation-error').exists()).toBeTruthy();
         expect(wrapper.find('strong.validation-error').text()).toBe('required error');
     });
@@ -235,6 +241,27 @@ describe('Validating field', () => {
         expect(wrapper.find('strong.validation-error').exists()).toBeFalsy();
     });
 
+    it('should not show a validation error when focus still in field', async () => {
+        const wrapper = mount(TextField, {
+            props: Object.assign({}, props, { required: true }),
+            slots: { required: 'required error', prepend: 'A prepend' },
+            attachTo: document.body
+        });
+
+        const input = wrapper.find('input');
+        await input.element.focus();
+        await input.setValue('');
+        expect(wrapper.find('strong.validation-error').exists()).toBeFalsy();
+
+        const prepend = wrapper.find<HTMLElement>('.prepend');
+        prepend.element.tabIndex = -1;
+
+        await prepend.element.focus();
+        await wrapper.vm.$nextTick();
+        await wrapper.vm.$nextTick();
+        expect(wrapper.find('strong.validation-error').exists()).toBeFalsy();
+    });
+
     it('should trigger validation via props', async () => {
         const wrapper = mount(TextField, {
             props: Object.assign({}, props, { required: true }),
@@ -248,7 +275,6 @@ describe('Validating field', () => {
     });
 
     describe('Specific validations', () => {
-
         it('should trigger min validation', async () => {
             const wrapper = mount(TextField, {
                 props: Object.assign({}, props, { typingDelay: 0, min: 2 }),
@@ -294,8 +320,8 @@ describe('Validating field', () => {
         const validations = [
             {
                 name: 'custom',
-                validator: (data: FieldData, find: string) => (<string> data.value)?.includes(find),
-                parameters: [ 'bar' ]
+                validator: (data: FieldData, find: string) => (<string>data.value)?.includes(find),
+                parameters: ['bar']
             }
         ];
 
@@ -320,7 +346,7 @@ describe('Validating field', () => {
     });
 });
 
-function mountComponent(): { wrapper: VueWrapper<any>, input: DOMWrapper<HTMLInputElement> } {
+function mountComponent(): { wrapper: VueWrapper<any>; input: DOMWrapper<HTMLInputElement> } {
     const wrapper = mount(TextField, {
         props: props
     });

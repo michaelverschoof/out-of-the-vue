@@ -27,7 +27,7 @@ import Modal from './components/modal.vue';
 /**
  * Types
  */
-import { BaseValidationType, CheckableFieldData, FieldData, NumberFieldData, StringFieldData, ValidatedFieldData, ValidatedNumberFieldData, ValidatedStringArrayFieldData, ValidatedStringFieldData, ValidationMethod, ValidationMethodParameters } from './composables/types';
+import { BaseValidationType, CheckableFieldData, FieldData, NumberFieldData, StringFieldData, ValidatedFieldData, ValidatedFormData, ValidatedNumberFieldData, ValidatedStringArrayFieldData, ValidatedStringFieldData, ValidationMethod, ValidationMethodParameters } from './composables/types';
 
 /**
  * Functional components
@@ -64,6 +64,7 @@ export type {
     NumberFieldData,
     CheckableFieldData,
     ValidatedFieldData,
+    ValidatedFormData,
     ValidatedNumberFieldData,
     ValidatedStringFieldData,
     ValidatedStringArrayFieldData,

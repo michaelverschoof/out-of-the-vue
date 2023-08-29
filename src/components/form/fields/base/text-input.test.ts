@@ -21,7 +21,6 @@ beforeAll(() => {
 });
 
 describe('Mounting components', () => {
-
     it('should mount the text component', async () => {
         const { wrapper } = mountComponent();
 
@@ -47,16 +46,40 @@ describe('Mounting components', () => {
             value: props.value
         });
     });
+
+    it('should mount the text component without a value', async () => {
+        const { wrapper } = mountComponent({ value: null });
+
+        expect(wrapper.find('input').exists()).toBeTruthy();
+        expect(wrapper.find('textarea').exists()).toBeFalsy();
+
+        const emits = emitted(wrapper, 'created');
+        expect(emits[0]).toEqual({
+            name: props.name,
+            value: null
+        });
+    });
+
+    it('should mount the text component with a value shortened to the max length', async () => {
+        const { wrapper } = mountComponent({ max: 2 });
+
+        expect(wrapper.find('input').exists()).toBeTruthy();
+        expect(wrapper.find('textarea').exists()).toBeFalsy();
+
+        const emits = emitted(wrapper, 'created');
+        expect(emits[0]).toEqual({
+            name: props.name,
+            value: props.value.slice(0, 2)
+        });
+    });
 });
 
 describe('Focusing components', () => {
-
     describe('On focus', () => {
-
         it('should focus natively', async () => {
             const { input, wrapper } = mountComponent(null, true);
 
-            await input.element.focus();
+            input.element.focus();
             expect(input.element).toBe(document.activeElement);
 
             emitted(wrapper, 'focused');
@@ -84,7 +107,7 @@ describe('Focusing components', () => {
             const { input, wrapper } = mountComponent(null, true);
             expect(input.element).not.toBe(document.activeElement);
 
-            await input.element.focus();
+            input.element.focus();
             expect(input.element).toBe(document.activeElement);
 
             await wrapper.setProps({ focus: true });
@@ -95,12 +118,11 @@ describe('Focusing components', () => {
     });
 
     describe('On blur', () => {
-
         it('should blur natively', async () => {
             const { input, wrapper } = mountComponent({ focus: true }, true);
             expect(input.element).toBe(document.activeElement);
 
-            await input.element.blur();
+            input.element.blur();
 
             expect(input.element).not.toBe(document.activeElement);
             emitted(wrapper, 'blurred');
@@ -119,9 +141,8 @@ describe('Focusing components', () => {
 });
 
 describe('Filtering input', () => {
-
     it('should filter out characters', async () => {
-        const { input, wrapper } = mountComponent({ allowedCharacters: '[A-z]' });
+        const { input, wrapper } = mountComponent({ allowedCharacters: 'letters' });
 
         await input.setValue('foo123bar');
         expect(input.element.value).toBe('foobar');
@@ -147,11 +168,11 @@ describe('Filtering input', () => {
         expect(input.element.value).toBe('');
 
         const emits = emitted(wrapper, 'updated');
+
         expect(emits[0].value).toBe('');
     });
 
     describe('When pasting values', () => {
-
         it('should filter characters', async () => {
             const { input, wrapper } = mountComponent({ allowedCharacters: '[A-z]' });
 
@@ -161,13 +182,62 @@ describe('Filtering input', () => {
             const emits = emitted(wrapper, 'updated');
             expect(emits[0].value).toBe('foobar');
         });
+
+        it('should not filter characters when empty', async () => {
+            const { input, wrapper } = mountComponent({ allowedCharacters: 'letters' });
+
+            await input.trigger('paste', { clipboardData: { getData: () => '' } });
+            expect(input.element.value).toBe('');
+
+            const emits = emitted(wrapper, 'updated');
+            expect(emits[0].value).toBe(null);
+        });
+
+        it('should not filter characters when null', async () => {
+            const { input, wrapper } = mountComponent({ allowedCharacters: 'letters' });
+
+            await input.trigger('paste', { clipboardData: { getData: (): null => null } });
+            expect(input.element.value).toBe('');
+
+            const emits = emitted(wrapper, 'updated');
+            expect(emits[0].value).toBe(null);
+        });
+    });
+
+    describe('When updating allowed characters', () => {
+        it('should filter after updating prop', async () => {
+            const { input, wrapper } = mountComponent({ allowedCharacters: '[A-z,1,3]' });
+
+            await input.setValue('foo123bar');
+            expect(input.element.value).toBe('foo13bar');
+
+            await wrapper.setProps({ allowedCharacters: '[A-z]' });
+            expect(input.element.value).toBe('foobar');
+
+            await wrapper.setProps({ value: 'foo12345bar' });
+            expect(input.element.value).toBe('foobar');
+
+            const emits = emitted(wrapper, 'updated', 2);
+
+            expect(emits[0].value).toBe('foo13bar');
+            expect(emits[1].value).toBe('foobar');
+        });
+
+        it('should not filter after updating prop when equal value', async () => {
+            const { input, wrapper } = mountComponent({ value: 'foobar', allowedCharacters: '[A-z]' });
+
+            expect(input.element.value).toBe('foobar');
+
+            await wrapper.setProps({ allowedCharacters: '[A-z0-9]' });
+            expect(input.element.value).toBe('foobar');
+
+            emitted(wrapper, 'updated', 0);
+        });
     });
 });
 
 describe('Transforming input', () => {
-
     describe('When value changes', () => {
-
         it('should uppercase characters', async () => {
             const { input, wrapper } = mountComponent({ transformInput: 'uppercase' });
 
@@ -200,7 +270,6 @@ describe('Transforming input', () => {
     });
 
     describe('When pasting values', () => {
-
         it('should uppercase characters', async () => {
             const { input, wrapper } = mountComponent({ transformInput: 'uppercase' });
 
@@ -211,10 +280,36 @@ describe('Transforming input', () => {
             expect(emits[0].value).toBe('FOOBAR');
         });
     });
+
+    describe('When updating allowed characters', () => {
+        it('should transform after updating prop', async () => {
+            const { input, wrapper } = mountComponent({ transformInput: 'uppercase' });
+
+            await input.setValue('fooBAR');
+            expect(input.element.value).toBe('FOOBAR');
+
+            await wrapper.setProps({ transformInput: 'lowercase' });
+            expect(input.element.value).toBe('foobar');
+
+            const emits = emitted(wrapper, 'updated', 2);
+            expect(emits[0].value).toBe('FOOBAR');
+            expect(emits[1].value).toBe('foobar');
+        });
+
+        it('should not transform after updating prop when equal value', async () => {
+            const { input, wrapper } = mountComponent({ value: 'FOOBAR' });
+
+            expect(input.element.value).toBe('FOOBAR');
+
+            await wrapper.setProps({ transformInput: 'uppercase' });
+            expect(input.element.value).toBe('FOOBAR');
+
+            emitted(wrapper, 'updated', 0);
+        });
+    });
 });
 
 describe('Updating input', () => {
-
     it('should update value from props', async () => {
         const { input, wrapper } = mountComponent();
 
@@ -242,8 +337,47 @@ describe('Updating input', () => {
     });
 });
 
-function mountComponent(props: { [key: string]: string | boolean | null } | null = null, attachToDocument: boolean = false): { wrapper: VueWrapper<any>, input: DOMWrapper<HTMLInputElement> } {
-    const options: { props: object, attachTo?: HTMLElement } = {
+describe('Preventing input', () => {
+    // TODO: Use this test once test-utils allows proper triggering of keyboard input
+    // Currently only
+    it('should prevent not allowed keyboard value', async () => {
+        const { input, wrapper } = mountComponent({ allowedCharacters: 'letters' });
+
+        await input.trigger('keypress', { key: '5' });
+
+        emitted(wrapper, 'updated', 0);
+    });
+
+    // TODO: Use this test once test-utils allows proper triggering of keyboard input
+    // it('should not prevent allowed keyboard value', async () => {
+    //     const { input, wrapper } = mountComponent({ allowedCharacters: 'letters' });
+    //     expect(input.element.value).toBe('foo');
+
+    //     await wrapper.trigger('keypress', { key: 'o' });
+    //     expect(input.element.value).toBe('fooo');
+
+    //     const updated = emitted(wrapper, 'updated');
+    //     expect(updated[0].value).toBe('fooo');
+    // });
+
+    // TODO: Use this test once test-utils allows proper triggering of keyboard input
+    // it('should not prevent keyboard value when there is no regex', async () => {
+    //     const { input, wrapper } = mountComponent();
+    //     expect(input.element.value).toBe('foo');
+
+    //     await input.trigger('keypress', { key: 'o' });
+    //     expect(input.element.value).toBe('fooo');
+
+    //     const updated = emitted(wrapper, 'updated');
+    //     expect(updated[0].value).toBe('fooo');
+    // });
+});
+
+function mountComponent(
+    props: { [key: string]: string | boolean | number | null } | null = null,
+    attachToDocument: boolean = false
+): { wrapper: VueWrapper<any>; input: DOMWrapper<HTMLInputElement> } {
+    const options: { props: object; attachTo?: HTMLElement } = {
         props: Object.assign({}, textProps, props || null)
     };
 

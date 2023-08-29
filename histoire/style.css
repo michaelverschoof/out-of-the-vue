@@ -1,0 +1,71 @@
+body.show-grid-lines {
+    [data-test-id='sandbox-render'] [data-v-app] > * {
+        border: 2px dashed;
+        @apply border-cyan-700;
+
+        > * {
+            border: 2px dashed;
+            @apply border-cyan-500;
+            margin: 3px;
+            padding: 3px;
+        }
+
+        .checkable-field-item {
+            border: 2px dashed;
+            @apply border-cyan-300;
+            padding: 3px;
+        }
+    }
+}
+
+[data-test-id='sandbox-render'] {
+    *,
+    *:before,
+    *:after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+
+    input.text-input,
+    textarea.text-input {
+        color: black !important;
+    }
+
+    [data-v-app] {
+        svg {
+            @apply text-emerald-600;
+            min-height: 1.5rem;
+            min-width: 1.5rem;
+        }
+
+        span.text {
+            display: inline-block;
+        }
+
+        .counter.exceeded {
+            @apply text-orange-500;
+        }
+    }
+}
+
+[data-test-id='story-controls'] {
+    h3 {
+        @apply font-medium;
+        @apply mb-2;
+        @apply mt-4;
+        @apply px-2;
+        @apply text-base;
+        @apply text-gray-500;
+    }
+
+    i {
+        @apply block;
+        @apply italic;
+        @apply mb-2;
+        @apply px-2;
+        @apply text-base;
+        @apply text-gray-500;
+        @apply text-sm;
+    }
+}

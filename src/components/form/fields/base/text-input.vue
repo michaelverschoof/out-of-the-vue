@@ -11,7 +11,7 @@
         @blur="blurElement"
         @focus="focusElement"
         @input="filterInputData"
-        @keydown="filterInputData"
+        @keypress="preventUnallowedCharacters"
         @paste.prevent="filterPasteData"
     />
 </template>
@@ -32,12 +32,13 @@ const props = defineProps<{
     textarea?: boolean;
     focus?: boolean;
     max?: number;
-    allowedCharacters?: string;
+    allowedCharacters?: 'letters' | 'numbers' | string;
     transformInput?: 'uppercase' | 'lowercase';
 }>();
 
 const element = ref<HTMLInputElement | HTMLTextAreaElement | null>(null);
 const focused = ref<boolean>(false);
+const characterRegex = ref<RegExp>(getRegex(props.allowedCharacters));
 
 const state = reactive<StringFieldData>({
     name: props.name,
@@ -47,53 +48,84 @@ const state = reactive<StringFieldData>({
 const model = computed({
     get: () => state.value,
     set: (value: string | null) => {
-        if (value === state.value) {
-            return;
-        }
+        state.value = value;
+    }
+});
 
-        state.value = value ?? null;
+function update(value?: string | null) {
+    if (value === null) {
+        model.value = null;
         emit('updated', { ...state });
-    }
-});
-
-watch(() => props.value, (received?: string) => {
-    const value = filterAndTransform(received);
-    if (received === model.value || value === model.value) {
         return;
     }
 
-    model.value = value;
-});
-
-watch(() => props.focus, (received?: boolean) => {
-    if (focused.value === received) {
+    const prepared = filterAndTransform(value ?? state.value);
+    if (prepared === state.value) {
         return;
     }
 
-    !received ? element.value?.blur() : element.value?.focus();
-});
+    model.value = prepared;
+    emit('updated', { ...state });
+}
 
-/**
- * The regex containing the allowed characters
- */
-const inputRegex = !!props.allowedCharacters ? new RegExp(props.allowedCharacters, 'g') : null;
+watch(
+    () => props.value,
+    () => {
+        update(props.value);
+    }
+);
+
+watch(
+    () => props.allowedCharacters,
+    () => {
+        characterRegex.value = getRegex(props.allowedCharacters);
+        update();
+    }
+);
+
+watch([() => props.transformInput, () => props.max], () => {
+    update();
+});
 
 /**
  * Filter the pasted value by the allowed character format
  */
 const filterPasteData = (event: ClipboardEvent): void => {
-    model.value = filterAndTransform(event.clipboardData?.getData('text'));
+    update(event.clipboardData?.getData('text'));
 };
 
 /**
  * Filter the user's inputted value by the allowed character format
  */
 const filterInputData = (event: Event): void => {
-    model.value = filterAndTransform((<HTMLInputElement> event.target).value);
+    update((<HTMLInputElement>event.target).value);
 };
 
-const filterAndTransform = (value?: string): string | null => {
-    let filtered = filter(value?.trimStart() ?? '', inputRegex ?? '');
+/**
+ * Prevent any unallowed characters
+ */
+const preventUnallowedCharacters = (event: KeyboardEvent): void => {
+    if (characterRegex.value && !characterRegex.value.test(event.key)) {
+        event.preventDefault();
+    }
+};
+
+watch(
+    () => props.focus,
+    (received: boolean) => {
+        if (focused.value === received) {
+            return;
+        }
+
+        !received ? element.value?.blur() : element.value?.focus();
+    }
+);
+
+/**
+ * Filter and transform the provided value
+ */
+function filterAndTransform(value?: string): string {
+    let filtered = filter(value?.trimStart(), characterRegex.value);
     if (!filtered) {
         return filtered;
     }
@@ -104,7 +136,17 @@ const filterAndTransform = (value?: string): string | null => {
     }
 
     return transform(filtered, props.transformInput);
-};
+}
+
+function getRegex(value?: 'letters' | 'numbers' | string): RegExp {
+    if (!value) {
+        return null;
+    }
+
+    const presets: Record<string, string> = { letters: '[A-Za-z]', numbers: '[0-9]' };
+
+    return new RegExp(Object.keys(presets).includes(value) ? presets[value] : value, 'g');
+}
 
 const focusElement = (): void => {
     focused.value = true;
@@ -121,11 +163,15 @@ onMounted(() => {
         element.value.focus();
     }
 
+    if (!!props.value && (props.allowedCharacters || props.transformInput || props.max)) {
+        model.value = filterAndTransform(props.value);
+    }
+
     emit('created', { ...state });
 });
 </script>
 
-<style lang="scss" scoped>
+<style lang="postcss" scoped>
 .text-input {
     border: none;
     color: inherit;

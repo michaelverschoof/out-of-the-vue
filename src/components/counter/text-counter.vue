@@ -8,5 +8,5 @@ import { computed } from 'vue';
 
 const props = defineProps<{ limit?: number; value?: string; tag?: string; type?: 'character' | 'word'; }>();
 
-const count = computed(() => props.value?.split(props.type === 'word' ? ' ' : '').length || 0);
+const count = computed(() => props.value?.trim().split(props.type === 'word' ? ' ' : '').length || 0);
 </script>

@@ -28,14 +28,14 @@ const createdEmit: ValidatedFieldData = {
 
 const validSingleUpdate: ValidatedFieldData = {
     name: props.name,
-    value: [ 'bar' ],
+    value: ['bar'],
     valid: true,
     failed: []
 };
 
 const validMultipleUpdate: ValidatedFieldData = {
     name: props.name,
-    value: [ 'bar', 'baz' ],
+    value: ['bar', 'baz'],
     valid: true,
     failed: []
 };
@@ -48,7 +48,6 @@ beforeAll(() => {
 });
 
 describe('Mounting components', () => {
-
     it('should mount the radio component', async () => {
         const { wrapper } = mountRadio();
 
@@ -67,11 +66,11 @@ describe('Mounting components', () => {
         const props = Object.assign({}, checkboxProps, { hideInput: true });
         const { items } = mountCheckable(props);
 
-        expect(items.every(item => item.find('input').classes().includes('hidden'))).toBeTruthy();
+        expect(items.every((item) => item.find('input').classes().includes('hidden'))).toBeTruthy();
     });
 
     it('should mount the checkbox component with disabled item', async () => {
-        const props = Object.assign({}, checkboxProps, { disabled: [ 'bar' ] });
+        const props = Object.assign({}, checkboxProps, { disabled: ['bar'] });
         const { items } = mountCheckable(props);
 
         expect(items[0].classes().includes('disabled')).toBeFalsy();
@@ -81,7 +80,6 @@ describe('Mounting components', () => {
 });
 
 describe('Providing non-item slots', () => {
-
     it('should show label and info on the radio component', async () => {
         const wrapper = mount(CheckableField, {
             props: radioProps,
@@ -114,7 +112,6 @@ describe('Providing non-item slots', () => {
 });
 
 describe('Ticking radio items', () => {
-
     it('should tick the radio item', async () => {
         const { items, wrapper } = mountRadio();
 
@@ -125,7 +122,7 @@ describe('Ticking radio items', () => {
     });
 
     it('should tick the radio item on load', async () => {
-        const { items, wrapper } = mountRadio([ 'bar' ]);
+        const { items, wrapper } = mountRadio(['bar']);
 
         expect(items[0].classes().includes('selected')).toBeFalsy();
         expect(items[1].classes().includes('selected')).toBeTruthy();
@@ -135,14 +132,43 @@ describe('Ticking radio items', () => {
         expect(emits[0]).toEqual(validSingleUpdate);
     });
 
+    it('should tick the radio item with space key', async () => {
+        const { items, wrapper } = mountRadio();
+
+        await items[1].trigger('keypress.space');
+
+        const emits = emitted(wrapper, 'updated') as ValidatedFieldData[];
+        expect(emits[0]).toEqual(validSingleUpdate);
+    });
+
+    it('should not untick the radio item with space key if already selected', async () => {
+        const { items, wrapper } = mountRadio();
+
+        await check(items[1]);
+        await items[1].trigger('keypress.space');
+
+        const emits = emitted(wrapper, 'updated', 2) as ValidatedFieldData[];
+        expect(emits[0]).toEqual(validSingleUpdate);
+        expect(emits[1]).toEqual(validSingleUpdate);
+    });
+
+    it('should not tick the radio item with space key if disabled', async () => {
+        const props = Object.assign({}, radioProps, { disabled: ['bar'] });
+        const { wrapper, items } = mountCheckable(props);
+
+        await items[1].trigger('keypress.space');
+
+        emitted(wrapper, 'updated', 0);
+    });
+
     it('should tick the radio item on prop update', async () => {
         const { items, wrapper } = mountRadio();
-        expect(items.every(item => !item.classes().includes('selected'))).toBeTruthy();
+        expect(items.every((item) => !item.classes().includes('selected'))).toBeTruthy();
 
         const emits = emitted(wrapper, 'created') as ValidatedFieldData[];
         expect(emits[0]).toEqual(createdEmit);
 
-        await wrapper.setProps({ selected: [ 'bar' ] });
+        await wrapper.setProps({ selected: ['bar'] });
         expect(items[0].classes().includes('selected')).toBeFalsy();
         expect(items[1].classes().includes('selected')).toBeTruthy();
         expect(items[2].classes().includes('selected')).toBeFalsy();
@@ -156,7 +182,7 @@ describe('Ticking radio items', () => {
         await check(items[1]);
         expect(items[1].classes().includes('selected')).toBeTruthy();
 
-        await wrapper.setProps({ selected: [ 'bar' ] });
+        await wrapper.setProps({ selected: ['bar'] });
         expect(items[1].classes().includes('selected')).toBeTruthy();
 
         emitted(wrapper, 'updated', 0);
@@ -164,7 +190,6 @@ describe('Ticking radio items', () => {
 });
 
 describe('Ticking checkbox boxes', () => {
-
     it('should tick the checkbox component', async () => {
         const { items, wrapper } = mountCheckbox();
 
@@ -179,8 +204,8 @@ describe('Ticking checkbox boxes', () => {
         expect(emits[1]).toEqual(validMultipleUpdate);
     });
 
-    it('should tick the checkbox component on  load', async () => {
-        const { items, wrapper } = mountCheckbox([ 'bar', 'baz' ]);
+    it('should tick the checkbox component on load', async () => {
+        const { items, wrapper } = mountCheckbox(['bar', 'baz']);
 
         expect(items[0].classes().includes('selected')).toBeFalsy();
         expect(items[1].classes().includes('selected')).toBeTruthy();
@@ -190,14 +215,43 @@ describe('Ticking checkbox boxes', () => {
         expect(emits[0]).toEqual(validMultipleUpdate);
     });
 
+    it('should tick the checkbox component with enter key', async () => {
+        const { items, wrapper } = mountCheckbox();
+
+        await items[1].trigger('keypress.enter');
+
+        const emits = emitted(wrapper, 'updated') as ValidatedFieldData[];
+        expect(emits[0]).toEqual(validSingleUpdate);
+    });
+
+    it('should untick the checkbox component with enter key if already selected', async () => {
+        const { items, wrapper } = mountCheckbox();
+
+        await check(items[1]);
+        await items[1].trigger('keypress.enter');
+
+        const emits = emitted(wrapper, 'updated', 2) as ValidatedFieldData[];
+        expect(emits[0]).toEqual(validSingleUpdate);
+        expect(emits[1]).toEqual(createdEmit);
+    });
+
+    it('should not tick the checkbox component with space key if disabled', async () => {
+        const props = Object.assign({}, checkboxProps, { disabled: ['bar'] });
+        const { wrapper, items } = mountCheckable(props);
+
+        await items[1].trigger('keypress.space');
+
+        emitted(wrapper, 'updated', 0);
+    });
+
     it('should tick the checkbox component on prop update', async () => {
         const { items, wrapper } = mountCheckbox();
-        expect(items.every(item => !item.classes().includes('selected'))).toBeTruthy();
+        expect(items.every((item) => !item.classes().includes('selected'))).toBeTruthy();
 
         const emits = emitted(wrapper, 'created') as ValidatedFieldData[];
         expect(emits[0]).toEqual(createdEmit);
 
-        await wrapper.setProps({ selected: [ 'bar', 'baz' ] });
+        await wrapper.setProps({ selected: ['bar', 'baz'] });
 
         expect(items[0].classes().includes('selected')).toBeFalsy();
         expect(items[1].classes().includes('selected')).toBeTruthy();
@@ -212,7 +266,7 @@ describe('Ticking checkbox boxes', () => {
         await check(items[1]);
         expect(items[1].classes().includes('selected')).toBeTruthy();
 
-        await wrapper.setProps({ selected: [ 'bar' ] });
+        await wrapper.setProps({ selected: ['bar'] });
         expect(items[1].classes().includes('selected')).toBeTruthy();
 
         emitted(wrapper, 'updated', 0);
@@ -221,18 +275,17 @@ describe('Ticking checkbox boxes', () => {
     it('should not tick the checkbox item on prop update if null is provided', async () => {
         const { items, wrapper } = mountCheckbox();
 
-        await wrapper.setProps({ selected: [ null ] });
-        expect(items.some(item => item.classes().includes('selected'))).toBeFalsy();
+        await wrapper.setProps({ selected: [null] });
+        expect(items.some((item) => item.classes().includes('selected'))).toBeFalsy();
 
         await wrapper.setProps({ selected: null });
-        expect(items.some(item => item.classes().includes('selected'))).toBeFalsy();
+        expect(items.some((item) => item.classes().includes('selected'))).toBeFalsy();
 
         emitted(wrapper, 'updated', 0);
     });
 });
 
 describe('Focusing items', () => {
-
     it('should focus the radio item', async () => {
         const { items } = mountRadio();
 
@@ -269,14 +322,11 @@ describe('Focusing items', () => {
 });
 
 describe('Validating field', () => {
-
     beforeEach(() => {
-        vi.spyOn(window, 'requestAnimationFrame').mockImplementation(
-            (callback: FrameRequestCallback): number => {
-                callback(100);
-                return 0;
-            }
-        );
+        vi.spyOn(window, 'requestAnimationFrame').mockImplementation((callback: FrameRequestCallback): number => {
+            callback(100);
+            return 0;
+        });
     });
 
     it('should show a validation error', async () => {
@@ -353,7 +403,6 @@ describe('Validating field', () => {
     });
 
     describe('Specific validations', () => {
-
         it('should trigger min validation', async () => {
             const wrapper = mount(CheckableField, {
                 props: Object.assign({}, checkboxProps, { min: 2 }),
@@ -425,8 +474,8 @@ describe('Validating field', () => {
         const validations = [
             {
                 name: 'custom',
-                validator: (data: FieldData, find: string) => (<string[]> data.value).includes(find),
-                parameters: [ 'foo' ]
+                validator: (data: FieldData, find: string) => (<string[]>data.value).includes(find),
+                parameters: ['foo']
             }
         ];
 
@@ -481,7 +530,7 @@ function uncheck(item: DOMWrapper<Element>): Promise<void> {
     return input.trigger('change');
 }
 
-type MountResult = { wrapper: VueWrapper<any>, items: DOMWrapper<HTMLElement>[] }
+type MountResult = { wrapper: VueWrapper<any>; items: DOMWrapper<HTMLElement>[] };
 
 function mountCheckbox(selected?: string[]): MountResult {
     const props = !selected ? checkboxProps : Object.assign({}, checkboxProps, { selected: selected });
