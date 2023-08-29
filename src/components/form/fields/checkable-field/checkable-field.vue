@@ -134,13 +134,13 @@ const created = (data: CheckableFieldData): void => {
         return;
     }
 
-    updated(data);
+    updated(data, 'created');
 };
 
-const updated = (data: CheckableFieldData): void => {
+const updated = (data: CheckableFieldData, event: 'created' | 'updated' = 'updated'): void => {
     if (props.type === 'radio') {
         if (selectedItems.value.has(data.value)) {
-            return emit('updated', { ...state });
+            return event !== 'created' ? emit(event, { ...state }) : null;
         }
 
         if (data.checked) {
