@@ -40,21 +40,16 @@ const element = ref<HTMLInputElement | HTMLTextAreaElement | null>(null);
 const focused = ref<boolean>(false);
 const characterRegex = ref<RegExp>(getRegex(props.allowedCharacters));
 
+const model = computed<string>(() => state.value);
+
 const state = reactive<StringFieldData>({
     name: props.name,
     value: props.value ?? null
 });
 
-const model = computed({
-    get: () => state.value,
-    set: (value: string | null) => {
-        state.value = value;
-    }
-});
-
 function update(value?: string | null) {
     if (value === null) {
-        model.value = null;
+        state.value = null;
         emit('updated', { ...state });
         return;
     }
@@ -64,7 +59,7 @@ function update(value?: string | null) {
         return;
     }
 
-    model.value = prepared;
+    state.value = prepared;
     emit('updated', { ...state });
 }
 
@@ -164,7 +159,7 @@ onMounted(() => {
     }
 
     if (!!props.value && (props.allowedCharacters || props.transformInput || props.max)) {
-        model.value = filterAndTransform(props.value);
+        state.value = filterAndTransform(props.value);
     }
 
     emit('created', { ...state });

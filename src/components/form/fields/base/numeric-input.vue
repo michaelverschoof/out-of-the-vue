@@ -4,7 +4,7 @@
         :allowed-characters="regex"
         :inputmode="allowDecimals ? 'decimal' : 'numeric'"
         :name="name"
-        :value="model ?? undefined"
+        :value="model"
         @updated="updated"
         @created="created"
     />
@@ -15,7 +15,7 @@ import TextInput from '@/components/form/fields/base/text-input.vue';
 import { NumberFieldData, StringFieldData } from '@/composables/types';
 import { exclude } from '@/util/attrs';
 import { filter, parse } from '@/util/numbers';
-import { computed, reactive, ref, watch } from 'vue';
+import { computed, reactive, watch } from 'vue';
 
 const emit = defineEmits<{ (event: 'created' | 'updated', data: NumberFieldData): void }>();
 
@@ -24,9 +24,9 @@ const props = withDefaults(defineProps<{ name: string; value?: number; allowDeci
     allowNegative: true
 });
 
-const regex = computed(() => `[0-9${props.allowDecimals ? '.,' : ''}${props.allowNegative ? '-' : ''}]`);
+const regex = computed<string>(() => `[0-9${props.allowDecimals ? '.,' : ''}${props.allowNegative ? '-' : ''}]`);
 
-const model = ref<string | null>(props.value?.toString() ?? null);
+const model = computed<string>(() => state.value?.toString() ?? null);
 
 const state = reactive<NumberFieldData>({
     name: props.name,
@@ -41,7 +41,6 @@ watch(
         }
 
         state.value = received ?? null;
-        model.value = state.value?.toString() ?? null;
     }
 );
 
@@ -52,7 +51,6 @@ const parseNumber = (data: StringFieldData): void => {
         return;
     }
 
-    model.value = filtered;
     state.value = parse(filtered);
 };
 

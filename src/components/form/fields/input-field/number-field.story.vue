@@ -120,6 +120,8 @@
         <template #controls>
             <show-grid-lines show />
 
+            <hst-text v-model="stringValue" title="Value" />
+
             <hst-slider v-model="state.delay" :step="100" :min="0" :max="1000" title="Typing delay" />
 
             <h3>Validations</h3>
@@ -152,10 +154,17 @@ import { Icon } from '@iconify/vue';
 import ShowGridLines from '@test/components/show-grid-lines.vue';
 import { toggleDecimalInValue, toggleMinusInValue } from '@test/functions/numbers';
 import { logEvent } from 'histoire/client';
-import { provide, reactive, ref } from 'vue';
+import { computed, provide, reactive, ref } from 'vue';
 
 const validate = ref<boolean>(false);
 provide(SubmittedSymbol, validate);
+
+const stringValue = computed({
+    get: () => state.value?.toString(),
+    set: (value) => {
+        state.value = !!value ? Number(value) : null;
+    }
+});
 
 const state = reactive({
     value: 1234.56,
