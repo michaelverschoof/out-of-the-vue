@@ -44,24 +44,28 @@ watch(
     }
 );
 
-const parseNumber = (data: StringFieldData): void => {
+const parseNumber = (data: StringFieldData): number => {
     const filtered = filter(data.value ?? '', props.allowDecimals, props.allowNegative);
     if (!filtered) {
-        state.value = null;
-        return;
+        return null;
     }
 
-    state.value = parse(filtered);
+    return parse(filtered);
 };
 
 const created = (data: StringFieldData): void => {
-    parseNumber(data);
+    state.value = parseNumber(data);
     emit('created', { ...state });
 };
 
 const updated = (data: StringFieldData): void => {
-    parseNumber(data);
-    emit('updated', { ...state });
+    console.log(data);
+
+    const value = parseNumber(data);
+    if (value !== state.value) {
+        state.value = value;
+        emit('updated', { ...state });
+    }
 };
 </script>
 
