@@ -129,11 +129,6 @@ import { reactive, ref } from 'vue';
 
 const validate = ref<boolean>(false);
 
-const submit = () => {
-    console.log('submit');
-    console.log(state.value);
-};
-
 const state = reactive({
     value: 'Some value',
     delay: 200,

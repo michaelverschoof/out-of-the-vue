@@ -1,11 +1,12 @@
 import NumberField from '@/components/form/fields/input-field/number-field.vue';
 import { FieldData, ValidatedFieldData } from '@/composables/types';
 import { emitted } from '@test/emits';
-import { DOMWrapper, mount, VueWrapper } from '@vue/test-utils';
-import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
+import { DOMWrapper, VueWrapper, mount } from '@vue/test-utils';
+import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
 /**
- * @vitest-environment happy-dom
+ * @vitest-environment jsdom
+ * Used instead of happy-dom to get the `main.value.includes(document.activeElement)` working
  */
 
 const props = {
@@ -30,7 +31,6 @@ afterEach(() => {
 });
 
 describe('Mounting components', () => {
-
     it('should mount the component', async () => {
         const { input, wrapper } = mountComponent();
 
@@ -78,9 +78,7 @@ describe('Mounting components', () => {
 });
 
 describe('Focusing components', () => {
-
     describe('On focus', () => {
-
         it('should focus natively', async () => {
             const wrapper = mount(NumberField, {
                 props: props,
@@ -109,6 +107,12 @@ describe('Focusing components', () => {
     });
 
     describe('On blur', () => {
+        beforeEach(() => {
+            vi.spyOn(window, 'requestAnimationFrame').mockImplementation((callback: FrameRequestCallback): number => {
+                callback(100);
+                return 0;
+            });
+        });
 
         it('should blur natively', async () => {
             const wrapper = mount(NumberField, {
@@ -149,15 +153,13 @@ describe('Focusing components', () => {
 });
 
 describe('Updating input', () => {
-
     it('should update value from props', async () => {
         const { input, wrapper } = mountComponent();
 
         await wrapper.setProps({ value: 123, typingDelay: 0 });
         expect(input.element.value).toBe('123');
 
-        const emits = emitted(wrapper, 'updated');
-        expect(emits[0].value).toBe(123);
+        emitted(wrapper, 'updated', 0);
     });
 
     it('should not update value from props if equal to current value', async () => {
@@ -180,7 +182,6 @@ describe('Updating input', () => {
 });
 
 describe('Debouncing input', () => {
-
     it('should trigger debounce', async () => {
         const { input, wrapper } = mountComponent();
 
@@ -205,7 +206,6 @@ describe('Debouncing input', () => {
 });
 
 describe('Validating field', () => {
-
     it('should show a validation error', async () => {
         const wrapper = mount(NumberField, {
             props: Object.assign({}, props, { required: true }),
@@ -260,7 +260,6 @@ describe('Validating field', () => {
     });
 
     describe('Specific validations', () => {
-
         it('should trigger min validation', async () => {
             const wrapper = mount(NumberField, {
                 props: Object.assign({}, props, { min: 2 }),
@@ -306,8 +305,8 @@ describe('Validating field', () => {
         const validations = [
             {
                 name: 'custom',
-                validator: (data: FieldData, amount: number) => (<number> data.value) === amount,
-                parameters: [ 123 ]
+                validator: (data: FieldData, amount: number) => <number>data.value === amount,
+                parameters: [123]
             }
         ];
 
@@ -332,7 +331,7 @@ describe('Validating field', () => {
     });
 });
 
-function mountComponent(): { wrapper: VueWrapper<any>, input: DOMWrapper<HTMLInputElement> } {
+function mountComponent(): { wrapper: VueWrapper<any>; input: DOMWrapper<HTMLInputElement> } {
     const wrapper = mount(NumberField, {
         props: props
     });

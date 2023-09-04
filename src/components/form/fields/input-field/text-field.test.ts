@@ -1,7 +1,7 @@
 import TextField from '@/components/form/fields/input-field/text-field.vue';
 import { FieldData, ValidatedFieldData } from '@/composables/types';
 import { emitted } from '@test/emits';
-import { DOMWrapper, mount, VueWrapper } from '@vue/test-utils';
+import { DOMWrapper, VueWrapper, mount } from '@vue/test-utils';
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
 /**
@@ -107,6 +107,13 @@ describe('Focusing components', () => {
     });
 
     describe('On blur', () => {
+        beforeEach(() => {
+            vi.spyOn(window, 'requestAnimationFrame').mockImplementation((callback: FrameRequestCallback): number => {
+                callback(100);
+                return 0;
+            });
+        });
+
         it('should blur natively', async () => {
             const wrapper = mount(TextField, {
                 props: props,
@@ -152,8 +159,7 @@ describe('Updating input', () => {
         await wrapper.setProps({ value: 'something', typingDelay: 0 });
         expect(input.element.value).toBe('something');
 
-        const emits = emitted(wrapper, 'updated');
-        expect(emits[0].value).toBe('something');
+        emitted(wrapper, 'updated', 0);
     });
 
     it('should not update value from props if equal to current value', async () => {
@@ -256,9 +262,8 @@ describe('Validating field', () => {
         const prepend = wrapper.find<HTMLElement>('.prepend');
         prepend.element.tabIndex = -1;
 
-        await prepend.element.focus();
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
+        await prepend.trigger('focus');
+
         expect(wrapper.find('strong.validation-error').exists()).toBeFalsy();
     });
 

@@ -96,6 +96,8 @@
                     @created="logEvent('created', $event)"
                     @updated="logEvent('updated', $event)"
                 >
+                    <template #append><icon icon="mdi:airplane" /></template>
+
                     <template #label>Field label</template>
                     <template #information>Helpful text on how to fill in the field</template>
                     <template #required>Required error message</template>

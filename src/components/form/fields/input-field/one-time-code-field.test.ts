@@ -1,7 +1,7 @@
 import OneTimeCodeField from '@/components/form/fields/input-field/one-time-code-field.vue';
 import { FieldData, ValidatedFieldData, ValidationMethod } from '@/composables/types';
 import { emitted } from '@test/emits';
-import { DOMWrapper, mount, VueWrapper } from '@vue/test-utils';
+import { DOMWrapper, VueWrapper, mount } from '@vue/test-utils';
 import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
 /**
@@ -71,12 +71,8 @@ describe('Give updated value on input', () => {
 
         const input = wrapper.find('input');
 
-        // console.log(input.html());
-
         await input.setValue('a');
         expect(input.element.value).toBe('A');
-
-        // console.log(wrapper.emitted('updated'));
 
         const emits = emitted(wrapper, 'updated');
         expect(emits[0].value === 'A').toBeTruthy();

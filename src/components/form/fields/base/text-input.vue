@@ -55,18 +55,20 @@ function update(value?: string | null) {
     }
 
     const prepared = filterAndTransform(value ?? state.value);
-    if (prepared === state.value) {
-        return;
+    if (prepared !== state.value) {
+        state.value = prepared;
+        emit('updated', { ...state });
     }
-
-    state.value = prepared;
-    emit('updated', { ...state });
 }
 
 watch(
     () => props.value,
-    () => {
-        update(props.value);
+    (received: string) => {
+        if (received === state.value) {
+            return;
+        }
+
+        update(received);
     }
 );
 

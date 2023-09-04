@@ -1,6 +1,6 @@
 <template>
     <label class="text-field input-field" v-bind="include($attrs, ['class', 'onClick'])">
-        <debouncer :delay="typingDelay" @updated="validated">
+        <debouncer :delay="typingDelay" @updated="debounced">
             <template #default="{ debounce }">
                 <validator :validations="validationMethods" :trigger-validation="triggerValidation" @created="initialized" @updated="debounce">
                     <template #default="{ initialize, validate, invalid, showing, showValidity }">
@@ -8,19 +8,24 @@
                             <slot name="label" />
                         </header>
 
-                        <main ref="main" class="input" :class="{ focused, invalid: invalid && showing }" tabindex="-1">
+                        <main
+                            ref="main"
+                            tabindex="-1"
+                            class="input"
+                            :class="{ focused, invalid: invalid && showing }"
+                            @blur.prevent.capture="fieldBlurred(showValidity)"
+                        >
                             <prepend-append>
                                 <template v-if="providedPrepend" #prepend>
                                     <slot name="prepend" />
                                 </template>
 
                                 <text-input
-                                    v-bind="exclude($attrs, ['class', 'onClick'])"
+                                    v-bind="exclude($attrs, ['class', 'onClick', 'onCreated', 'onUpdated'])"
                                     :name="name"
                                     :value="value"
                                     :allowed-characters="allowedCharacters"
                                     :max="maxLength"
-                                    @blurred="fieldBlurred(showValidity)"
                                     @focused="focused = true"
                                     @created="initialize"
                                     @updated="validate"
@@ -55,7 +60,7 @@ import Debouncer from '@/functionals/debouncer.vue';
 import Validator from '@/functionals/validator.vue';
 import { exclude, include } from '@/util/attrs';
 import { provided } from '@/util/slots';
-import { computed, nextTick, ref, useSlots } from 'vue';
+import { computed, ref, useSlots } from 'vue';
 
 const emit = defineEmits<{ (event: 'created' | 'updated', data: ValidatedFieldData): void }>();
 
@@ -79,31 +84,31 @@ const validationMethods = computed<ValidationMethod[]>(() => [
     ...(props.validations ?? [])
 ]);
 
+const focused = ref<boolean>(false);
+
+const main = ref<HTMLElement | null>(null);
+const fieldBlurred = (showValidity: () => void): void => {
+    requestAnimationFrame(() => {
+        if (!main.value || main.value.contains(document.activeElement)) {
+            return;
+        }
+
+        focused.value = false;
+        showValidity();
+    });
+};
+
 const initialized = (data: FieldData | ValidatedFieldData): void => {
     emit('created', { ...(data as ValidatedFieldData) });
 };
 
-const validated = (data: FieldData | ValidatedFieldData): void => {
+const debounced = (data: FieldData | ValidatedFieldData): void => {
     emit('updated', { ...(data as ValidatedFieldData) });
 };
 
-const focused = ref<boolean>(false);
-const main = ref<HTMLElement | null>(null);
-
-const fieldBlurred = async (showValidity: () => void): Promise<void> => {
-    focused.value = false;
-
-    await nextTick();
-    if (!main.value || main.value.contains(document.activeElement)) {
-        return;
-    }
-
-    showValidity();
-};
-
 const slots = useSlots();
-const providedPrepend = computed(() => provided(slots.prepend));
-const providedAppend = computed(() => provided(slots.append));
+const providedPrepend = computed<boolean>(() => provided(slots.prepend));
+const providedAppend = computed<boolean>(() => provided(slots.append));
 </script>
 
 <script lang="ts">

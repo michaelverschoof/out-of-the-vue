@@ -1,5 +1,5 @@
 <template>
-    <label class="number-field input-field" v-bind="include($attrs, ['class'])">
+    <label class="number-field input-field" v-bind="include($attrs, ['class', 'onClick'])">
         <debouncer :delay="typingDelay" @updated="debounced">
             <template #default="{ debounce }">
                 <validator :validations="validationMethods" :trigger-validation="triggerValidation" @created="initialized" @updated="debounce">
@@ -8,28 +8,30 @@
                             <slot name="label" />
                         </header>
 
-                        <main class="input" :class="{ focused, invalid: invalid && showing }">
+                        <main
+                            ref="main"
+                            tabindex="-1"
+                            class="input"
+                            :class="{ focused, invalid: invalid && showing }"
+                            @blur.prevent.capture="fieldBlurred(showValidity)"
+                        >
                             <prepend-append>
-                                <template #prepend>
+                                <template v-if="providedPrepend" #prepend>
                                     <slot name="prepend" />
                                 </template>
 
                                 <numeric-input
-                                    v-bind="exclude($attrs, ['class', 'onCreated', 'onUpdated'])"
+                                    v-bind="exclude($attrs, ['class', 'onClick', 'onCreated', 'onUpdated'])"
                                     :name="name"
                                     :value="value"
                                     :allow-decimals="allowDecimals"
                                     :allow-negative="allowNegative"
                                     @focused="focused = true"
-                                    @blurred="
-                                        focused = false;
-                                        showValidity();
-                                    "
                                     @created="initialize"
                                     @updated="validate"
                                 />
 
-                                <template #append>
+                                <template v-if="providedAppend" #append>
                                     <slot name="append" />
                                 </template>
                             </prepend-append>
@@ -57,7 +59,8 @@ import { predefinedValidations } from '@/composables/validate';
 import Debouncer from '@/functionals/debouncer.vue';
 import Validator from '@/functionals/validator.vue';
 import { exclude, include } from '@/util/attrs';
-import { computed, ref } from 'vue';
+import { provided } from '@/util/slots';
+import { computed, ref, useSlots } from 'vue';
 
 const emit = defineEmits<{ (event: 'created' | 'updated', data: ValidatedFieldData): void }>();
 
@@ -77,14 +80,26 @@ const props = withDefaults(
     { allowDecimals: true, allowNegative: true }
 );
 
-const focused = ref<boolean>(false);
-
 const validationMethods = computed<ValidationMethod[]>(() => [
     { ...predefinedValidations['required'], parameters: [props.required ?? false] },
     { ...predefinedValidations['min-amount'], parameters: [props.min] },
     { ...predefinedValidations['max-amount'], parameters: [props.max] },
     ...(props.validations ?? [])
 ]);
+
+const focused = ref<boolean>(false);
+
+const main = ref<HTMLElement | null>(null);
+const fieldBlurred = (showValidity: () => void): void => {
+    requestAnimationFrame(() => {
+        if (!main.value || main.value.contains(document.activeElement)) {
+            return;
+        }
+
+        focused.value = false;
+        showValidity();
+    });
+};
 
 const initialized = (data: FieldData | ValidatedFieldData): void => {
     emit('created', { ...(data as ValidatedNumberFieldData) });
@@ -93,6 +108,10 @@ const initialized = (data: FieldData | ValidatedFieldData): void => {
 const debounced = (data: FieldData | ValidatedFieldData): void => {
     emit('updated', { ...(data as ValidatedNumberFieldData) });
 };
+
+const slots = useSlots();
+const providedPrepend = computed<boolean>(() => provided(slots.prepend));
+const providedAppend = computed<boolean>(() => provided(slots.append));
 </script>
 
 <script lang="ts">
