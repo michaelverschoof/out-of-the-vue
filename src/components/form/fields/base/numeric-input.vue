@@ -59,8 +59,6 @@ const created = (data: StringFieldData): void => {
 };
 
 const updated = (data: StringFieldData): void => {
-    console.log(data);
-
     const value = parseNumber(data);
     if (value !== state.value) {
         state.value = value;
