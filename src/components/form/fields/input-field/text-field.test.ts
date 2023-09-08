@@ -1,5 +1,5 @@
 import TextField from '@/components/form/fields/input-field/text-field.vue';
-import { FieldData, ValidatedFieldData } from '@/composables/types';
+import { FieldData, ValidatedFieldData, ValidatedStringFieldData } from '@/composables/types';
 import { emitted } from '@test/emits';
 import { DOMWrapper, VueWrapper, mount } from '@vue/test-utils';
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -277,6 +277,28 @@ describe('Validating field', () => {
 
         await wrapper.setProps({ triggerValidation: 'required' });
         expect(wrapper.find('strong.validation-error').exists()).toBeTruthy();
+    });
+
+    it.only('should retrigger validation on prop update', async () => {
+        const wrapper = mount(TextField, {
+            props: Object.assign({}, props, { typingDelay: 0, min: 2 }),
+            slots: { min: 'min error' }
+        });
+
+        const input = wrapper.find('input');
+
+        await input.setValue('foo');
+        await input.trigger('blur');
+        expect(wrapper.find('strong.validation-error').exists()).toBeFalsy();
+
+        await wrapper.setProps({ value: 'f' });
+        await input.trigger('blur');
+        expect(wrapper.find('strong.validation-error').exists()).toBeTruthy();
+
+        const emits = emitted(wrapper, 'updated', 2);
+        expect((emits[0] as ValidatedStringFieldData).valid).toBeTruthy();
+        expect((emits[1] as ValidatedStringFieldData).valid).toBeFalsy();
+        expect((emits[1] as ValidatedStringFieldData).failed).toEqual(['min']);
     });
 
     describe('Specific validations', () => {

@@ -9,7 +9,7 @@
                 :allow-negative="true"
                 required
                 @created="logEvent('created', $event)"
-                @updated="logEvent('updated', $event)"
+                @updated="updateValue"
             />
         </Variant>
 
@@ -21,7 +21,7 @@
                 :allow-negative="true"
                 required
                 @created="logEvent('created', $event)"
-                @updated="logEvent('updated', $event)"
+                @updated="updateValue"
             >
                 <template #label>Field label</template>
                 <template #information><i>Helpful text on how to fill in the field</i></template>
@@ -36,7 +36,7 @@
                 :allow-negative="true"
                 required
                 @created="logEvent('created', $event)"
-                @updated="logEvent('updated', $event)"
+                @updated="updateValue"
             >
                 <template #label>Field label</template>
                 <template #information>Helpful text on how to fill in the field</template>
@@ -53,7 +53,7 @@
                     :allow-decimals="true"
                     :allow-negative="true"
                     @created="logEvent('created', $event)"
-                    @updated="logEvent('updated', $event)"
+                    @updated="updateValue"
                 >
                     <template #label>Field label</template>
                     <template #information>Helpful text on how to fill in the field</template>
@@ -71,7 +71,7 @@
                     :allow-decimals="true"
                     :allow-negative="true"
                     @created="logEvent('created', $event)"
-                    @updated="logEvent('updated', $event)"
+                    @updated="updateValue"
                 >
                     <template #label>Field label</template>
                     <template #information>Helpful text on how to fill in the field</template>
@@ -94,7 +94,7 @@
                     :max="state.max"
                     required
                     @created="logEvent('created', $event)"
-                    @updated="logEvent('updated', $event)"
+                    @updated="updateValue"
                 >
                     <template #append><icon icon="mdi:airplane" /></template>
 
@@ -107,6 +107,7 @@
             </template>
 
             <template #controls>
+                <hst-text v-model="stringValue" title="Value" />
                 <hst-slider v-model="state.min" :step="100" :min="0" :max="1000" title="Minimum value" />
                 <hst-slider v-model="state.max" :step="100" :min="1000" :max="2000" title="Maximum value" />
 
@@ -151,7 +152,7 @@
 <script lang="ts" setup>
 import NumberField from '@/components/form/fields/input-field/number-field.vue';
 import PrependAppend from '@/components/layout/prepend-append.vue';
-import { SubmittedSymbol } from '@/composables/types';
+import { SubmittedSymbol, ValidatedFieldData } from '@/composables/types';
 import { Icon } from '@iconify/vue';
 import ShowGridLines from '@test/components/show-grid-lines.vue';
 import { toggleDecimalInValue, toggleMinusInValue } from '@test/functions/numbers';
@@ -187,6 +188,11 @@ const toggleDecimal = () => {
 
 const toggleMinus = () => {
     state.value = toggleMinusInValue(state.value);
+};
+
+const updateValue = (event: ValidatedFieldData) => {
+    state.value = <number>event.value;
+    logEvent('updated', event);
 };
 </script>
 

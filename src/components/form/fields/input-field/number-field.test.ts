@@ -1,5 +1,5 @@
 import NumberField from '@/components/form/fields/input-field/number-field.vue';
-import { FieldData, ValidatedFieldData } from '@/composables/types';
+import { FieldData, ValidatedFieldData, ValidatedNumberFieldData } from '@/composables/types';
 import { emitted } from '@test/emits';
 import { DOMWrapper, VueWrapper, mount } from '@vue/test-utils';
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -257,6 +257,28 @@ describe('Validating field', () => {
 
         await wrapper.setProps({ triggerValidation: 'required' });
         expect(wrapper.find('strong.validation-error').exists()).toBeTruthy();
+    });
+
+    it.only('should retrigger validation on prop update', async () => {
+        const wrapper = mount(NumberField, {
+            props: Object.assign({}, props, { typingDelay: 0, min: 2 }),
+            slots: { min: 'min error' }
+        });
+
+        const input = wrapper.find('input');
+
+        await input.setValue('3');
+        await input.trigger('blur');
+        expect(wrapper.find('strong.validation-error').exists()).toBeFalsy();
+
+        await wrapper.setProps({ value: 1 });
+        // await input.trigger('blur');
+        expect(wrapper.find('strong.validation-error').exists()).toBeTruthy();
+
+        const emits = emitted(wrapper, 'updated', 2);
+        expect((emits[0] as ValidatedNumberFieldData).valid).toBeTruthy();
+        expect((emits[1] as ValidatedNumberFieldData).valid).toBeFalsy();
+        expect((emits[1] as ValidatedNumberFieldData).failed).toEqual(['min']);
     });
 
     describe('Specific validations', () => {

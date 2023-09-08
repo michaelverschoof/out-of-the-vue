@@ -18,7 +18,7 @@ import { inject, reactive, ref, watch } from 'vue';
 
 const emit = defineEmits<{ (event: 'created' | 'updated', data: ValidatedFieldData): void }>();
 
-const props = defineProps<{ validations?: ValidationMethod[]; triggerValidation?: string }>();
+const props = defineProps<{ validations?: ValidationMethod[]; triggerValidation?: string; liveValidation?: boolean }>();
 
 const state = reactive<ValidatedFieldData>({
     name: null,
@@ -36,6 +36,7 @@ watch(
 
 const triggeredSubmitValidation = inject(SubmittedSymbol, ref<boolean>(false));
 const { validate: validateInput } = useValidate();
+const showing = ref<boolean>(false);
 
 watch(triggeredSubmitValidation, (received: boolean) => {
     if (!received && !props.triggerValidation) {
@@ -75,13 +76,15 @@ watch(
     }
 );
 
-const showing = ref<boolean>(false);
-
 const initialize = (data: FieldData): void => {
     return validateFieldData(data, 'created');
 };
 
 const validate = (data: FieldData): void => {
+    if (!!props.liveValidation) {
+        showing.value = true;
+    }
+
     return validateFieldData(data, 'updated');
 };
 

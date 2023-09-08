@@ -2,7 +2,13 @@
     <label class="number-field input-field" v-bind="include($attrs, ['class', 'onClick'])">
         <debouncer :delay="typingDelay" @updated="debounced">
             <template #default="{ debounce }">
-                <validator :validations="validationMethods" :trigger-validation="triggerValidation" @created="initialized" @updated="debounce">
+                <validator
+                    :validations="validationMethods"
+                    :live-validation="!focused"
+                    :trigger-validation="triggerValidation"
+                    @created="initialized"
+                    @updated="debounce"
+                >
                     <template #default="{ initialize, validate, invalid, showing, showValidity }">
                         <header v-if="$slots.label" class="label">
                             <slot name="label" />
@@ -16,7 +22,7 @@
                             @blur.prevent.capture="fieldBlurred(showValidity)"
                         >
                             <prepend-append>
-                                <template v-if="providedPrepend" #prepend>
+                                <template #prepend>
                                     <slot name="prepend" />
                                 </template>
 
@@ -31,7 +37,7 @@
                                     @updated="validate"
                                 />
 
-                                <template v-if="providedAppend" #append>
+                                <template #append>
                                     <slot name="append" />
                                 </template>
                             </prepend-append>
@@ -59,8 +65,7 @@ import { predefinedValidations } from '@/composables/validate';
 import Debouncer from '@/functionals/debouncer.vue';
 import Validator from '@/functionals/validator.vue';
 import { exclude, include } from '@/util/attrs';
-import { provided } from '@/util/slots';
-import { computed, ref, useSlots } from 'vue';
+import { computed, ref } from 'vue';
 
 const emit = defineEmits<{ (event: 'created' | 'updated', data: ValidatedFieldData): void }>();
 
@@ -108,10 +113,6 @@ const initialized = (data: FieldData | ValidatedFieldData): void => {
 const debounced = (data: FieldData | ValidatedFieldData): void => {
     emit('updated', { ...(data as ValidatedNumberFieldData) });
 };
-
-const slots = useSlots();
-const providedPrepend = computed<boolean>(() => provided(slots.prepend));
-const providedAppend = computed<boolean>(() => provided(slots.append));
 </script>
 
 <script lang="ts">
