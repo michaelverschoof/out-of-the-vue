@@ -1,13 +1,28 @@
-import { isReactive, toRaw } from 'vue';
+import { isReactive, isRef, toRaw } from 'vue';
 
+/**
+ * Check if a value is an object
+ *
+ * @param value the object to check
+ */
 function isObject(value: unknown): boolean {
     return value !== null && !Array.isArray(value) && typeof value === 'object';
 }
 
+/**
+ * Convert a Vue object to its raw data, if needed
+ *
+ * @param data the object to convert
+ */
 function getRawData<T>(data: T): T {
-    return isReactive(data) ? toRaw(data) : data;
+    return isReactive(data) ? toRaw(data) : isRef<T>(data) ? data.value : data;
 }
 
+/**
+ * Create a deep clone of the provided object, without reactivity
+ *
+ * @param data the object to clone
+ */
 export function rawClone<T>(data: T): T {
     const rawData = getRawData<T>(data);
 
@@ -21,6 +36,5 @@ export function rawClone<T>(data: T): T {
         rawData[key] = rawClone<typeof value>(value);
     }
 
-    // return rawData; // much better:
-    return structuredClone(rawData);
+    return rawData;
 }
