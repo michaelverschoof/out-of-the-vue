@@ -2,7 +2,7 @@
     <fieldset class="one-time-code-field input-field" @paste.prevent="filterPasteData">
         <validator :validations="fieldValidations" :trigger-validation="triggerValidation" @created="fieldInitialized" @updated="fieldValidated">
             <template #default="{ initialize: initializeState, validate: validateState, invalid: invalidState, showing, showValidity }">
-                <header v-if="$slots.label" class="label">
+                <header v-if="$slots.label" ref="header" class="label" tabindex="-1">
                     <slot name="label" />
                 </header>
 
@@ -24,7 +24,7 @@
                     </template>
                 </main>
 
-                <footer v-if="$slots.information && !(invalidState && showing)" class="information">
+                <footer v-if="$slots.information && !(invalidState && showing)" ref="footer" class="information" tabindex="-1">
                     <slot name="information" />
                 </footer>
             </template>
@@ -49,6 +49,7 @@ import {
 } from '@/composables/types';
 import { predefinedValidations } from '@/composables/validate';
 import Validator from '@/functionals/validator.vue';
+import { hasFocus } from '@/util/focus';
 import { filter, shorten, transform } from '@/util/strings';
 import { computed, onMounted, reactive, ref, watch } from 'vue';
 
@@ -138,10 +139,13 @@ const fieldValidated = (data: ValidatedFieldData): void => {
     updatedState('updated');
 };
 
+const header = ref<HTMLElement | null>(null);
 const main = ref<HTMLElement | null>(null);
+const footer = ref<HTMLElement | null>(null);
+
 const fieldBlurred = (showValidity: () => void): void => {
     requestAnimationFrame(() => {
-        if (!main.value || main.value.contains(document.activeElement)) {
+        if (hasFocus(header, main, footer)) {
             return;
         }
 

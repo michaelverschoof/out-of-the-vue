@@ -10,7 +10,7 @@
                     @updated="debounce"
                 >
                     <template #default="{ initialize, validate, invalid, showing, showValidity }">
-                        <header v-if="$slots.label" class="label">
+                        <header v-if="$slots.label" class="label" tabindex="-1">
                             <slot name="label" />
                         </header>
 
@@ -43,7 +43,7 @@
                             </prepend-append>
                         </main>
 
-                        <footer v-if="$slots.information && !(invalid && showing)" class="information">
+                        <footer v-if="$slots.information && !(invalid && showing)" ref="footer" class="information" tabindex="-1">
                             <slot name="information" />
                         </footer>
                     </template>
@@ -65,6 +65,7 @@ import { predefinedValidations } from '@/composables/validate';
 import Debouncer from '@/functionals/debouncer.vue';
 import Validator from '@/functionals/validator.vue';
 import { exclude, include } from '@/util/attrs';
+import { hasFocus } from '@/util/focus';
 import { computed, ref } from 'vue';
 
 const emit = defineEmits<{ (event: 'created' | 'updated', data: ValidatedFieldData): void }>();
@@ -91,10 +92,13 @@ const validationMethods = computed<ValidationMethod[]>(() => [
 
 const focused = ref<boolean>(false);
 
+const header = ref<HTMLElement | null>(null);
 const main = ref<HTMLElement | null>(null);
+const footer = ref<HTMLElement | null>(null);
+
 const fieldBlurred = (showValidity: () => void): void => {
     requestAnimationFrame(() => {
-        if (!main.value || main.value.contains(document.activeElement)) {
+        if (hasFocus(header, main, footer)) {
             return;
         }
 

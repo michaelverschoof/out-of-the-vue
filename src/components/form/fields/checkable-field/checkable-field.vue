@@ -2,7 +2,7 @@
     <fieldset class="checkable-field input-field">
         <validator :validations="validationMethods" :trigger-validation="triggerValidation" @created="initialized" @updated="validated">
             <template #default="{ initialize, validate, invalid, showing, showValidity }">
-                <header v-if="provided(slots.label)" class="label">
+                <header v-if="provided(slots.label)" ref="header" class="label" tabindex="-1">
                     <slot name="label" />
                 </header>
 
@@ -53,7 +53,7 @@
                     </template>
                 </main>
 
-                <footer v-if="provided(slots.information) && !(invalid && showing)" class="information">
+                <footer v-if="provided(slots.information) && !(invalid && showing)" ref="footer" class="information" tabindex="-1">
                     <slot name="information" />
                 </footer>
             </template>
@@ -70,6 +70,7 @@ import CheckableInput from '@/components/form/fields/base/checkable-input.vue';
 import { CheckableFieldData, ValidatedFieldData, ValidatedStringArrayFieldData, ValidationMethod } from '@/composables/types';
 import { predefinedValidations } from '@/composables/validate';
 import Validator from '@/functionals/validator.vue';
+import { hasFocus } from '@/util/focus';
 import { provided } from '@/util/slots';
 import { computed, onMounted, reactive, ref, useSlots, watch } from 'vue';
 
@@ -186,10 +187,13 @@ const blurItem = (item: string): void => {
     focusedItems.value.delete(item);
 };
 
+const header = ref<HTMLElement | null>(null);
 const main = ref<HTMLElement | null>(null);
+const footer = ref<HTMLElement | null>(null);
+
 const fieldBlurred = (showValidity: () => void): void => {
     requestAnimationFrame(() => {
-        if (!main.value || main.value.contains(document.activeElement)) {
+        if (hasFocus(header, main, footer)) {
             return;
         }
 
