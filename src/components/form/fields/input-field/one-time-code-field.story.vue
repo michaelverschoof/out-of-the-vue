@@ -28,7 +28,7 @@
         <Variant title="With outer icons">
             <prepend-append>
                 <one-time-code-field
-                    name="histoire-one-time-code-field-labels"
+                    name="histoire-one-time-code-field-icons"
                     :focus="state.focus"
                     :type="state.type"
                     :length="state.length"
@@ -41,6 +41,22 @@
                 <template #prepend><icon icon="mdi:airballoon" /></template>
                 <template #append><icon icon="mdi:airplane" /></template>
             </prepend-append>
+        </Variant>
+
+        <Variant title="With validations">
+            <one-time-code-field
+                name="histoire-one-time-code-field-required"
+                :focus="state.focus"
+                :type="state.type"
+                :length="3"
+                required
+                @created="logEvent('created', $event)"
+                @updated="logEvent('updated', $event)"
+            >
+                <template #label>Field label</template>
+                <template #information><i>Helpful text on how to fill in the field</i></template>
+                <template #required>This field is required</template>
+            </one-time-code-field>
         </Variant>
 
         <template #controls>

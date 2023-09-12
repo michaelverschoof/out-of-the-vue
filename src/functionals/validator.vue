@@ -13,6 +13,7 @@
 <script lang="ts" setup>
 import { FieldData, SubmittedSymbol, UpdateEmitType, ValidatedFieldData, ValidationMethod } from '@/composables/types';
 import { useValidate } from '@/composables/validate';
+import { rawClone } from '@/util/copy';
 import { provided } from '@/util/slots';
 import { inject, reactive, ref, watch } from 'vue';
 
@@ -77,7 +78,7 @@ watch(
 );
 
 const initialize = (data: FieldData): void => {
-    return validateFieldData(data, 'created');
+    validateFieldData(data, 'created');
 };
 
 const validate = (data: FieldData): void => {
@@ -85,40 +86,42 @@ const validate = (data: FieldData): void => {
         showing.value = true;
     }
 
-    return validateFieldData(data, 'updated');
+    validateFieldData(data, 'updated');
 };
 
 // TODO: Move to composable for non-component use
 const validateFieldData = (data: FieldData, event: UpdateEmitType): void => {
-    if (state.name === data.name && JSON.stringify(state.value) === JSON.stringify(data.value)) {
+    const clone = rawClone(data);
+
+    if (!!state.name && JSON.stringify(state.value) === JSON.stringify(clone.value)) {
         return;
     }
 
-    state.name = data.name;
-    state.value = data.value;
+    state.name = clone.name;
+    state.value = clone.value;
 
     if (!props.validations || !props.validations.length) {
         state.valid = true;
         state.failed = [];
         showing.value = false;
 
-        return emit(event, { ...state });
+        return emit(event, rawClone(state));
     }
 
-    const failedValidations = validateInput(data, props.validations);
+    const failedValidations = validateInput(clone, props.validations);
 
     state.valid = !failedValidations.length;
     state.failed = failedValidations;
 
-    return emit(event, { ...state });
+    return emit(event, rawClone(state));
 };
 
 // TODO: Can we trigger this better?
-const showValidity = () => {
+const showValidity = (): void => {
     showing.value = !state.valid;
 };
 
-function revalidate() {
+function revalidate(): void {
     const failedValidations = validateInput(state, props.validations);
     if (props.triggerValidation) {
         failedValidations.push(props.triggerValidation);
@@ -127,6 +130,6 @@ function revalidate() {
     state.valid = !failedValidations.length;
     state.failed = failedValidations;
 
-    emit('updated', { ...state });
+    emit('updated', rawClone(state));
 }
 </script>

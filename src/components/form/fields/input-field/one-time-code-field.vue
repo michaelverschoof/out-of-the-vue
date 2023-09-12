@@ -17,13 +17,8 @@
                             :value="state.value[index]"
                             :validations="inputValidations"
                             @focused="focusedElement = index"
-                            @created="initializeState(toRaw(state))"
-                            @updated="
-                                (data) => {
-                                    inputValidated(index, data);
-                                    validateState(toRaw(state));
-                                }
-                            "
+                            @created="initializeState({ ...state })"
+                            @updated="(data) => inputValidated(index, data, validateState)"
                             @cleared="cleared(index)"
                         />
                     </template>
@@ -55,7 +50,7 @@ import {
 import { predefinedValidations } from '@/composables/validate';
 import Validator from '@/functionals/validator.vue';
 import { filter, shorten, transform } from '@/util/strings';
-import { computed, onMounted, reactive, ref, toRaw, watch } from 'vue';
+import { computed, onMounted, reactive, ref, watch } from 'vue';
 
 const emit = defineEmits<{ (event: 'created' | 'updated', data: ValidatedFieldData): void }>();
 
@@ -119,8 +114,11 @@ watch(
     }
 );
 
-const inputValidated = (index: number, data: ValidatedFieldData): void => {
-    state.value[index] = shorten((data as ValidatedStringFieldData).value, 1);
+const inputValidated = (index: number, data: ValidatedFieldData, validateState: (data: FieldData) => void): void => {
+    state.value[index] = shorten((<ValidatedStringFieldData>data).value, 1);
+
+    validateState(state);
+
     if (!data.valid) {
         return;
     }
@@ -152,7 +150,7 @@ const fieldBlurred = (showValidity: () => void): void => {
     });
 };
 
-const allowedCharacters = computed(() => `[${props.type !== 'numeric' ? 'A-z' : ''}${props.type !== 'alpha' ? '0-9' : ''}]`);
+const allowedCharacters = computed<string>(() => `[${props.type !== 'numeric' ? 'A-z' : ''}${props.type !== 'alpha' ? '0-9' : ''}]`);
 
 const filterPasteData = (event: ClipboardEvent): void => {
     const value = event.clipboardData?.getData('text');

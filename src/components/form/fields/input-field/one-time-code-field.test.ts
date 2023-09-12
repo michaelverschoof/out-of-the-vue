@@ -386,6 +386,43 @@ describe('Validating field', () => {
         expect(wrapper.find('strong.validation-error').exists()).toBeFalsy();
     });
 
+    it('should not show a validation error after filling the last field', async () => {
+        // const { inputs, wrapper } = mountComponent();
+        const wrapper = mount(OneTimeCodeField, {
+            props: Object.assign({}, props, { required: true }),
+            slots: { required: 'required error' },
+            attachTo: document.body
+        });
+
+        const inputs = wrapper.findAll('input');
+
+        await inputs[0].setValue('a');
+        await inputs[1].setValue('a');
+        await inputs[2].setValue('a');
+        expect(wrapper.find('strong.validation-error').exists()).toBeTruthy();
+
+        await inputs[3].setValue('a');
+        await inputs[4].setValue('a');
+        await inputs[5].setValue('a');
+
+        expect(wrapper.find('.focused').exists()).toBeFalsy();
+        expect(wrapper.find('strong.validation-error').exists()).toBeFalsy();
+
+        const emits = emitted(wrapper, 'updated', 6);
+        expect(emits[4]).toEqual({
+            name: props.name,
+            value: 'AAAAA',
+            valid: false,
+            failed: ['required']
+        });
+        expect(emits[5]).toEqual({
+            name: props.name,
+            value: 'AAAAAA',
+            valid: true,
+            failed: []
+        });
+    });
+
     it('should trigger validation via props', async () => {
         const wrapper = mount(OneTimeCodeField, {
             props: Object.assign({}, props, { required: true }),
