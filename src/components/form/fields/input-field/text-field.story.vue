@@ -86,6 +86,7 @@
                 :typing-delay="state.delay"
                 :max="state.max"
                 :min="state.min"
+                :permanent-information="state.permanentInformation"
                 @created="logEvent('created', $event)"
                 @updated="logEvent('updated', $event)"
             >
@@ -100,6 +101,7 @@
                 <hst-checkbox v-model="state.required" title="Required field" />
                 <hst-slider v-model="state.min" :step="1" :min="0" :max="20" title="Minimum length" />
                 <hst-slider v-model="state.max" :step="1" :min="0" :max="20" title="Maximum length" />
+                <hst-checkbox v-model="state.permanentInformation" title="Show information on error" />
 
                 <label class="histoire-wrapper htw-p-2 htw-flex htw-gap-2 htw-flex-wrap htw-items-center">
                     <span class="htw-w-28 htw-shrink-0">Validate field</span>
@@ -135,7 +137,8 @@ const state = reactive({
     required: true,
     min: 3,
     max: 15,
-    maxLength: 25
+    maxLength: 25,
+    permanentInformation: false
 });
 </script>
 

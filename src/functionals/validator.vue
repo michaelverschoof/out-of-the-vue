@@ -3,7 +3,12 @@
 
     <template v-if="!state.valid && showing">
         <template v-for="validation of validations">
-            <strong v-if="provided($slots[validation.name]) && state.failed[0] === validation.name" class="validation-error" :class="validation.name">
+            <strong
+                v-if="provided($slots[validation.name]) && state.failed[0] === validation.name"
+                class="validation-error"
+                :class="validation.name"
+                @click="emit('clicked-validation')"
+            >
                 <slot :name="validation.name" />
             </strong>
         </template>
@@ -17,7 +22,10 @@ import { rawClone } from '@/util/copy';
 import { provided } from '@/util/slots';
 import { inject, reactive, ref, watch } from 'vue';
 
-const emit = defineEmits<{ (event: 'created' | 'updated', data: ValidatedFieldData): void }>();
+const emit = defineEmits<{
+    (event: 'created' | 'updated', data: ValidatedFieldData): void;
+    (event: 'clicked-validation'): void;
+}>();
 
 const props = defineProps<{ validations?: ValidationMethod[]; triggerValidation?: string; liveValidation?: boolean }>();
 

@@ -1,8 +1,14 @@
 <template>
-    <fieldset class="one-time-code-field input-field" @paste.prevent="filterPasteData">
-        <validator :validations="fieldValidations" :trigger-validation="triggerValidation" @created="fieldInitialized" @updated="fieldValidated">
-            <template #default="{ initialize: initializeState, validate: validateState, invalid: invalidState, showing, showValidity }">
-                <header v-if="$slots.label" ref="header" class="label" tabindex="-1">
+    <fieldset ref="field" tabindex="-1" class="one-time-code-field input-field" @paste.prevent="filterPasteData">
+        <validator
+            :validations="fieldValidations"
+            :trigger-validation="triggerValidation"
+            @created="fieldInitialized"
+            @updated="fieldValidated"
+            @clicked-validation="autoFocus"
+        >
+            <template #default="{ initialize: initializeState, validate: validateState, invalid, showing, showValidity }">
+                <header v-if="$slots.label" class="label" @click="autoFocus">
                     <slot name="label" />
                 </header>
 
@@ -24,7 +30,7 @@
                     </template>
                 </main>
 
-                <footer v-if="$slots.information && !(invalidState && showing)" ref="footer" class="information" tabindex="-1">
+                <footer v-if="$slots.information && (permanentInformation || !(invalid && showing))" class="information" @click="autoFocus">
                     <slot name="information" />
                 </footer>
             </template>
@@ -64,6 +70,7 @@ const props = withDefaults(
         triggerValidation?: string;
         type?: 'alpha' | 'numeric' | 'alphanumeric';
         length?: number;
+        permanentInformation?: boolean;
     }>(),
     { type: 'alphanumeric', length: 6 }
 );
@@ -139,13 +146,17 @@ const fieldValidated = (data: ValidatedFieldData): void => {
     updatedState('updated');
 };
 
-const header = ref<HTMLElement | null>(null);
-const main = ref<HTMLElement | null>(null);
-const footer = ref<HTMLElement | null>(null);
+const field = ref<HTMLElement>(null);
+const main = ref<HTMLElement>(null);
 
 const fieldBlurred = (showValidity: () => void): void => {
     requestAnimationFrame(() => {
-        if (hasFocus(header, main, footer)) {
+        if (hasFocus(field)) {
+            if (hasFocus(main)) {
+                return;
+            }
+
+            focusedElement.value = -1;
             return;
         }
 

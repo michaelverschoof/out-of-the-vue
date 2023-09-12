@@ -92,6 +92,7 @@
                     :allow-negative="true"
                     :min="state.min"
                     :max="state.max"
+                    :permanent-information="state.permanentInformation"
                     required
                     @created="logEvent('created', $event)"
                     @updated="updateValue"
@@ -110,6 +111,7 @@
                 <hst-text v-model="stringValue" title="Value" />
                 <hst-slider v-model="state.min" :step="100" :min="0" :max="1000" title="Minimum value" />
                 <hst-slider v-model="state.max" :step="100" :min="1000" :max="2000" title="Maximum value" />
+                <hst-checkbox v-model="state.permanentInformation" title="Display information on error" />
 
                 <label class="histoire-wrapper htw-p-2 htw-flex htw-gap-2 htw-flex-wrap htw-items-center">
                     <span class="htw-w-28 htw-shrink-0">Validate field</span>
@@ -176,7 +178,8 @@ const state = reactive({
     allowNegative: true,
     required: true,
     min: 200,
-    max: 1200
+    max: 1200,
+    permanentInformation: false
 });
 
 const previousDecimal = ref<number>(null);

@@ -49,6 +49,7 @@
                 :focus="state.focus"
                 :type="state.type"
                 :length="3"
+                :permanent-information="state.permanentInformation"
                 required
                 @created="logEvent('created', $event)"
                 @updated="logEvent('updated', $event)"
@@ -65,6 +66,7 @@
             <hst-checkbox v-model="state.focus" title="Focus" />
             <hst-slider v-model="state.length" :step="1" :min="1" :max="10" title="Length" />
             <hst-button-group v-model="state.type" title="Input type" :options="['alpha', 'numeric', 'alphanumeric']" />
+            <hst-checkbox v-model="state.permanentInformation" title="Show information on error" />
         </template>
     </Story>
 </template>
@@ -80,7 +82,8 @@ import { reactive } from 'vue';
 const state = reactive({
     focus: false,
     type: 'alphanumeric' as 'alpha' | 'numeric' | 'alphanumeric',
-    length: 6
+    length: 6,
+    permanentInformation: false
 });
 </script>
 

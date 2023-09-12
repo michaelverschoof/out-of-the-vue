@@ -1,12 +1,12 @@
 <template>
-    <fieldset class="checkable-field input-field">
+    <fieldset ref="field" class="checkable-field input-field" tabindex="-1">
         <validator :validations="validationMethods" :trigger-validation="triggerValidation" @created="initialized" @updated="validated">
             <template #default="{ initialize, validate, invalid, showing, showValidity }">
-                <header v-if="provided(slots.label)" ref="header" class="label" tabindex="-1">
+                <header v-if="provided(slots.label)" class="label">
                     <slot name="label" />
                 </header>
 
-                <main ref="main" tabindex="-1" @blur.capture="fieldBlurred(showValidity)">
+                <main @blur.capture="fieldBlurred(showValidity)">
                     <template v-for="key of keys" :key="key">
                         <label
                             v-if="!nonOptionSlots.includes(key) && provided(slots[key])"
@@ -53,7 +53,7 @@
                     </template>
                 </main>
 
-                <footer v-if="provided(slots.information) && !(invalid && showing)" ref="footer" class="information" tabindex="-1">
+                <footer v-if="provided(slots.information) && (permanentInformation || !(invalid && showing))" class="information">
                     <slot name="information" />
                 </footer>
             </template>
@@ -87,6 +87,7 @@ const props = defineProps<{
     validations?: ValidationMethod[];
     triggerValidation?: string;
     hideInput?: boolean;
+    permanentInformation?: boolean;
 }>();
 
 const validationMethods = computed<ValidationMethod[]>(() => {
@@ -187,13 +188,11 @@ const blurItem = (item: string): void => {
     focusedItems.value.delete(item);
 };
 
-const header = ref<HTMLElement | null>(null);
-const main = ref<HTMLElement | null>(null);
-const footer = ref<HTMLElement | null>(null);
+const field = ref<HTMLElement>(null);
 
 const fieldBlurred = (showValidity: () => void): void => {
     requestAnimationFrame(() => {
-        if (hasFocus(header, main, footer)) {
+        if (hasFocus(field)) {
             return;
         }
 

@@ -1,5 +1,5 @@
 <template>
-    <label class="text-field input-field" v-bind="include($attrs, ['class', 'onClick'])">
+    <label ref="field" class="text-field input-field" tabindex="-1" v-bind="include($attrs, ['class', 'onClick'])">
         <debouncer :delay="typingDelay" @updated="debounced">
             <template #default="{ debounce }">
                 <validator
@@ -10,17 +10,11 @@
                     @updated="debounce"
                 >
                     <template #default="{ initialize, validate, invalid, showing, showValidity }">
-                        <header v-if="$slots.label" class="label" tabindex="-1">
+                        <header v-if="$slots.label" class="label">
                             <slot name="label" />
                         </header>
 
-                        <main
-                            ref="main"
-                            tabindex="-1"
-                            class="input"
-                            :class="{ focused, invalid: invalid && showing }"
-                            @blur.prevent.capture="fieldBlurred(showValidity)"
-                        >
+                        <main class="input" :class="{ focused, invalid: invalid && showing }" @blur.prevent.capture="fieldBlurred(showValidity)">
                             <prepend-append>
                                 <template #prepend>
                                     <slot name="prepend" />
@@ -43,7 +37,7 @@
                             </prepend-append>
                         </main>
 
-                        <footer v-if="$slots.information && !(invalid && showing)" ref="footer" class="information" tabindex="-1">
+                        <footer v-if="$slots.information && (permanentInformation || !(invalid && showing))" class="information">
                             <slot name="information" />
                         </footer>
                     </template>
@@ -81,6 +75,7 @@ const props = defineProps<{
     required?: boolean;
     validations?: ValidationMethod[];
     triggerValidation?: string;
+    permanentInformation?: boolean;
 }>();
 
 const validationMethods = computed<ValidationMethod[]>(() => [
@@ -92,13 +87,11 @@ const validationMethods = computed<ValidationMethod[]>(() => [
 
 const focused = ref<boolean>(false);
 
-const header = ref<HTMLElement | null>(null);
-const main = ref<HTMLElement | null>(null);
-const footer = ref<HTMLElement | null>(null);
+const field = ref<HTMLElement>(null);
 
 const fieldBlurred = (showValidity: () => void): void => {
     requestAnimationFrame(() => {
-        if (hasFocus(header, main, footer)) {
+        if (hasFocus(field)) {
             return;
         }
 
