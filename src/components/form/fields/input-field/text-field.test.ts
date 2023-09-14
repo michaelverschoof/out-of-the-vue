@@ -5,8 +5,7 @@ import { DOMWrapper, VueWrapper, mount } from '@vue/test-utils';
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
 /**
- * @vitest-environment jsdom
- * Used instead of happy-dom to get the `main.value.includes(document.activeElement)` working
+ * @vitest-environment happy-dom
  */
 
 const props = {
@@ -240,6 +239,8 @@ describe('Validating field', () => {
         });
 
         const input = wrapper.find('input');
+
+        await input.trigger('focus');
         await input.setValue('foo');
         expect(wrapper.find('strong.validation-error').exists()).toBeFalsy();
 
@@ -279,7 +280,7 @@ describe('Validating field', () => {
         expect(wrapper.find('strong.validation-error').exists()).toBeTruthy();
     });
 
-    it.only('should retrigger validation on prop update', async () => {
+    it('should retrigger validation on prop update', async () => {
         const wrapper = mount(TextField, {
             props: Object.assign({}, props, { typingDelay: 0, min: 2 }),
             slots: { min: 'min error' }
@@ -310,6 +311,7 @@ describe('Validating field', () => {
 
             const input = wrapper.find('input');
 
+            await input.trigger('focus');
             await input.setValue('f');
             expect(wrapper.find('strong.validation-error').exists()).toBeFalsy();
 
@@ -330,6 +332,7 @@ describe('Validating field', () => {
 
             const input = wrapper.find('input');
 
+            await input.trigger('focus');
             await input.setValue('foo');
             expect(wrapper.find('strong.validation-error').exists()).toBeFalsy();
 
@@ -360,6 +363,7 @@ describe('Validating field', () => {
 
             const input = wrapper.find('input');
 
+            await input.trigger('focus');
             await input.setValue('foo');
             expect(wrapper.find('strong.validation-error').exists()).toBeFalsy();
 

@@ -6,7 +6,6 @@ import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vite
 
 /**
  * @vitest-environment happy-dom
- * Used instead of happy-dom to get the `main.value.includes(document.activeElement)` working
  */
 
 const props = {
@@ -273,7 +272,6 @@ describe('Validating field', () => {
         expect(wrapper.find('strong.validation-error').exists()).toBeFalsy();
 
         await wrapper.setProps({ value: 1 });
-        // await input.trigger('blur');
         expect(wrapper.find('strong.validation-error').exists()).toBeTruthy();
 
         const emits = emitted(wrapper, 'updated', 2);

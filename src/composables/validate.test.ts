@@ -1,4 +1,4 @@
-import { FieldData } from '@/composables/types';
+import { FieldData, ValidationMethodParameters } from '@/composables/types';
 import { predefinedValidations, useValidate } from '@/composables/validate';
 import { describe, expect, it } from 'vitest';
 
@@ -19,6 +19,8 @@ describe('Single validation', () => {
     it('should validate when given no parameter', () => {
         expect(validate(data, [{ ...predefinedValidations.required, parameters: [] }])).toEqual([]);
         expect(validate(data, [{ ...predefinedValidations.required, parameters: undefined }])).toEqual([]);
+
+        expect(validate(data, [{ ...predefinedValidations['min-length'], parameters: [] as ValidationMethodParameters }])).toEqual([]);
     });
 
     it('should validate when required is false', () => {
