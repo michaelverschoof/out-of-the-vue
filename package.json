@@ -2,7 +2,7 @@
     "name": "out-of-the-vue",
     "author": "Michael Verschoof",
     "description": "Functional UX components built with Vue 3",
-    "version": "0.1.0-rc.52",
+    "version": "0.1.0-rc.53",
     "license": "MIT",
     "type": "module",
     "publishConfig": {
