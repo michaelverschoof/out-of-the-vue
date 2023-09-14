@@ -39,8 +39,8 @@ export default defineConfig({
     plugins: [
         vue(),
         dts({
-            tsConfigFilePath: 'tsconfig.build.json',
-            outputDir: 'dist/types',
+            tsconfigPath: 'tsconfig.build.json',
+            outDir: 'dist/types',
             rollupTypes: true
         })
     ],
@@ -48,7 +48,7 @@ export default defineConfig({
     // Vitest Configuration
     test: {
         coverage: {
-            provider: 'c8',
+            provider: 'v8',
             reporter: ['text', 'lcov']
         },
         resolveSnapshotPath: (path: string, extension: string) => {

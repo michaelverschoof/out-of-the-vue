@@ -70,6 +70,7 @@ import CheckableInput from '@/components/form/fields/base/checkable-input.vue';
 import { CheckableFieldData, ValidatedFieldData, ValidatedStringArrayFieldData, ValidationMethod } from '@/composables/types';
 import { predefinedValidations } from '@/composables/validate';
 import Validator from '@/functionals/validator.vue';
+import { rawClone } from '@/util/copy';
 import { hasFocus } from '@/util/focus';
 import { provided } from '@/util/slots';
 import { computed, onMounted, reactive, ref, useSlots, watch } from 'vue';
@@ -120,7 +121,7 @@ const state = reactive<ValidatedStringArrayFieldData>({
 
 watch(
     () => props.selected,
-    (received?: string[]) => {
+    (received: string[]) => {
         const filtered = filterSelected(received);
         if (JSON.stringify(filtered) === JSON.stringify(state.value)) {
             return;
@@ -136,25 +137,19 @@ const created = (data: CheckableFieldData): void => {
         return;
     }
 
-    updated(data, 'created');
+    updated(data);
 };
 
-const updated = (data: CheckableFieldData, event: 'created' | 'updated' = 'updated'): void => {
-    if (props.type === 'radio') {
-        if (selectedItems.value.has(data.value)) {
-            return event !== 'created' ? emit(event, { ...state }) : null;
-        }
-
-        if (data.checked) {
-            selectedItems.value.clear();
-        }
+const updated = (data: CheckableFieldData): void => {
+    if (props.type === 'radio' && data.checked) {
+        selectedItems.value.clear();
     }
 
     data.checked ? selectedItems.value.add(data.value) : selectedItems.value.delete(data.value);
     state.value = Array.from(selectedItems.value);
 };
 
-const select = (key: string) => {
+const select = (key: string): void => {
     if (!!props.disabled && props.disabled.includes(key)) {
         return;
     }
@@ -162,7 +157,7 @@ const select = (key: string) => {
     const data: CheckableFieldData = {
         name: state.name,
         value: key,
-        checked: !selectedItems.value.has(key)
+        checked: props.type !== 'radio' ? !selectedItems.value.has(key) : true
     };
 
     updated(data);
@@ -177,7 +172,7 @@ const validated = (data: ValidatedFieldData): void => {
     state.valid = data.valid;
     state.failed = data.failed;
 
-    emit('updated', { ...state });
+    emit('updated', rawClone(state));
 };
 
 const focusItem = (item: string): void => {
@@ -200,9 +195,7 @@ const fieldBlurred = (showValidity: () => void): void => {
     });
 };
 
-onMounted(() => {
-    emit('created', { ...state });
-});
+onMounted(() => emit('created', rawClone(state)));
 
 function filterSelected(selected?: (string | null)[]): string[] {
     return (selected || []).filter((item) => item !== null) as string[];

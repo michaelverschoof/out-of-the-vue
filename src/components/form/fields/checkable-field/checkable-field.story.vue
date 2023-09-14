@@ -29,7 +29,9 @@
                 @updated="update"
             >
                 <template v-for="item of filteredItems" #[item.value]>
-                    <span>{{ item.label }}</span>
+                    <template v-if="!state.filterDisabled || !state.disabled.includes(item.value)">
+                        {{ item.label }}
+                    </template>
                 </template>
                 <template #label>Field label</template>
                 <template #information><i>Helpful text on how to fill in the field</i></template>
@@ -47,12 +49,14 @@
                 @updated="update"
             >
                 <template v-for="item of filteredItems" #[item.value]>
-                    <prepend-append :key="item.value">
-                        <template #prepend>
-                            <icon icon="mdi:airballoon" />
-                        </template>
-                        {{ item.label }}
-                    </prepend-append>
+                    <template v-if="!state.filterDisabled || !state.disabled.includes(item.value)">
+                        <prepend-append :key="item.value">
+                            <template #prepend>
+                                <icon icon="mdi:airballoon" />
+                            </template>
+                            {{ item.label }}
+                        </prepend-append>
+                    </template>
                 </template>
             </checkable-field>
         </Variant>
@@ -60,7 +64,14 @@
         <template #controls>
             <show-grid-lines show />
 
-            <hst-button-group v-model="state.type" title="Input type" :options="['radio', 'checkbox']" />
+            <hst-button-group
+                v-model="state.type"
+                title="Input type"
+                :options="{
+                    radio: 'radio',
+                    checkbox: 'checkbox'
+                }"
+            />
             <hst-radio v-if="'radio' === state.type" v-model="state.selected[0]" title="Selected" :options="items" />
             <hst-checkbox-list v-else v-model="state.selected" title="Selected" :options="items" />
             <hst-checkbox v-model="state.hideInput" title="Hide input" />

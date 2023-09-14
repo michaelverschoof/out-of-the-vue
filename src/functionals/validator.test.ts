@@ -3,7 +3,7 @@ import { predefinedValidations } from '@/composables/validate';
 import ValidatableInput from '@/functionals/validator.vue';
 import { emitted } from '@test/emits';
 import { MountedComponent } from '@test/types';
-import { mount, MountingOptions } from '@vue/test-utils';
+import { MountingOptions, mount } from '@vue/test-utils';
 import { afterEach, beforeAll, describe, expect, it } from 'vitest';
 import { ref } from 'vue';
 

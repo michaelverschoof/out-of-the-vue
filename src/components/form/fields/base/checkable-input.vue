@@ -17,6 +17,7 @@
 
 <script lang="ts" setup>
 import { CheckableFieldData } from '@/composables/types';
+import { rawClone } from '@/util/copy';
 import { computed, onMounted, reactive, ref, watch } from 'vue';
 
 const emit = defineEmits<{
@@ -39,7 +40,7 @@ const model = computed<boolean>({
     get: () => state.checked,
     set: () => {
         state.checked = !!element.value?.checked;
-        emit('updated', { ...state });
+        emit('updated', rawClone(state));
     }
 });
 
@@ -55,7 +56,7 @@ const reselect = (): void => {
         return;
     }
 
-    emit('updated', { ...state });
+    emit('updated', rawClone(state));
 };
 
 const focus = (): void => {
@@ -68,5 +69,5 @@ const blur = (): void => {
     emit('blurred');
 };
 
-onMounted(() => emit('created', { ...state }));
+onMounted(() => emit('created', rawClone(state)));
 </script>

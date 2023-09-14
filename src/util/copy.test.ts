@@ -13,9 +13,11 @@ const complexObject = {
 };
 
 const complexerObject = {
-    name: 'simple',
+    name: ref('simple'),
     value: ref([1, 2, 56]),
-    other: reactive({ foo: 'bar' })
+    other: reactive({ foo: 'bar' }),
+    bool: ref(true),
+    num: ref(3)
 };
 
 it('should clone shallow objects', () => {
@@ -30,7 +32,9 @@ it('should clone complex objects', () => {
     const expected = {
         name: 'simple',
         value: [1, 2, 56],
-        other: { foo: 'bar' }
+        other: { foo: 'bar' },
+        bool: true,
+        num: 3
     };
 
     expect(rawClone(complexerObject)).toEqual(expected);

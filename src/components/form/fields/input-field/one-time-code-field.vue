@@ -23,7 +23,7 @@
                             :value="state.value[index]"
                             :validations="inputValidations"
                             @focused="focusedElement = index"
-                            @created="initializeState({ ...state })"
+                            @created="initializeState(rawClone(state))"
                             @updated="(data) => inputValidated(index, data, validateState)"
                             @cleared="cleared(index)"
                         />
@@ -55,6 +55,7 @@ import {
 } from '@/composables/types';
 import { predefinedValidations } from '@/composables/validate';
 import Validator from '@/functionals/validator.vue';
+import { rawClone } from '@/util/copy';
 import { hasFocus } from '@/util/focus';
 import { filter, shorten, transform } from '@/util/strings';
 import { computed, onMounted, reactive, ref, watch } from 'vue';
@@ -127,11 +128,9 @@ const inputValidated = (index: number, data: ValidatedFieldData, validateState: 
 
     validateState(state);
 
-    if (!data.valid) {
-        return;
+    if (data.valid) {
+        focusedElement.value = index + 1;
     }
-
-    focusedElement.value = index + 1;
 };
 
 const fieldInitialized = (data: ValidatedFieldData): void => {

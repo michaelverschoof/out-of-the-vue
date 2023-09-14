@@ -15,7 +15,7 @@ function isObject(value: unknown): boolean {
  * @param data the object to convert
  */
 function getRawData<T>(data: T): T {
-    return isReactive(data) ? toRaw(data) : isRef<T>(data) ? data.value : data;
+    return isReactive(data) ? { ...toRaw(data) } : isRef<T>(data) ? JSON.parse(JSON.stringify(data.value)) : data;
 }
 
 /**

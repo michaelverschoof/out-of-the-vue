@@ -1,7 +1,7 @@
 import CheckableField from '@/components/form/fields/checkable-field/checkable-field.vue';
 import { FieldData, ValidatedFieldData } from '@/composables/types';
 import { emitted } from '@test/emits';
-import { DOMWrapper, mount, VueWrapper } from '@vue/test-utils';
+import { DOMWrapper, VueWrapper, mount } from '@vue/test-utils';
 import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
 /**
@@ -19,21 +19,21 @@ const slots = {
     baz: 'Baz'
 };
 
-const createdEmit: ValidatedFieldData = {
+const emptyFieldData: ValidatedFieldData = {
     name: props.name,
     value: [],
     valid: true,
     failed: []
 };
 
-const validSingleUpdate: ValidatedFieldData = {
+const singleFieldData: ValidatedFieldData = {
     name: props.name,
     value: ['bar'],
     valid: true,
     failed: []
 };
 
-const validMultipleUpdate: ValidatedFieldData = {
+const multipleFieldData: ValidatedFieldData = {
     name: props.name,
     value: ['bar', 'baz'],
     valid: true,
@@ -52,14 +52,14 @@ describe('Mounting components', () => {
         const { wrapper } = mountRadio();
 
         const emits = emitted(wrapper, 'created');
-        expect(emits[0]).toEqual(createdEmit);
+        expect(emits[0]).toEqual(emptyFieldData);
     });
 
     it('should mount the checkbox component', async () => {
         const { wrapper } = mountCheckbox();
 
         const emits = emitted(wrapper, 'created');
-        expect(emits[0]).toEqual(createdEmit);
+        expect(emits[0]).toEqual(emptyFieldData);
     });
 
     it('should mount the checkbox component with hidden inputs', async () => {
@@ -118,7 +118,7 @@ describe('Ticking radio items', () => {
         await check(items[1]);
 
         const emits = emitted(wrapper, 'updated') as ValidatedFieldData[];
-        expect(emits[0]).toEqual(validSingleUpdate);
+        expect(emits[0]).toEqual(singleFieldData);
     });
 
     it('should tick the radio item on load', async () => {
@@ -129,7 +129,7 @@ describe('Ticking radio items', () => {
         expect(items[2].classes().includes('selected')).toBeFalsy();
 
         const emits = emitted(wrapper, 'created') as ValidatedFieldData[];
-        expect(emits[0]).toEqual(validSingleUpdate);
+        expect(emits[0]).toEqual(singleFieldData);
     });
 
     it('should tick the radio item with space key', async () => {
@@ -138,18 +138,18 @@ describe('Ticking radio items', () => {
         await items[1].trigger('keypress.space');
 
         const emits = emitted(wrapper, 'updated') as ValidatedFieldData[];
-        expect(emits[0]).toEqual(validSingleUpdate);
+        expect(emits[0]).toEqual(singleFieldData);
     });
 
     it('should not untick the radio item with space key if already selected', async () => {
         const { items, wrapper } = mountRadio();
 
-        await check(items[1]);
+        await items[1].find('input').setValue(true);
         await items[1].trigger('keypress.space');
 
         const emits = emitted(wrapper, 'updated', 2) as ValidatedFieldData[];
-        expect(emits[0]).toEqual(validSingleUpdate);
-        expect(emits[1]).toEqual(validSingleUpdate);
+        expect(emits[0]).toEqual(singleFieldData);
+        expect(emits[1]).toEqual(singleFieldData);
     });
 
     it('should not tick the radio item with space key if disabled', async () => {
@@ -166,7 +166,7 @@ describe('Ticking radio items', () => {
         expect(items.every((item) => !item.classes().includes('selected'))).toBeTruthy();
 
         const emits = emitted(wrapper, 'created') as ValidatedFieldData[];
-        expect(emits[0]).toEqual(createdEmit);
+        expect(emits[0]).toEqual(emptyFieldData);
 
         await wrapper.setProps({ selected: ['bar'] });
         expect(items[0].classes().includes('selected')).toBeFalsy();
@@ -196,12 +196,12 @@ describe('Ticking checkbox boxes', () => {
         await check(items[1]);
 
         let emits = emitted(wrapper, 'updated') as ValidatedFieldData[];
-        expect(emits[0]).toEqual(validSingleUpdate);
+        expect(emits[0]).toEqual(singleFieldData);
 
         await check(items[2]);
 
         emits = emitted(wrapper, 'updated', 2) as ValidatedFieldData[];
-        expect(emits[1]).toEqual(validMultipleUpdate);
+        expect(emits[1]).toEqual(multipleFieldData);
     });
 
     it('should tick the checkbox component on load', async () => {
@@ -212,7 +212,7 @@ describe('Ticking checkbox boxes', () => {
         expect(items[2].classes().includes('selected')).toBeTruthy();
 
         const emits = emitted(wrapper, 'created') as ValidatedFieldData[];
-        expect(emits[0]).toEqual(validMultipleUpdate);
+        expect(emits[0]).toEqual(multipleFieldData);
     });
 
     it('should tick the checkbox component with enter key', async () => {
@@ -221,7 +221,7 @@ describe('Ticking checkbox boxes', () => {
         await items[1].trigger('keypress.enter');
 
         const emits = emitted(wrapper, 'updated') as ValidatedFieldData[];
-        expect(emits[0]).toEqual(validSingleUpdate);
+        expect(emits[0]).toEqual(singleFieldData);
     });
 
     it('should untick the checkbox component with enter key if already selected', async () => {
@@ -231,8 +231,8 @@ describe('Ticking checkbox boxes', () => {
         await items[1].trigger('keypress.enter');
 
         const emits = emitted(wrapper, 'updated', 2) as ValidatedFieldData[];
-        expect(emits[0]).toEqual(validSingleUpdate);
-        expect(emits[1]).toEqual(createdEmit);
+        expect(emits[0]).toEqual(singleFieldData);
+        expect(emits[1]).toEqual(emptyFieldData);
     });
 
     it('should not tick the checkbox component with space key if disabled', async () => {
@@ -249,7 +249,7 @@ describe('Ticking checkbox boxes', () => {
         expect(items.every((item) => !item.classes().includes('selected'))).toBeTruthy();
 
         const emits = emitted(wrapper, 'created') as ValidatedFieldData[];
-        expect(emits[0]).toEqual(createdEmit);
+        expect(emits[0]).toEqual(emptyFieldData);
 
         await wrapper.setProps({ selected: ['bar', 'baz'] });
 
@@ -512,22 +512,18 @@ describe('Validating field', () => {
     });
 });
 
-function check(item: DOMWrapper<Element>): Promise<void> {
+async function check(item: DOMWrapper<Element>): Promise<void> {
     const input = item.find('input');
-    const element = input.element as HTMLInputElement;
-    element.checked = true;
-    expect(element.checked).toBeTruthy();
+    await input.setValue(true);
 
-    return input.trigger('change');
+    expect((input.element as HTMLInputElement).checked).toBeTruthy();
 }
 
-function uncheck(item: DOMWrapper<Element>): Promise<void> {
+async function uncheck(item: DOMWrapper<Element>): Promise<void> {
     const input = item.find('input');
-    const element = input.element as HTMLInputElement;
-    element.checked = false;
-    expect(element.checked).toBeFalsy();
+    await input.setValue(false);
 
-    return input.trigger('change');
+    expect((input.element as HTMLInputElement).checked).toBeFalsy();
 }
 
 type MountResult = { wrapper: VueWrapper<any>; items: DOMWrapper<HTMLElement>[] };

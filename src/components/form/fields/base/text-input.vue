@@ -18,6 +18,7 @@
 
 <script lang="ts" setup>
 import { StringFieldData } from '@/composables/types';
+import { rawClone } from '@/util/copy';
 import { filter, shorten, transform } from '@/util/strings';
 import { computed, onMounted, reactive, ref, watch } from 'vue';
 
@@ -50,14 +51,14 @@ const state = reactive<StringFieldData>({
 function update(value?: string | null) {
     if (value === null) {
         state.value = null;
-        emit('updated', { ...state });
+        emit('updated', rawClone(state));
         return;
     }
 
     const prepared = filterAndTransform(value ?? state.value);
     if (prepared !== state.value) {
         state.value = prepared;
-        emit('updated', { ...state });
+        emit('updated', rawClone(state));
     }
 }
 
@@ -164,7 +165,7 @@ onMounted(() => {
         state.value = filterAndTransform(props.value);
     }
 
-    emit('created', { ...state });
+    emit('created', rawClone(state));
 });
 </script>
 

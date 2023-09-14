@@ -59,6 +59,7 @@ import { predefinedValidations } from '@/composables/validate';
 import Debouncer from '@/functionals/debouncer.vue';
 import Validator from '@/functionals/validator.vue';
 import { exclude, include } from '@/util/attrs';
+import { rawClone } from '@/util/copy';
 import { hasFocus } from '@/util/focus';
 import { computed, ref } from 'vue';
 
@@ -101,11 +102,11 @@ const fieldBlurred = (showValidity: () => void): void => {
 };
 
 const initialized = (data: FieldData | ValidatedFieldData): void => {
-    emit('created', { ...(data as ValidatedFieldData) });
+    emit('created', rawClone(data) as ValidatedFieldData);
 };
 
 const debounced = (data: FieldData | ValidatedFieldData): void => {
-    emit('updated', { ...(data as ValidatedFieldData) });
+    emit('updated', rawClone(data) as ValidatedFieldData);
 };
 </script>
 

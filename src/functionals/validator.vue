@@ -101,10 +101,6 @@ const validate = (data: FieldData): void => {
 const validateFieldData = (data: FieldData, event: UpdateEmitType): void => {
     const clone = rawClone(data);
 
-    if (!!state.name && JSON.stringify(state.value) === JSON.stringify(clone.value)) {
-        return;
-    }
-
     state.name = clone.name;
     state.value = clone.value;
 

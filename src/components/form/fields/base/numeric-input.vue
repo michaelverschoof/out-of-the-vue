@@ -14,7 +14,8 @@
 import TextInput from '@/components/form/fields/base/text-input.vue';
 import { NumberFieldData, StringFieldData } from '@/composables/types';
 import { exclude } from '@/util/attrs';
-import { filter, parse } from '@/util/numbers';
+import { rawClone } from '@/util/copy';
+import { parse } from '@/util/numbers';
 import { computed, reactive, watch } from 'vue';
 
 const emit = defineEmits<{ (event: 'created' | 'updated', data: NumberFieldData): void }>();
@@ -45,22 +46,17 @@ watch(
 );
 
 const parseNumber = (data: StringFieldData): number => {
-    const filtered = filter(data.value ?? '', props.allowDecimals, props.allowNegative);
-    if (!filtered) {
-        return null;
-    }
-
-    return parse(filtered);
+    return parse(data.value ?? '', props.allowDecimals, props.allowNegative);
 };
 
 const created = (data: StringFieldData): void => {
     state.value = parseNumber(data);
-    emit('created', { ...state });
+    emit('created', rawClone(state));
 };
 
 const updated = (data: StringFieldData): void => {
     state.value = parseNumber(data);
-    emit('updated', { ...state });
+    emit('updated', rawClone(state));
 };
 </script>
 
