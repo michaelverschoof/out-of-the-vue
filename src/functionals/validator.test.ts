@@ -14,9 +14,9 @@ import { ref } from 'vue';
 const data = { name: 'test', value: 'foo' };
 
 const validations = [
-    { ...predefinedValidations['required'], parameters: [ true ] },
-    { ...predefinedValidations['min-length'], parameters: [ 2 ] },
-    { ...predefinedValidations['max-length'], parameters: [ 5 ] }
+    { ...predefinedValidations['required'], parameters: [true] },
+    { ...predefinedValidations['min-length'], parameters: [2] },
+    { ...predefinedValidations['max-length'], parameters: [5] }
 ];
 
 let provided = ref<boolean>(false);
@@ -26,7 +26,6 @@ beforeAll(() => {
 });
 
 describe('Mounting component', () => {
-
     it('should mount the component', async () => {
         const { wrapper } = mountComponent();
         expect(wrapper.html()).toBe('<div class="">Foo</div>\n<!--v-if-->');
@@ -39,7 +38,6 @@ describe('Mounting component', () => {
 });
 
 describe('Validating on create event', () => {
-
     it('should validate', async () => {
         const { element, wrapper } = mountComponent(undefined, validations);
         expect(wrapper.emitted('created')).toBeFalsy();
@@ -79,7 +77,7 @@ describe('Validating on create event', () => {
             name: data.name,
             value: '',
             valid: false,
-            failed: [ 'required', 'min' ]
+            failed: ['required', 'min']
         });
     });
 
@@ -94,7 +92,7 @@ describe('Validating on create event', () => {
             name: data.name,
             value: 'a',
             valid: false,
-            failed: [ 'min' ]
+            failed: ['min']
         });
     });
 
@@ -109,13 +107,12 @@ describe('Validating on create event', () => {
             name: data.name,
             value: 'foobar',
             valid: false,
-            failed: [ 'max' ]
+            failed: ['max']
         });
     });
 });
 
 describe('Validating on update event', () => {
-
     it('should validate', async () => {
         const { element, wrapper } = mountComponent(undefined, validations);
         expect(wrapper.emitted('updated')).toBeFalsy();
@@ -155,7 +152,7 @@ describe('Validating on update event', () => {
             name: data.name,
             value: 'a',
             valid: false,
-            failed: [ 'min' ]
+            failed: ['min']
         });
     });
 
@@ -170,13 +167,12 @@ describe('Validating on update event', () => {
             name: data.name,
             value: 'foobar',
             valid: false,
-            failed: [ 'max' ]
+            failed: ['max']
         });
     });
 });
 
 describe('Show validity', () => {
-
     it('should trigger showing', async () => {
         const { wrapper, element } = mountComponent(undefined, validations);
         await element?.trigger('updated');
@@ -218,9 +214,7 @@ describe('Show validity', () => {
 });
 
 describe('Triggering validation externally', () => {
-
     describe('Triggering validation by prop', () => {
-
         it('should show error', async () => {
             const { wrapper } = mountComponent(undefined, validations);
 
@@ -266,9 +260,9 @@ describe('Triggering validation externally', () => {
             });
 
             const updatedValidations = [
-                { ...predefinedValidations['required'], parameters: [ true ] },
-                { ...predefinedValidations['min-length'], parameters: [ 4 ] },
-                { ...predefinedValidations['max-length'], parameters: [ 5 ] }
+                { ...predefinedValidations['required'], parameters: [true] },
+                { ...predefinedValidations['min-length'], parameters: [4] },
+                { ...predefinedValidations['max-length'], parameters: [5] }
             ];
 
             await wrapper.setProps({ validations: updatedValidations });
@@ -277,13 +271,12 @@ describe('Triggering validation externally', () => {
             expect(emits[0]).toEqual({
                 ...data,
                 valid: false,
-                failed: [ 'min' ]
+                failed: ['min']
             });
         });
     });
 
     describe('Triggering validation by provide', () => {
-
         afterEach(() => {
             provided.value = false;
         });
@@ -343,16 +336,20 @@ describe('Triggering validation externally', () => {
     });
 });
 
-function mountComponent(value?: string, validations?: ValidationMethod[], enableProvide?: boolean): MountedComponent {
+function mountComponent(
+    value?: string,
+    validations?: ValidationMethod[],
+    enableProvide?: boolean
+): MountedComponent {
     const testData = !!value || value === '' ? Object.assign({}, data, { value: value }) : data;
-    const stringedData = JSON.stringify(testData).replace(/"/g, '\'');
+    const stringedData = JSON.stringify(testData).replace(/"/g, "'");
 
     const options: MountingOptions<any> = {
         slots: {
             default: `<template #default="{ initialize, validate, invalid, showing, showValidity }">
                         <div :class="{ invalid, showing }"
-                             @created="initialize(${ stringedData })"
-                             @updated="validate(${ stringedData })"
+                             @created="initialize(${stringedData})"
+                             @updated="validate(${stringedData})"
                              @show="showValidity"
                         >Foo</div>
                       </template>`,
@@ -373,7 +370,7 @@ function mountComponent(value?: string, validations?: ValidationMethod[], enable
         };
     }
 
-    const wrapper = mount(ValidatableInput, options);
+    const wrapper = mount(ValidatableInput, options as any);
 
     const element = wrapper.find('div');
 

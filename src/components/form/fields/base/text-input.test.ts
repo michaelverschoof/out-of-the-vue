@@ -224,7 +224,10 @@ describe('Filtering input', () => {
         });
 
         it('should not filter after updating prop when equal value', async () => {
-            const { input, wrapper } = mountComponent({ value: 'foobar', allowedCharacters: '[A-z]' });
+            const { input, wrapper } = mountComponent({
+                value: 'foobar',
+                allowedCharacters: '[A-z]'
+            });
 
             expect(input.element.value).toBe('foobar');
 
@@ -385,7 +388,7 @@ function mountComponent(
         options.attachTo = document.body;
     }
 
-    const wrapper = mount(TextInput, options);
+    const wrapper = mount(TextInput, options as any);
     const input = wrapper.find('input');
 
     return { wrapper, input };

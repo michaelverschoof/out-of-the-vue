@@ -82,8 +82,11 @@ describe('Mounting components', () => {
 describe('Providing non-item slots', () => {
     it('should show label and info on the radio component', async () => {
         const wrapper = mount(CheckableField, {
-            props: radioProps,
-            slots: Object.assign({}, slots, { label: 'some radio label', information: 'some radio info' })
+            props: radioProps as any,
+            slots: Object.assign({}, slots, {
+                label: 'some radio label',
+                information: 'some radio info'
+            })
         });
 
         const label = wrapper.find('.label') as DOMWrapper<HTMLElement>;
@@ -97,8 +100,11 @@ describe('Providing non-item slots', () => {
 
     it('should show label and info on the checkbox component', async () => {
         const wrapper = mount(CheckableField, {
-            props: checkboxProps,
-            slots: Object.assign({}, slots, { label: 'some checkbox label', information: 'some checkbox info' })
+            props: checkboxProps as any,
+            slots: Object.assign({}, slots, {
+                label: 'some checkbox label',
+                information: 'some checkbox info'
+            })
         });
 
         const label = wrapper.find('.label') as DOMWrapper<HTMLElement>;
@@ -323,15 +329,17 @@ describe('Focusing items', () => {
 
 describe('Validating field', () => {
     beforeEach(() => {
-        vi.spyOn(window, 'requestAnimationFrame').mockImplementation((callback: FrameRequestCallback): number => {
-            callback(100);
-            return 0;
-        });
+        vi.spyOn(window, 'requestAnimationFrame').mockImplementation(
+            (callback: FrameRequestCallback): number => {
+                callback(100);
+                return 0;
+            }
+        );
     });
 
     it('should show a validation error', async () => {
         const wrapper = mount(CheckableField, {
-            props: Object.assign({}, checkboxProps, { required: true }),
+            props: Object.assign({}, checkboxProps, { required: true }) as any,
             slots: Object.assign({}, slots, { required: 'required error' })
         });
 
@@ -350,7 +358,7 @@ describe('Validating field', () => {
 
     it('should not show a validation error when focus is still inside the field', async () => {
         const wrapper = mount(CheckableField, {
-            props: Object.assign({}, checkboxProps, { required: true }),
+            props: Object.assign({}, checkboxProps, { required: true }) as any,
             slots: Object.assign({}, slots, { required: 'required error' }),
             attachTo: document.body
         });
@@ -375,7 +383,7 @@ describe('Validating field', () => {
 
     it('should not show a validation error when parameter is undefined', async () => {
         const wrapper = mount(CheckableField, {
-            props: Object.assign({}, checkboxProps, { required: undefined }),
+            props: Object.assign({}, checkboxProps, { required: undefined }) as any,
             slots: Object.assign({}, slots, { required: 'required error' })
         });
 
@@ -392,7 +400,7 @@ describe('Validating field', () => {
 
     it('should trigger validation via props', async () => {
         const wrapper = mount(CheckableField, {
-            props: radioProps,
+            props: radioProps as any,
             slots: Object.assign({}, slots, { required: 'required error' })
         });
 
@@ -405,7 +413,7 @@ describe('Validating field', () => {
     describe('Specific validations', () => {
         it('should trigger min validation', async () => {
             const wrapper = mount(CheckableField, {
-                props: Object.assign({}, checkboxProps, { min: 2 }),
+                props: Object.assign({}, checkboxProps, { min: 2 }) as any,
                 slots: Object.assign({}, slots, { min: 'min error' })
             });
 
@@ -421,7 +429,7 @@ describe('Validating field', () => {
 
         it('should not trigger min validation', async () => {
             const wrapper = mount(CheckableField, {
-                props: Object.assign({}, checkboxProps, { min: 2 }),
+                props: Object.assign({}, checkboxProps, { min: 2 }) as any,
                 slots: Object.assign({}, slots, { min: 'min error' })
             });
 
@@ -437,7 +445,7 @@ describe('Validating field', () => {
 
         it('should trigger max validation', async () => {
             const wrapper = mount(CheckableField, {
-                props: Object.assign({}, checkboxProps, { max: 2 }),
+                props: Object.assign({}, checkboxProps, { max: 2 }) as any,
                 slots: Object.assign({}, slots, { max: 'max error' })
             });
 
@@ -455,7 +463,7 @@ describe('Validating field', () => {
 
         it('should not trigger max validation', async () => {
             const wrapper = mount(CheckableField, {
-                props: Object.assign({}, checkboxProps, { max: 2 }),
+                props: Object.assign({}, checkboxProps, { max: 2 }) as any,
                 slots: Object.assign({}, slots, { max: 'max error' })
             });
 
@@ -481,7 +489,7 @@ describe('Validating field', () => {
 
         it('should trigger custom validation', async () => {
             const wrapper = mount(CheckableField, {
-                props: Object.assign({}, checkboxProps, { validations: validations }),
+                props: Object.assign({}, checkboxProps, { validations: validations }) as any,
                 slots: Object.assign({}, slots, { custom: 'custom error' })
             });
 
@@ -497,7 +505,7 @@ describe('Validating field', () => {
 
         it('should not trigger custom validation', async () => {
             const wrapper = mount(CheckableField, {
-                props: Object.assign({}, checkboxProps, { validations: validations }),
+                props: Object.assign({}, checkboxProps, { validations: validations }) as any,
                 slots: Object.assign({}, slots, { custom: 'custom error' })
             });
 
@@ -533,7 +541,9 @@ function uncheck(item: DOMWrapper<Element>): Promise<void> {
 type MountResult = { wrapper: VueWrapper<any>; items: DOMWrapper<HTMLElement>[] };
 
 function mountCheckbox(selected?: string[]): MountResult {
-    const props = !selected ? checkboxProps : Object.assign({}, checkboxProps, { selected: selected });
+    const props = !selected
+        ? checkboxProps
+        : Object.assign({}, checkboxProps, { selected: selected });
     return mountCheckable(props);
 }
 
@@ -544,7 +554,7 @@ function mountRadio(selected?: string[]): MountResult {
 
 function mountCheckable(props: { type: string } & { name: string }): MountResult {
     const wrapper = mount(CheckableField, {
-        props: props,
+        props: props as any,
         slots: slots
     });
 

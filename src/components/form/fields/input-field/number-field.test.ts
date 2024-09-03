@@ -30,7 +30,6 @@ afterEach(() => {
 });
 
 describe('Mounting components', () => {
-
     it('should mount the component', async () => {
         const { input, wrapper } = mountComponent();
 
@@ -78,9 +77,7 @@ describe('Mounting components', () => {
 });
 
 describe('Focusing components', () => {
-
     describe('On focus', () => {
-
         it('should focus natively', async () => {
             const wrapper = mount(NumberField, {
                 props: props,
@@ -101,7 +98,7 @@ describe('Focusing components', () => {
             });
 
             const input = wrapper.find('input');
-            await wrapper.setProps({ focus: true });
+            await wrapper.setProps({ focus: true } as any);
 
             expect(input.element).toBe(document.activeElement);
             expect(wrapper.find('main').classes().includes('focused')).toBeTruthy();
@@ -109,7 +106,6 @@ describe('Focusing components', () => {
     });
 
     describe('On blur', () => {
-
         it('should blur natively', async () => {
             const wrapper = mount(NumberField, {
                 props: props,
@@ -135,12 +131,12 @@ describe('Focusing components', () => {
             });
 
             const input = wrapper.find('input');
-            await wrapper.setProps({ focus: true });
+            await wrapper.setProps({ focus: true } as any);
 
             expect(input.element).toBe(document.activeElement);
             expect(wrapper.find('main').classes().includes('focused')).toBeTruthy();
 
-            await wrapper.setProps({ focus: false });
+            await wrapper.setProps({ focus: false } as any);
 
             expect(input.element).not.toBe(document.activeElement);
             expect(wrapper.find('main').classes().includes('focused')).toBeFalsy();
@@ -149,7 +145,6 @@ describe('Focusing components', () => {
 });
 
 describe('Updating input', () => {
-
     it('should update value from props', async () => {
         const { input, wrapper } = mountComponent();
 
@@ -180,7 +175,6 @@ describe('Updating input', () => {
 });
 
 describe('Debouncing input', () => {
-
     it('should trigger debounce', async () => {
         const { input, wrapper } = mountComponent();
 
@@ -205,7 +199,6 @@ describe('Debouncing input', () => {
 });
 
 describe('Validating field', () => {
-
     it('should show a validation error', async () => {
         const wrapper = mount(NumberField, {
             props: Object.assign({}, props, { required: true }),
@@ -260,7 +253,6 @@ describe('Validating field', () => {
     });
 
     describe('Specific validations', () => {
-
         it('should trigger min validation', async () => {
             const wrapper = mount(NumberField, {
                 props: Object.assign({}, props, { min: 2 }),
@@ -306,14 +298,14 @@ describe('Validating field', () => {
         const validations = [
             {
                 name: 'custom',
-                validator: (data: FieldData, amount: number) => (<number> data.value) === amount,
-                parameters: [ 123 ]
+                validator: (data: FieldData, amount: number) => <number>data.value === amount,
+                parameters: [123]
             }
         ];
 
         it('should trigger custom validation', async () => {
             const wrapper = mount(NumberField, {
-                props: Object.assign({}, props, { validations: validations }),
+                props: Object.assign({}, props, { validations: validations }) as any,
                 slots: Object.assign({}, { custom: 'custom error' })
             });
 
@@ -332,7 +324,7 @@ describe('Validating field', () => {
     });
 });
 
-function mountComponent(): { wrapper: VueWrapper<any>, input: DOMWrapper<HTMLInputElement> } {
+function mountComponent(): { wrapper: VueWrapper<any>; input: DOMWrapper<HTMLInputElement> } {
     const wrapper = mount(NumberField, {
         props: props
     });

@@ -8,7 +8,7 @@ import { FieldData } from '@/composables/types';
  * @returns true if the value is greater or equal to the minimum amount
  */
 export function minimum(data: FieldData, minimum: number): boolean {
-    return !minimum || (data?.value || 0) >= minimum;
+    return !minimum || ((data?.value as number) || 0) >= minimum;
 }
 
 /**
@@ -19,5 +19,5 @@ export function minimum(data: FieldData, minimum: number): boolean {
  * @returns true if the value is smaller or equal to the maximum amount
  */
 export function maximum(data: FieldData, maximum: number): boolean {
-    return !maximum || (data?.value || 0) <= maximum;
+    return !maximum || ((data?.value as number) || 0) <= maximum;
 }

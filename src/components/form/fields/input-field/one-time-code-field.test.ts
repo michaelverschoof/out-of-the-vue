@@ -28,7 +28,9 @@ describe('Mounting components', () => {
     it('should mount the component', async () => {
         const { inputs, wrapper } = mountComponent();
         expect(inputs.length).toBe(6);
-        expect(inputs.every((input) => input.attributes().name.startsWith(props.name))).toBeTruthy();
+        expect(
+            inputs.every((input) => input.attributes().name.startsWith(props.name))
+        ).toBeTruthy();
 
         const emits = emitted(wrapper, 'created');
         expect(emits[0]).toEqual(createdEmit);
@@ -65,7 +67,7 @@ describe('Mounting components', () => {
 describe('Give updated value on input', () => {
     it('should emit on input', async () => {
         const wrapper = mount(OneTimeCodeField, {
-            props: Object.assign({}, props, { type: 'alpha' }),
+            props: Object.assign({}, props, { type: 'alpha' }) as any,
             attachTo: document.body
         });
 
@@ -84,7 +86,7 @@ describe('Give updated value on input', () => {
 
     it('should emit number on input', async () => {
         const wrapper = mount(OneTimeCodeField, {
-            props: Object.assign({}, props, { type: 'numeric' }),
+            props: Object.assign({}, props, { type: 'numeric' }) as any,
             attachTo: document.body
         });
 
@@ -346,10 +348,12 @@ describe('Pasting data', () => {
 
 describe('Validating field', () => {
     beforeEach(() => {
-        vi.spyOn(window, 'requestAnimationFrame').mockImplementation((callback: FrameRequestCallback): number => {
-            callback(100);
-            return 0;
-        });
+        vi.spyOn(window, 'requestAnimationFrame').mockImplementation(
+            (callback: FrameRequestCallback): number => {
+                callback(100);
+                return 0;
+            }
+        );
     });
 
     it('should show a validation error', async () => {
@@ -407,7 +411,8 @@ describe('Validating field', () => {
         const validations: ValidationMethod[] = [
             {
                 name: 'custom',
-                validator: (data: FieldData) => JSON.stringify(data.value) === JSON.stringify(['F', 'O', 'O', 'B', 'A', 'R']),
+                validator: (data: FieldData) =>
+                    JSON.stringify(data.value) === JSON.stringify(['F', 'O', 'O', 'B', 'A', 'R']),
                 parameters: null
             }
         ];
@@ -418,7 +423,9 @@ describe('Validating field', () => {
                 slots: { custom: 'custom error' }
             });
 
-            await wrapper.find('fieldset').trigger('paste', { clipboardData: { getData: () => 'foobaz' } });
+            await wrapper
+                .find('fieldset')
+                .trigger('paste', { clipboardData: { getData: () => 'foobaz' } });
             expect(wrapper.find('strong.validation-error').exists()).toBeFalsy();
 
             await wrapper.find('main').trigger('blur');
@@ -432,7 +439,9 @@ describe('Validating field', () => {
                 slots: { custom: 'custom error' }
             });
 
-            await wrapper.find('fieldset').trigger('paste', { clipboardData: { getData: () => 'foobar' } });
+            await wrapper
+                .find('fieldset')
+                .trigger('paste', { clipboardData: { getData: () => 'foobar' } });
             expect(wrapper.find('strong.validation-error').exists()).toBeFalsy();
 
             await wrapper.find('main').trigger('blur');
