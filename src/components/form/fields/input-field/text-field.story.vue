@@ -1,5 +1,9 @@
 <template>
-    <Story title="Form/Fields/Text field" :layout="{ type: 'grid', width: 400 }" auto-props-disabled>
+    <Story
+        title="Form/Fields/Text field"
+        :layout="{ type: 'grid', width: 400 }"
+        auto-props-disabled
+    >
         <Variant title="Simple">
             <text-field
                 name="histoire-text-field-simple"
@@ -99,14 +103,33 @@
 
             <template #controls>
                 <hst-checkbox v-model="state.required" title="Required field" />
-                <hst-slider v-model="state.min" :step="1" :min="0" :max="20" title="Minimum length" />
-                <hst-slider v-model="state.max" :step="1" :min="0" :max="20" title="Maximum length" />
-                <hst-checkbox v-model="state.permanentInformation" title="Show information on error" />
+                <hst-slider
+                    v-model="state.min"
+                    :step="1"
+                    :min="0"
+                    :max="20"
+                    title="Minimum length"
+                />
+                <hst-slider
+                    v-model="state.max"
+                    :step="1"
+                    :min="0"
+                    :max="20"
+                    title="Maximum length"
+                />
+                <hst-checkbox
+                    v-model="state.permanentInformation"
+                    title="Show information on error"
+                />
 
-                <label class="histoire-wrapper htw-p-2 htw-flex htw-gap-2 htw-flex-wrap htw-items-center">
+                <label
+                    class="histoire-wrapper htw-p-2 htw-flex htw-gap-2 htw-flex-wrap htw-items-center"
+                >
                     <span class="htw-w-28 htw-shrink-0">Validate field</span>
                     <span class="htw-grow htw-max-w-full htw-flex htw-items-center htw-gap-1">
-                        <hst-button class="htw-p-2" @click="validate = !validate"> Validate = {{ validate }}</hst-button>
+                        <hst-button class="htw-p-2" @click="validate = !validate">
+                            Validate = {{ validate }}</hst-button
+                        >
                     </span>
                 </label>
             </template>
@@ -115,8 +138,20 @@
         <template #controls>
             <show-grid-lines show />
 
-            <hst-slider v-model="state.maxLength" :step="1" :min="0" :max="30" title="Maximum length" />
-            <hst-slider v-model="state.delay" :step="100" :min="0" :max="1000" title="Typing delay" />
+            <hst-slider
+                v-model="state.maxLength"
+                :step="1"
+                :min="0"
+                :max="30"
+                title="Maximum length"
+            />
+            <hst-slider
+                v-model="state.delay"
+                :step="100"
+                :min="0"
+                :max="1000"
+                title="Typing delay"
+            />
         </template>
     </Story>
 </template>

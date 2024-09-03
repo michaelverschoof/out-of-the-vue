@@ -1,5 +1,10 @@
 <template>
-    <label ref="field" class="number-field input-field" tabindex="-1" v-bind="include($attrs, ['class', 'onClick'])">
+    <label
+        ref="field"
+        class="number-field input-field"
+        tabindex="-1"
+        v-bind="include($attrs, ['class', 'onClick'])"
+    >
         <debouncer :delay="typingDelay" @updated="debounced">
             <template #default="{ debounce }">
                 <validator
@@ -14,19 +19,34 @@
                             <slot name="label" />
                         </header>
 
-                        <main class="input" :class="{ focused, invalid: invalid && showing }" @blur.prevent.capture="fieldBlurred(showValidity)">
+                        <main
+                            class="input"
+                            :class="{ focused, invalid: invalid && showing }"
+                            @blur.prevent.capture="fieldBlurred(showValidity)"
+                        >
                             <prepend-append>
                                 <template #prepend>
                                     <slot name="prepend" />
                                 </template>
 
                                 <numeric-input
-                                    v-bind="exclude($attrs, ['class', 'onClick', 'onCreated', 'onUpdated'])"
+                                    v-bind="
+                                        exclude($attrs, [
+                                            'class',
+                                            'onClick',
+                                            'onCreated',
+                                            'onUpdated'
+                                        ])
+                                    "
                                     :name="name"
                                     :value="value"
                                     :allow-decimals="allowDecimals"
                                     :allow-negative="allowNegative"
                                     @focused="focused = true"
+                                    @blurred="
+                                        focused = false;
+                                        showValidity();
+                                    "
                                     @created="initialize"
                                     @updated="validate"
                                 />
@@ -37,7 +57,13 @@
                             </prepend-append>
                         </main>
 
-                        <footer v-if="$slots.information && (permanentInformation || !(invalid && showing))" class="information">
+                        <footer
+                            v-if="
+                                $slots.information &&
+                                (permanentInformation || !(invalid && showing))
+                            "
+                            class="information"
+                        >
                             <slot name="information" />
                         </footer>
                     </template>
@@ -54,7 +80,12 @@
 <script lang="ts" setup>
 import NumericInput from '@/components/form/fields/base/numeric-input.vue';
 import PrependAppend from '@/components/layout/prepend-append.vue';
-import { FieldData, ValidatedFieldData, ValidatedNumberFieldData, ValidationMethod } from '@/composables/types';
+import {
+    FieldData,
+    ValidatedFieldData,
+    ValidatedNumberFieldData,
+    ValidationMethod
+} from '@/composables/types';
 import { predefinedValidations } from '@/composables/validate';
 import Debouncer from '@/functionals/debouncer.vue';
 import Validator from '@/functionals/validator.vue';
@@ -105,11 +136,11 @@ const fieldBlurred = (showValidity: () => void): void => {
 };
 
 const initialized = (data: FieldData | ValidatedFieldData): void => {
-    emit('created', rawClone(data) as ValidatedNumberFieldData);
+    emit('created', { ...(data as ValidatedNumberFieldData) });
 };
 
 const debounced = (data: FieldData | ValidatedFieldData): void => {
-    emit('updated', rawClone(data) as ValidatedNumberFieldData);
+    emit('updated', { ...(data as ValidatedNumberFieldData) });
 };
 </script>
 

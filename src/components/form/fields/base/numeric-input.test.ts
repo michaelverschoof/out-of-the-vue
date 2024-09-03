@@ -110,7 +110,10 @@ describe('Updating input', () => {
     });
 });
 
-function mountComponent(props: { [key: string]: number | boolean | null } | null = null): { wrapper: VueWrapper<any>; input: DOMWrapper<HTMLInputElement> } {
+function mountComponent(props: { [key: string]: number | boolean | null } | null = null): {
+    wrapper: VueWrapper<any>;
+    input: DOMWrapper<HTMLInputElement>;
+} {
     const options = {
         props: Object.assign({}, numberProps, props || null)
     };

@@ -1,5 +1,9 @@
 <template>
-    <Story title="Form/Fields/Checkable field" :layout="{ type: 'grid', width: 400 }" auto-props-disabled>
+    <Story
+        title="Form/Fields/Checkable field"
+        :layout="{ type: 'grid', width: 400 }"
+        auto-props-disabled
+    >
         <Variant title="Simple">
             <checkable-field
                 name="histoire-checkable-field-simple"
@@ -72,7 +76,12 @@
                     checkbox: 'checkbox'
                 }"
             />
-            <hst-radio v-if="'radio' === state.type" v-model="state.selected[0]" title="Selected" :options="items" />
+            <hst-radio
+                v-if="'radio' === state.type"
+                v-model="state.selected[0]"
+                title="Selected"
+                :options="items"
+            />
             <hst-checkbox-list v-else v-model="state.selected" title="Selected" :options="items" />
             <hst-checkbox v-model="state.hideInput" title="Hide input" />
             <hst-checkbox v-model="state.filter" title="Filter items" />

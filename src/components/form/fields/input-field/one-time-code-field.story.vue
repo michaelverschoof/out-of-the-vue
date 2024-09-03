@@ -1,5 +1,9 @@
 <template>
-    <Story title="Form/Fields/One time code field" :layout="{ type: 'grid', width: 400 }" auto-props-disabled>
+    <Story
+        title="Form/Fields/One time code field"
+        :layout="{ type: 'grid', width: 400 }"
+        auto-props-disabled
+    >
         <Variant title="Simple">
             <one-time-code-field
                 name="histoire-one-time-code-field-simple"
@@ -36,7 +40,9 @@
                     @updated="logEvent('updated', $event)"
                 >
                     <template #label>Field label</template>
-                    <template #information><i>Helpful text on how to fill in the field</i></template>
+                    <template #information
+                        ><i>Helpful text on how to fill in the field</i></template
+                    >
                 </one-time-code-field>
                 <template #prepend><icon icon="mdi:airballoon" /></template>
                 <template #append><icon icon="mdi:airplane" /></template>
@@ -65,7 +71,11 @@
 
             <hst-checkbox v-model="state.focus" title="Focus" />
             <hst-slider v-model="state.length" :step="1" :min="1" :max="10" title="Length" />
-            <hst-button-group v-model="state.type" title="Input type" :options="['alpha', 'numeric', 'alphanumeric']" />
+            <hst-button-group
+                v-model="state.type"
+                title="Input type"
+                :options="['alpha', 'numeric', 'alphanumeric']"
+            />
             <hst-checkbox v-model="state.permanentInformation" title="Show information on error" />
         </template>
     </Story>

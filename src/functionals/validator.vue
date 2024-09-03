@@ -1,5 +1,12 @@
 <template>
-    <slot v-bind="$attrs" :initialize="initialize" :validate="validate" :invalid="!state.valid" :showing="showing" :show-validity="showValidity" />
+    <slot
+        v-bind="$attrs"
+        :initialize="initialize"
+        :validate="validate"
+        :invalid="!state.valid"
+        :showing="showing"
+        :show-validity="showValidity"
+    />
 
     <template v-if="!state.valid && showing">
         <template v-for="validation of validations">
@@ -16,7 +23,13 @@
 </template>
 
 <script lang="ts" setup>
-import { FieldData, SubmittedSymbol, UpdateEmitType, ValidatedFieldData, ValidationMethod } from '@/composables/types';
+import {
+    FieldData,
+    SubmittedSymbol,
+    UpdateEmitType,
+    ValidatedFieldData,
+    ValidationMethod
+} from '@/composables/types';
 import { useValidate } from '@/composables/validate';
 import { rawClone } from '@/util/copy';
 import { provided } from '@/util/slots';
@@ -27,7 +40,11 @@ const emit = defineEmits<{
     (event: 'clicked-validation'): void;
 }>();
 
-const props = defineProps<{ validations?: ValidationMethod[]; triggerValidation?: string; liveValidation?: boolean }>();
+const props = defineProps<{
+    validations?: ValidationMethod[];
+    triggerValidation?: string;
+    liveValidation?: boolean;
+}>();
 
 const state = reactive<ValidatedFieldData>({
     name: null,

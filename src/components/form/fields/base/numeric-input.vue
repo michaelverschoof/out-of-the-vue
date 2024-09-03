@@ -20,12 +20,22 @@ import { computed, reactive, watch } from 'vue';
 
 const emit = defineEmits<{ (event: 'created' | 'updated', data: NumberFieldData): void }>();
 
-const props = withDefaults(defineProps<{ name: string; value?: number; allowDecimals?: boolean; allowNegative?: boolean }>(), {
-    allowDecimals: true,
-    allowNegative: true
-});
+const props = withDefaults(
+    defineProps<{
+        name: string;
+        value?: number;
+        allowDecimals?: boolean;
+        allowNegative?: boolean;
+    }>(),
+    {
+        allowDecimals: true,
+        allowNegative: true
+    }
+);
 
-const regex = computed<string>(() => `[0-9${props.allowDecimals ? '.,' : ''}${props.allowNegative ? '-' : ''}]`);
+const regex = computed<string>(
+    () => `[0-9${props.allowDecimals ? '.,' : ''}${props.allowNegative ? '-' : ''}]`
+);
 
 const model = computed<string>(() => state.value?.toString() ?? null);
 

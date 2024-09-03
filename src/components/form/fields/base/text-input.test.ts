@@ -385,7 +385,7 @@ function mountComponent(
         options.attachTo = document.body;
     }
 
-    const wrapper = mount(TextInput, options);
+    const wrapper = mount(TextInput, options as any);
     const input = wrapper.find('input');
 
     return { wrapper, input };

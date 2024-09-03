@@ -5,7 +5,8 @@ import { DOMWrapper, VueWrapper, mount } from '@vue/test-utils';
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
 /**
- * @vitest-environment happy-dom
+ * @vitest-environment jsdom
+ * Used instead of happy-dom to get the `main.value.includes(document.activeElement)` working
  */
 
 const props = {
@@ -98,7 +99,7 @@ describe('Focusing components', () => {
             });
 
             const input = wrapper.find('input');
-            await wrapper.setProps({ focus: true });
+            await wrapper.setProps({ focus: true } as any);
 
             expect(input.element).toBe(document.activeElement);
             expect(wrapper.find('main').classes().includes('focused')).toBeTruthy();
@@ -107,10 +108,12 @@ describe('Focusing components', () => {
 
     describe('On blur', () => {
         beforeEach(() => {
-            vi.spyOn(window, 'requestAnimationFrame').mockImplementation((callback: FrameRequestCallback): number => {
-                callback(100);
-                return 0;
-            });
+            vi.spyOn(window, 'requestAnimationFrame').mockImplementation(
+                (callback: FrameRequestCallback): number => {
+                    callback(100);
+                    return 0;
+                }
+            );
         });
 
         it('should blur natively', async () => {
@@ -138,12 +141,12 @@ describe('Focusing components', () => {
             });
 
             const input = wrapper.find('input');
-            await wrapper.setProps({ focus: true });
+            await wrapper.setProps({ focus: true } as any);
 
             expect(input.element).toBe(document.activeElement);
             expect(wrapper.find('main').classes().includes('focused')).toBeTruthy();
 
-            await wrapper.setProps({ focus: false });
+            await wrapper.setProps({ focus: false } as any);
 
             expect(input.element).not.toBe(document.activeElement);
             expect(wrapper.find('main').classes().includes('focused')).toBeFalsy();
@@ -206,10 +209,12 @@ describe('Debouncing input', () => {
 
 describe('Validating field', () => {
     beforeEach(() => {
-        vi.spyOn(window, 'requestAnimationFrame').mockImplementation((callback: FrameRequestCallback): number => {
-            callback(100);
-            return 0;
-        });
+        vi.spyOn(window, 'requestAnimationFrame').mockImplementation(
+            (callback: FrameRequestCallback): number => {
+                callback(100);
+                return 0;
+            }
+        );
     });
 
     it('should show a validation error', async () => {
@@ -357,7 +362,10 @@ describe('Validating field', () => {
 
         it('should trigger custom validation', async () => {
             const wrapper = mount(TextField, {
-                props: Object.assign({}, props, { typingDelay: 0, validations: validations }),
+                props: Object.assign({}, props, {
+                    typingDelay: 0,
+                    validations: validations
+                }) as any,
                 slots: Object.assign({}, { custom: 'custom error' })
             });
 

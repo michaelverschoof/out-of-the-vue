@@ -1,5 +1,9 @@
 <template>
-    <Story title="Form/Fields/Number field" :layout="{ type: 'grid', width: 400 }" auto-props-disabled>
+    <Story
+        title="Form/Fields/Number field"
+        :layout="{ type: 'grid', width: 400 }"
+        auto-props-disabled
+    >
         <Variant title="Simple">
             <number-field
                 name="histoire-number-field-simple"
@@ -109,14 +113,33 @@
 
             <template #controls>
                 <hst-text v-model="stringValue" title="Value" />
-                <hst-slider v-model="state.min" :step="100" :min="0" :max="1000" title="Minimum value" />
-                <hst-slider v-model="state.max" :step="100" :min="1000" :max="2000" title="Maximum value" />
-                <hst-checkbox v-model="state.permanentInformation" title="Display information on error" />
+                <hst-slider
+                    v-model="state.min"
+                    :step="100"
+                    :min="0"
+                    :max="1000"
+                    title="Minimum value"
+                />
+                <hst-slider
+                    v-model="state.max"
+                    :step="100"
+                    :min="1000"
+                    :max="2000"
+                    title="Maximum value"
+                />
+                <hst-checkbox
+                    v-model="state.permanentInformation"
+                    title="Display information on error"
+                />
 
-                <label class="histoire-wrapper htw-p-2 htw-flex htw-gap-2 htw-flex-wrap htw-items-center">
+                <label
+                    class="histoire-wrapper htw-p-2 htw-flex htw-gap-2 htw-flex-wrap htw-items-center"
+                >
                     <span class="htw-w-28 htw-shrink-0">Validate field</span>
                     <span class="htw-grow htw-max-w-full htw-flex htw-items-center htw-gap-1">
-                        <hst-button class="htw-p-2" @click="validate = !validate"> Validate = {{ validate }}</hst-button>
+                        <hst-button class="htw-p-2" @click="validate = !validate">
+                            Validate = {{ validate }}</hst-button
+                        >
                     </span>
                 </label>
             </template>
@@ -127,7 +150,13 @@
 
             <hst-text v-model="stringValue" title="Value" />
 
-            <hst-slider v-model="state.delay" :step="100" :min="0" :max="1000" title="Typing delay" />
+            <hst-slider
+                v-model="state.delay"
+                :step="100"
+                :min="0"
+                :max="1000"
+                title="Typing delay"
+            />
 
             <h3>Validations</h3>
             <hst-checkbox v-model="state.required" title="Required field" />
@@ -136,7 +165,13 @@
             <label class="histoire-wrapper htw-p-2 htw-flex htw-gap-2 htw-flex-wrap">
                 <span class="htw-w-28 htw-shrink-0" />
                 <span class="htw-grow htw-max-w-full htw-flex htw-items-center htw-gap-1">
-                    <hst-button :disabled="!state.allowDecimals" class="htw-p-2" @click="toggleDecimal"> Toggle decimal </hst-button>
+                    <hst-button
+                        :disabled="!state.allowDecimals"
+                        class="htw-p-2"
+                        @click="toggleDecimal"
+                    >
+                        Toggle decimal
+                    </hst-button>
                 </span>
             </label>
 
@@ -144,7 +179,13 @@
             <label class="histoire-wrapper htw-p-2 htw-flex htw-gap-2 htw-flex-wrap">
                 <span class="htw-w-28 htw-shrink-0" />
                 <span class="htw-grow htw-max-w-full htw-flex htw-items-center htw-gap-1">
-                    <hst-button :disabled="!state.allowNegative" class="htw-p-2" @click="toggleMinus"> Toggle minus sign </hst-button>
+                    <hst-button
+                        :disabled="!state.allowNegative"
+                        class="htw-p-2"
+                        @click="toggleMinus"
+                    >
+                        Toggle minus sign
+                    </hst-button>
                 </span>
             </label>
         </template>

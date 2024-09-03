@@ -65,14 +65,18 @@ describe('Mounting components', () => {
 describe('Give updated value on input', () => {
     it('should emit on input', async () => {
         const wrapper = mount(OneTimeCodeField, {
-            props: Object.assign({}, props, { type: 'alpha' }),
+            props: Object.assign({}, props, { type: 'alpha' }) as any,
             attachTo: document.body
         });
 
         const input = wrapper.find('input');
 
+        // console.log(input.html());
+
         await input.setValue('a');
         expect(input.element.value).toBe('A');
+
+        // console.log(wrapper.emitted('updated'));
 
         const emits = emitted(wrapper, 'updated');
         expect(emits[0].value === 'A').toBeTruthy();
@@ -80,7 +84,7 @@ describe('Give updated value on input', () => {
 
     it('should emit number on input', async () => {
         const wrapper = mount(OneTimeCodeField, {
-            props: Object.assign({}, props, { type: 'numeric' }),
+            props: Object.assign({}, props, { type: 'numeric' }) as any,
             attachTo: document.body
         });
 
@@ -445,7 +449,9 @@ describe('Validating field', () => {
                 slots: { custom: 'custom error' }
             });
 
-            await wrapper.find('fieldset').trigger('paste', { clipboardData: { getData: () => 'foobaz' } });
+            await wrapper
+                .find('fieldset')
+                .trigger('paste', { clipboardData: { getData: () => 'foobaz' } });
             expect(wrapper.find('strong.validation-error').exists()).toBeFalsy();
 
             await wrapper.find('main').trigger('blur');
@@ -459,7 +465,9 @@ describe('Validating field', () => {
                 slots: { custom: 'custom error' }
             });
 
-            await wrapper.find('fieldset').trigger('paste', { clipboardData: { getData: () => 'foobar' } });
+            await wrapper
+                .find('fieldset')
+                .trigger('paste', { clipboardData: { getData: () => 'foobar' } });
             expect(wrapper.find('strong.validation-error').exists()).toBeFalsy();
 
             await wrapper.find('main').trigger('blur');

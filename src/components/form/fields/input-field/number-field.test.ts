@@ -1,5 +1,11 @@
 import NumberField from '@/components/form/fields/input-field/number-field.vue';
-import { FieldData, ValidatedFieldData, ValidatedNumberFieldData, ValidationMethod, ValidationMethodParameters } from '@/composables/types';
+import {
+    FieldData,
+    ValidatedFieldData,
+    ValidatedNumberFieldData,
+    ValidationMethod,
+    ValidationMethodParameters
+} from '@/composables/types';
 import { emitted } from '@test/emits';
 import { DOMWrapper, VueWrapper, mount } from '@vue/test-utils';
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -98,7 +104,7 @@ describe('Focusing components', () => {
             });
 
             const input = wrapper.find('input');
-            await wrapper.setProps({ focus: true });
+            await wrapper.setProps({ focus: true } as any);
 
             expect(input.element).toBe(document.activeElement);
             expect(wrapper.find('main').classes().includes('focused')).toBeTruthy();
@@ -107,10 +113,12 @@ describe('Focusing components', () => {
 
     describe('On blur', () => {
         beforeEach(() => {
-            vi.spyOn(window, 'requestAnimationFrame').mockImplementation((callback: FrameRequestCallback): number => {
-                callback(100);
-                return 0;
-            });
+            vi.spyOn(window, 'requestAnimationFrame').mockImplementation(
+                (callback: FrameRequestCallback): number => {
+                    callback(100);
+                    return 0;
+                }
+            );
         });
 
         it('should blur natively', async () => {
@@ -138,12 +146,12 @@ describe('Focusing components', () => {
             });
 
             const input = wrapper.find('input');
-            await wrapper.setProps({ focus: true });
+            await wrapper.setProps({ focus: true } as any);
 
             expect(input.element).toBe(document.activeElement);
             expect(wrapper.find('main').classes().includes('focused')).toBeTruthy();
 
-            await wrapper.setProps({ focus: false });
+            await wrapper.setProps({ focus: false } as any);
 
             expect(input.element).not.toBe(document.activeElement);
             expect(wrapper.find('main').classes().includes('focused')).toBeFalsy();
@@ -330,14 +338,15 @@ describe('Validating field', () => {
         const validations: ValidationMethod[] = [
             {
                 name: 'custom',
-                validator: (data: FieldData, ...parameters: ValidationMethodParameters) => <number>data.value === <number>parameters[0],
+                validator: (data: FieldData, ...parameters: ValidationMethodParameters) =>
+                    <number>data.value === <number>parameters[0],
                 parameters: [123]
             }
         ];
 
         it('should trigger custom validation', async () => {
             const wrapper = mount(NumberField, {
-                props: Object.assign({}, props, { validations: validations }),
+                props: Object.assign({}, props, { validations: validations }) as any,
                 slots: Object.assign({}, { custom: 'custom error' })
             });
 

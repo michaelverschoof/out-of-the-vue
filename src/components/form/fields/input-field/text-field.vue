@@ -1,5 +1,10 @@
 <template>
-    <label ref="field" class="text-field input-field" tabindex="-1" v-bind="include($attrs, ['class', 'onClick'])">
+    <label
+        ref="field"
+        class="text-field input-field"
+        tabindex="-1"
+        v-bind="include($attrs, ['class', 'onClick'])"
+    >
         <debouncer :delay="typingDelay" @updated="debounced">
             <template #default="{ debounce }">
                 <validator
@@ -14,14 +19,25 @@
                             <slot name="label" />
                         </header>
 
-                        <main class="input" :class="{ focused, invalid: invalid && showing }" @blur.prevent.capture="fieldBlurred(showValidity)">
+                        <main
+                            class="input"
+                            :class="{ focused, invalid: invalid && showing }"
+                            @blur.prevent.capture="fieldBlurred(showValidity)"
+                        >
                             <prepend-append>
-                                <template #prepend>
+                                <template v-if="providedPrepend" #prepend>
                                     <slot name="prepend" />
                                 </template>
 
                                 <text-input
-                                    v-bind="exclude($attrs, ['class', 'onClick', 'onCreated', 'onUpdated'])"
+                                    v-bind="
+                                        exclude($attrs, [
+                                            'class',
+                                            'onClick',
+                                            'onCreated',
+                                            'onUpdated'
+                                        ])
+                                    "
                                     :name="name"
                                     :value="value"
                                     :allowed-characters="allowedCharacters"
@@ -31,13 +47,19 @@
                                     @updated="validate"
                                 />
 
-                                <template #append>
+                                <template v-if="providedAppend" #append>
                                     <slot name="append" />
                                 </template>
                             </prepend-append>
                         </main>
 
-                        <footer v-if="$slots.information && (permanentInformation || !(invalid && showing))" class="information">
+                        <footer
+                            v-if="
+                                $slots.information &&
+                                (permanentInformation || !(invalid && showing))
+                            "
+                            class="information"
+                        >
                             <slot name="information" />
                         </footer>
                     </template>
@@ -61,10 +83,14 @@ import Validator from '@/functionals/validator.vue';
 import { exclude, include } from '@/util/attrs';
 import { rawClone } from '@/util/copy';
 import { hasFocus } from '@/util/focus';
-import { computed, ref } from 'vue';
+import { provided } from '@/util/slots';
+import { computed, ref, useSlots } from 'vue';
+
+const slots = useSlots();
+const providedPrepend = computed<boolean>(() => provided(slots.prepend));
+const providedAppend = computed<boolean>(() => provided(slots.append));
 
 const emit = defineEmits<{ (event: 'created' | 'updated', data: ValidatedFieldData): void }>();
-
 const props = defineProps<{
     name: string;
     value?: string;

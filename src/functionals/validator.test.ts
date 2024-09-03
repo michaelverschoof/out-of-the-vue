@@ -350,7 +350,11 @@ describe('Triggering validation externally', () => {
     });
 });
 
-function mountComponent(value?: string, validations?: ValidationMethod[], enableProvide?: boolean): MountedComponent {
+function mountComponent(
+    value?: string,
+    validations?: ValidationMethod[],
+    enableProvide?: boolean
+): MountedComponent {
     const testData = !!value || value === '' ? Object.assign({}, data, { value: value }) : data;
     const stringedData = JSON.stringify(testData).replace(/"/g, "'");
 
@@ -380,7 +384,7 @@ function mountComponent(value?: string, validations?: ValidationMethod[], enable
         };
     }
 
-    const wrapper = mount(ValidatableInput, options);
+    const wrapper = mount(ValidatableInput, options as any);
 
     const element = wrapper.find('div');
 
