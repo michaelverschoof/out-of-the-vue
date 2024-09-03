@@ -1,21 +1,43 @@
 <template>
-    <label class="number-field input-field" v-bind="include($attrs, ['class'])">
+    <label
+        ref="field"
+        class="number-field input-field"
+        tabindex="-1"
+        v-bind="include($attrs, ['class', 'onClick'])"
+    >
         <debouncer :delay="typingDelay" @updated="debounced">
             <template #default="{ debounce }">
-                <validator :validations="validationMethods" :trigger-validation="triggerValidation" @created="initialized" @updated="debounce">
+                <validator
+                    :validations="validationMethods"
+                    :live-validation="!focused"
+                    :trigger-validation="triggerValidation"
+                    @created="initialized"
+                    @updated="debounce"
+                >
                     <template #default="{ initialize, validate, invalid, showing, showValidity }">
                         <header v-if="$slots.label" class="label">
                             <slot name="label" />
                         </header>
 
-                        <main class="input" :class="{ focused, invalid: invalid && showing }">
+                        <main
+                            class="input"
+                            :class="{ focused, invalid: invalid && showing }"
+                            @blur.prevent.capture="fieldBlurred(showValidity)"
+                        >
                             <prepend-append>
                                 <template #prepend>
                                     <slot name="prepend" />
                                 </template>
 
                                 <numeric-input
-                                    v-bind="exclude($attrs, ['class', 'onCreated', 'onUpdated'])"
+                                    v-bind="
+                                        exclude($attrs, [
+                                            'class',
+                                            'onClick',
+                                            'onCreated',
+                                            'onUpdated'
+                                        ])
+                                    "
                                     :name="name"
                                     :value="value"
                                     :allow-decimals="allowDecimals"
@@ -35,7 +57,13 @@
                             </prepend-append>
                         </main>
 
-                        <footer v-if="$slots.information && !(invalid && showing)" class="information">
+                        <footer
+                            v-if="
+                                $slots.information &&
+                                (permanentInformation || !(invalid && showing))
+                            "
+                            class="information"
+                        >
                             <slot name="information" />
                         </footer>
                     </template>
@@ -52,11 +80,18 @@
 <script lang="ts" setup>
 import NumericInput from '@/components/form/fields/base/numeric-input.vue';
 import PrependAppend from '@/components/layout/prepend-append.vue';
-import { FieldData, ValidatedFieldData, ValidatedNumberFieldData, ValidationMethod } from '@/composables/types';
+import {
+    FieldData,
+    ValidatedFieldData,
+    ValidatedNumberFieldData,
+    ValidationMethod
+} from '@/composables/types';
 import { predefinedValidations } from '@/composables/validate';
 import Debouncer from '@/functionals/debouncer.vue';
 import Validator from '@/functionals/validator.vue';
 import { exclude, include } from '@/util/attrs';
+import { rawClone } from '@/util/copy';
+import { hasFocus } from '@/util/focus';
 import { computed, ref } from 'vue';
 
 const emit = defineEmits<{ (event: 'created' | 'updated', data: ValidatedFieldData): void }>();
@@ -73,11 +108,10 @@ const props = withDefaults(
         max?: number;
         validations?: ValidationMethod[];
         triggerValidation?: string;
+        permanentInformation?: boolean;
     }>(),
     { allowDecimals: true, allowNegative: true }
 );
-
-const focused = ref<boolean>(false);
 
 const validationMethods = computed<ValidationMethod[]>(() => [
     { ...predefinedValidations['required'], parameters: [props.required ?? false] },
@@ -85,6 +119,21 @@ const validationMethods = computed<ValidationMethod[]>(() => [
     { ...predefinedValidations['max-amount'], parameters: [props.max] },
     ...(props.validations ?? [])
 ]);
+
+const focused = ref<boolean>(false);
+
+const field = ref<HTMLElement>(null);
+
+const fieldBlurred = (showValidity: () => void): void => {
+    requestAnimationFrame(() => {
+        if (hasFocus(field)) {
+            return;
+        }
+
+        focused.value = false;
+        showValidity();
+    });
+};
 
 const initialized = (data: FieldData | ValidatedFieldData): void => {
     emit('created', { ...(data as ValidatedNumberFieldData) });

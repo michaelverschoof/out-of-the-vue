@@ -1,12 +1,12 @@
 <template>
-    <fieldset class="checkable-field input-field">
+    <fieldset ref="field" class="checkable-field input-field" tabindex="-1">
         <validator :validations="validationMethods" :trigger-validation="triggerValidation" @created="initialized" @updated="validated">
             <template #default="{ initialize, validate, invalid, showing, showValidity }">
                 <header v-if="provided(slots.label)" class="label">
                     <slot name="label" />
                 </header>
 
-                <main ref="main" tabindex="-1" @blur.capture="fieldBlurred(showValidity)">
+                <main @blur.capture="fieldBlurred(showValidity)">
                     <template v-for="key of keys" :key="key">
                         <label
                             v-if="!nonOptionSlots.includes(key) && provided(slots[key])"
@@ -53,7 +53,7 @@
                     </template>
                 </main>
 
-                <footer v-if="provided(slots.information) && !(invalid && showing)" class="information">
+                <footer v-if="provided(slots.information) && (permanentInformation || !(invalid && showing))" class="information">
                     <slot name="information" />
                 </footer>
             </template>
@@ -70,6 +70,8 @@ import CheckableInput from '@/components/form/fields/base/checkable-input.vue';
 import { CheckableFieldData, ValidatedFieldData, ValidatedStringArrayFieldData, ValidationMethod } from '@/composables/types';
 import { predefinedValidations } from '@/composables/validate';
 import Validator from '@/functionals/validator.vue';
+import { rawClone } from '@/util/copy';
+import { hasFocus } from '@/util/focus';
 import { provided } from '@/util/slots';
 import { computed, onMounted, reactive, ref, useSlots, watch } from 'vue';
 
@@ -86,6 +88,7 @@ const props = defineProps<{
     validations?: ValidationMethod[];
     triggerValidation?: string;
     hideInput?: boolean;
+    permanentInformation?: boolean;
 }>();
 
 const validationMethods = computed<ValidationMethod[]>(() => {
@@ -118,7 +121,7 @@ const state = reactive<ValidatedStringArrayFieldData>({
 
 watch(
     () => props.selected,
-    (received?: string[]) => {
+    (received: string[]) => {
         const filtered = filterSelected(received);
         if (JSON.stringify(filtered) === JSON.stringify(state.value)) {
             return;
@@ -152,7 +155,7 @@ const updated = (data: CheckableFieldData, event: 'created' | 'updated' = 'updat
     state.value = Array.from(selectedItems.value);
 };
 
-const select = (key: string) => {
+const select = (key: string): void => {
     if (!!props.disabled && props.disabled.includes(key)) {
         return;
     }
@@ -160,7 +163,7 @@ const select = (key: string) => {
     const data: CheckableFieldData = {
         name: state.name,
         value: key,
-        checked: !selectedItems.value.has(key)
+        checked: props.type !== 'radio' ? !selectedItems.value.has(key) : true
     };
 
     updated(data);
@@ -175,7 +178,7 @@ const validated = (data: ValidatedFieldData): void => {
     state.valid = data.valid;
     state.failed = data.failed;
 
-    emit('updated', { ...state });
+    emit('updated', rawClone(state));
 };
 
 const focusItem = (item: string): void => {
@@ -186,10 +189,11 @@ const blurItem = (item: string): void => {
     focusedItems.value.delete(item);
 };
 
-const main = ref<HTMLElement | null>(null);
+const field = ref<HTMLElement>(null);
+
 const fieldBlurred = (showValidity: () => void): void => {
     requestAnimationFrame(() => {
-        if (!main.value || main.value.contains(document.activeElement)) {
+        if (hasFocus(field)) {
             return;
         }
 
@@ -197,9 +201,7 @@ const fieldBlurred = (showValidity: () => void): void => {
     });
 };
 
-onMounted(() => {
-    emit('created', { ...state });
-});
+onMounted(() => emit('created', rawClone(state)));
 
 function filterSelected(selected?: (string | null)[]): string[] {
     return (selected || []).filter((item) => item !== null) as string[];

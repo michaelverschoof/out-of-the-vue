@@ -18,6 +18,7 @@
 
 <script lang="ts" setup>
 import { StringFieldData } from '@/composables/types';
+import { rawClone } from '@/util/copy';
 import { filter, shorten, transform } from '@/util/strings';
 import { computed, onMounted, reactive, ref, watch } from 'vue';
 
@@ -40,38 +41,35 @@ const element = ref<HTMLInputElement | HTMLTextAreaElement | null>(null);
 const focused = ref<boolean>(false);
 const characterRegex = ref<RegExp>(getRegex(props.allowedCharacters));
 
+const model = computed<string>(() => state.value);
+
 const state = reactive<StringFieldData>({
     name: props.name,
     value: props.value ?? null
 });
 
-const model = computed({
-    get: () => state.value,
-    set: (value: string | null) => {
-        state.value = value;
-    }
-});
-
 function update(value?: string | null) {
     if (value === null) {
-        model.value = null;
-        emit('updated', { ...state });
+        state.value = null;
+        emit('updated', rawClone(state));
         return;
     }
 
     const prepared = filterAndTransform(value ?? state.value);
-    if (prepared === state.value) {
-        return;
+    if (prepared !== state.value) {
+        state.value = prepared;
+        emit('updated', rawClone(state));
     }
-
-    model.value = prepared;
-    emit('updated', { ...state });
 }
 
 watch(
     () => props.value,
-    () => {
-        update(props.value);
+    (received: string) => {
+        if (received === state.value) {
+            return;
+        }
+
+        update(received);
     }
 );
 
@@ -164,10 +162,10 @@ onMounted(() => {
     }
 
     if (!!props.value && (props.allowedCharacters || props.transformInput || props.max)) {
-        model.value = filterAndTransform(props.value);
+        state.value = filterAndTransform(props.value);
     }
 
-    emit('created', { ...state });
+    emit('created', rawClone(state));
 });
 </script>
 

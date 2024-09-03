@@ -3,7 +3,7 @@ import { predefinedValidations } from '@/composables/validate';
 import ValidatableInput from '@/functionals/validator.vue';
 import { emitted } from '@test/emits';
 import { MountedComponent } from '@test/types';
-import { mount, MountingOptions } from '@vue/test-utils';
+import { ComponentMountingOptions, mount } from '@vue/test-utils';
 import { afterEach, beforeAll, describe, expect, it } from 'vitest';
 import { ref } from 'vue';
 
@@ -211,6 +211,20 @@ describe('Show validity', () => {
         expect(wrapper.find('strong.validation-error').exists()).toBeTruthy();
         expect(wrapper.find('strong.validation-error').text()).toBe('min error');
     });
+
+    it('should show clickable error', async () => {
+        const { element, wrapper } = mountComponent('', validations);
+        await element?.trigger('updated');
+        await element?.trigger('show');
+
+        expect(element?.classes()).toContain('showing');
+        expect(element?.classes()).toContain('invalid');
+        expect(wrapper.find('strong.validation-error').exists()).toBeTruthy();
+        expect(wrapper.find('strong.validation-error').text()).toBe('required error');
+
+        await wrapper.find('strong.validation-error').trigger('click');
+        emitted(wrapper, 'clicked-validation');
+    });
 });
 
 describe('Triggering validation externally', () => {
@@ -344,7 +358,7 @@ function mountComponent(
     const testData = !!value || value === '' ? Object.assign({}, data, { value: value }) : data;
     const stringedData = JSON.stringify(testData).replace(/"/g, "'");
 
-    const options: MountingOptions<any> = {
+    const options: ComponentMountingOptions<any> = {
         slots: {
             default: `<template #default="{ initialize, validate, invalid, showing, showValidity }">
                         <div :class="{ invalid, showing }"

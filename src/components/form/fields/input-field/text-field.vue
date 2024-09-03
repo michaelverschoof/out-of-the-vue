@@ -1,26 +1,47 @@
 <template>
-    <label class="text-field input-field" v-bind="include($attrs, ['class', 'onClick'])">
-        <debouncer :delay="typingDelay" @updated="validated">
+    <label
+        ref="field"
+        class="text-field input-field"
+        tabindex="-1"
+        v-bind="include($attrs, ['class', 'onClick'])"
+    >
+        <debouncer :delay="typingDelay" @updated="debounced">
             <template #default="{ debounce }">
-                <validator :validations="validationMethods" :trigger-validation="triggerValidation" @created="initialized" @updated="debounce">
+                <validator
+                    :validations="validationMethods"
+                    :trigger-validation="triggerValidation"
+                    :live-validation="!focused"
+                    @created="initialized"
+                    @updated="debounce"
+                >
                     <template #default="{ initialize, validate, invalid, showing, showValidity }">
                         <header v-if="$slots.label" class="label">
                             <slot name="label" />
                         </header>
 
-                        <main ref="main" class="input" :class="{ focused, invalid: invalid && showing }" tabindex="-1">
+                        <main
+                            class="input"
+                            :class="{ focused, invalid: invalid && showing }"
+                            @blur.prevent.capture="fieldBlurred(showValidity)"
+                        >
                             <prepend-append>
                                 <template v-if="providedPrepend" #prepend>
                                     <slot name="prepend" />
                                 </template>
 
                                 <text-input
-                                    v-bind="exclude($attrs, ['class', 'onClick'])"
+                                    v-bind="
+                                        exclude($attrs, [
+                                            'class',
+                                            'onClick',
+                                            'onCreated',
+                                            'onUpdated'
+                                        ])
+                                    "
                                     :name="name"
                                     :value="value"
                                     :allowed-characters="allowedCharacters"
                                     :max="maxLength"
-                                    @blurred="fieldBlurred(showValidity)"
                                     @focused="focused = true"
                                     @created="initialize"
                                     @updated="validate"
@@ -32,7 +53,13 @@
                             </prepend-append>
                         </main>
 
-                        <footer v-if="$slots.information && !(invalid && showing)" class="information">
+                        <footer
+                            v-if="
+                                $slots.information &&
+                                (permanentInformation || !(invalid && showing))
+                            "
+                            class="information"
+                        >
                             <slot name="information" />
                         </footer>
                     </template>
@@ -54,11 +81,16 @@ import { predefinedValidations } from '@/composables/validate';
 import Debouncer from '@/functionals/debouncer.vue';
 import Validator from '@/functionals/validator.vue';
 import { exclude, include } from '@/util/attrs';
+import { rawClone } from '@/util/copy';
+import { hasFocus } from '@/util/focus';
 import { provided } from '@/util/slots';
-import { computed, nextTick, ref, useSlots } from 'vue';
+import { computed, ref, useSlots } from 'vue';
+
+const slots = useSlots();
+const providedPrepend = computed<boolean>(() => provided(slots.prepend));
+const providedAppend = computed<boolean>(() => provided(slots.append));
 
 const emit = defineEmits<{ (event: 'created' | 'updated', data: ValidatedFieldData): void }>();
-
 const props = defineProps<{
     name: string;
     value?: string;
@@ -70,6 +102,7 @@ const props = defineProps<{
     required?: boolean;
     validations?: ValidationMethod[];
     triggerValidation?: string;
+    permanentInformation?: boolean;
 }>();
 
 const validationMethods = computed<ValidationMethod[]>(() => [
@@ -79,31 +112,28 @@ const validationMethods = computed<ValidationMethod[]>(() => [
     ...(props.validations ?? [])
 ]);
 
-const initialized = (data: FieldData | ValidatedFieldData): void => {
-    emit('created', { ...(data as ValidatedFieldData) });
-};
-
-const validated = (data: FieldData | ValidatedFieldData): void => {
-    emit('updated', { ...(data as ValidatedFieldData) });
-};
-
 const focused = ref<boolean>(false);
-const main = ref<HTMLElement | null>(null);
 
-const fieldBlurred = async (showValidity: () => void): Promise<void> => {
-    focused.value = false;
+const field = ref<HTMLElement>(null);
 
-    await nextTick();
-    if (!main.value || main.value.contains(document.activeElement)) {
-        return;
-    }
+const fieldBlurred = (showValidity: () => void): void => {
+    requestAnimationFrame(() => {
+        if (hasFocus(field)) {
+            return;
+        }
 
-    showValidity();
+        focused.value = false;
+        showValidity();
+    });
 };
 
-const slots = useSlots();
-const providedPrepend = computed(() => provided(slots.prepend));
-const providedAppend = computed(() => provided(slots.append));
+const initialized = (data: FieldData | ValidatedFieldData): void => {
+    emit('created', rawClone(data) as ValidatedFieldData);
+};
+
+const debounced = (data: FieldData | ValidatedFieldData): void => {
+    emit('updated', rawClone(data) as ValidatedFieldData);
+};
 </script>
 
 <script lang="ts">

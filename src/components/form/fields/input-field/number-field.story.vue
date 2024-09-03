@@ -1,5 +1,9 @@
 <template>
-    <Story title="Form/Fields/Number field" :layout="{ type: 'grid', width: 400 }" auto-props-disabled>
+    <Story
+        title="Form/Fields/Number field"
+        :layout="{ type: 'grid', width: 400 }"
+        auto-props-disabled
+    >
         <Variant title="Simple">
             <number-field
                 name="histoire-number-field-simple"
@@ -9,7 +13,7 @@
                 :allow-negative="true"
                 required
                 @created="logEvent('created', $event)"
-                @updated="logEvent('updated', $event)"
+                @updated="updateValue"
             />
         </Variant>
 
@@ -21,7 +25,7 @@
                 :allow-negative="true"
                 required
                 @created="logEvent('created', $event)"
-                @updated="logEvent('updated', $event)"
+                @updated="updateValue"
             >
                 <template #label>Field label</template>
                 <template #information><i>Helpful text on how to fill in the field</i></template>
@@ -36,7 +40,7 @@
                 :allow-negative="true"
                 required
                 @created="logEvent('created', $event)"
-                @updated="logEvent('updated', $event)"
+                @updated="updateValue"
             >
                 <template #label>Field label</template>
                 <template #information>Helpful text on how to fill in the field</template>
@@ -53,7 +57,7 @@
                     :allow-decimals="true"
                     :allow-negative="true"
                     @created="logEvent('created', $event)"
-                    @updated="logEvent('updated', $event)"
+                    @updated="updateValue"
                 >
                     <template #label>Field label</template>
                     <template #information>Helpful text on how to fill in the field</template>
@@ -71,7 +75,7 @@
                     :allow-decimals="true"
                     :allow-negative="true"
                     @created="logEvent('created', $event)"
-                    @updated="logEvent('updated', $event)"
+                    @updated="updateValue"
                 >
                     <template #label>Field label</template>
                     <template #information>Helpful text on how to fill in the field</template>
@@ -92,10 +96,13 @@
                     :allow-negative="true"
                     :min="state.min"
                     :max="state.max"
+                    :permanent-information="state.permanentInformation"
                     required
                     @created="logEvent('created', $event)"
-                    @updated="logEvent('updated', $event)"
+                    @updated="updateValue"
                 >
+                    <template #append><icon icon="mdi:airplane" /></template>
+
                     <template #label>Field label</template>
                     <template #information>Helpful text on how to fill in the field</template>
                     <template #required>Required error message</template>
@@ -105,13 +112,34 @@
             </template>
 
             <template #controls>
-                <hst-slider v-model="state.min" :step="100" :min="0" :max="1000" title="Minimum value" />
-                <hst-slider v-model="state.max" :step="100" :min="1000" :max="2000" title="Maximum value" />
+                <hst-text v-model="stringValue" title="Value" />
+                <hst-slider
+                    v-model="state.min"
+                    :step="100"
+                    :min="0"
+                    :max="1000"
+                    title="Minimum value"
+                />
+                <hst-slider
+                    v-model="state.max"
+                    :step="100"
+                    :min="1000"
+                    :max="2000"
+                    title="Maximum value"
+                />
+                <hst-checkbox
+                    v-model="state.permanentInformation"
+                    title="Display information on error"
+                />
 
-                <label class="histoire-wrapper htw-p-2 htw-flex htw-gap-2 htw-flex-wrap htw-items-center">
+                <label
+                    class="histoire-wrapper htw-p-2 htw-flex htw-gap-2 htw-flex-wrap htw-items-center"
+                >
                     <span class="htw-w-28 htw-shrink-0">Validate field</span>
                     <span class="htw-grow htw-max-w-full htw-flex htw-items-center htw-gap-1">
-                        <hst-button class="htw-p-2" @click="validate = !validate"> Validate = {{ validate }}</hst-button>
+                        <hst-button class="htw-p-2" @click="validate = !validate">
+                            Validate = {{ validate }}</hst-button
+                        >
                     </span>
                 </label>
             </template>
@@ -120,7 +148,15 @@
         <template #controls>
             <show-grid-lines show />
 
-            <hst-slider v-model="state.delay" :step="100" :min="0" :max="1000" title="Typing delay" />
+            <hst-text v-model="stringValue" title="Value" />
+
+            <hst-slider
+                v-model="state.delay"
+                :step="100"
+                :min="0"
+                :max="1000"
+                title="Typing delay"
+            />
 
             <h3>Validations</h3>
             <hst-checkbox v-model="state.required" title="Required field" />
@@ -129,7 +165,13 @@
             <label class="histoire-wrapper htw-p-2 htw-flex htw-gap-2 htw-flex-wrap">
                 <span class="htw-w-28 htw-shrink-0" />
                 <span class="htw-grow htw-max-w-full htw-flex htw-items-center htw-gap-1">
-                    <hst-button :disabled="!state.allowDecimals" class="htw-p-2" @click="toggleDecimal"> Toggle decimal </hst-button>
+                    <hst-button
+                        :disabled="!state.allowDecimals"
+                        class="htw-p-2"
+                        @click="toggleDecimal"
+                    >
+                        Toggle decimal
+                    </hst-button>
                 </span>
             </label>
 
@@ -137,7 +179,13 @@
             <label class="histoire-wrapper htw-p-2 htw-flex htw-gap-2 htw-flex-wrap">
                 <span class="htw-w-28 htw-shrink-0" />
                 <span class="htw-grow htw-max-w-full htw-flex htw-items-center htw-gap-1">
-                    <hst-button :disabled="!state.allowNegative" class="htw-p-2" @click="toggleMinus"> Toggle minus sign </hst-button>
+                    <hst-button
+                        :disabled="!state.allowNegative"
+                        class="htw-p-2"
+                        @click="toggleMinus"
+                    >
+                        Toggle minus sign
+                    </hst-button>
                 </span>
             </label>
         </template>
@@ -147,15 +195,22 @@
 <script lang="ts" setup>
 import NumberField from '@/components/form/fields/input-field/number-field.vue';
 import PrependAppend from '@/components/layout/prepend-append.vue';
-import { SubmittedSymbol } from '@/composables/types';
+import { SubmittedSymbol, ValidatedFieldData } from '@/composables/types';
 import { Icon } from '@iconify/vue';
 import ShowGridLines from '@test/components/show-grid-lines.vue';
 import { toggleDecimalInValue, toggleMinusInValue } from '@test/functions/numbers';
 import { logEvent } from 'histoire/client';
-import { provide, reactive, ref } from 'vue';
+import { computed, provide, reactive, ref } from 'vue';
 
 const validate = ref<boolean>(false);
 provide(SubmittedSymbol, validate);
+
+const stringValue = computed({
+    get: () => state.value?.toString(),
+    set: (value) => {
+        state.value = !!value ? Number(value) : null;
+    }
+});
 
 const state = reactive({
     value: 1234.56,
@@ -164,7 +219,8 @@ const state = reactive({
     allowNegative: true,
     required: true,
     min: 200,
-    max: 1200
+    max: 1200,
+    permanentInformation: false
 });
 
 const previousDecimal = ref<number>(null);
@@ -176,6 +232,11 @@ const toggleDecimal = () => {
 
 const toggleMinus = () => {
     state.value = toggleMinusInValue(state.value);
+};
+
+const updateValue = (event: ValidatedFieldData) => {
+    state.value = <number>event.value;
+    logEvent('updated', event);
 };
 </script>
 

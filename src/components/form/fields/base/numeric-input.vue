@@ -4,7 +4,7 @@
         :allowed-characters="regex"
         :inputmode="allowDecimals ? 'decimal' : 'numeric'"
         :name="name"
-        :value="model ?? undefined"
+        :value="model"
         @updated="updated"
         @created="created"
     />
@@ -14,19 +14,30 @@
 import TextInput from '@/components/form/fields/base/text-input.vue';
 import { NumberFieldData, StringFieldData } from '@/composables/types';
 import { exclude } from '@/util/attrs';
-import { filter, parse } from '@/util/numbers';
-import { computed, reactive, ref, watch } from 'vue';
+import { rawClone } from '@/util/copy';
+import { parse } from '@/util/numbers';
+import { computed, reactive, watch } from 'vue';
 
 const emit = defineEmits<{ (event: 'created' | 'updated', data: NumberFieldData): void }>();
 
-const props = withDefaults(defineProps<{ name: string; value?: number; allowDecimals?: boolean; allowNegative?: boolean }>(), {
-    allowDecimals: true,
-    allowNegative: true
-});
+const props = withDefaults(
+    defineProps<{
+        name: string;
+        value?: number;
+        allowDecimals?: boolean;
+        allowNegative?: boolean;
+    }>(),
+    {
+        allowDecimals: true,
+        allowNegative: true
+    }
+);
 
-const regex = computed(() => `[0-9${props.allowDecimals ? '.,' : ''}${props.allowNegative ? '-' : ''}]`);
+const regex = computed<string>(
+    () => `[0-9${props.allowDecimals ? '.,' : ''}${props.allowNegative ? '-' : ''}]`
+);
 
-const model = ref<string | null>(props.value?.toString() ?? null);
+const model = computed<string>(() => state.value?.toString() ?? null);
 
 const state = reactive<NumberFieldData>({
     name: props.name,
@@ -41,29 +52,21 @@ watch(
         }
 
         state.value = received ?? null;
-        model.value = state.value?.toString() ?? null;
     }
 );
 
-const parseNumber = (data: StringFieldData): void => {
-    const filtered = filter(data.value ?? '', props.allowDecimals, props.allowNegative);
-    if (!filtered) {
-        state.value = null;
-        return;
-    }
-
-    model.value = filtered;
-    state.value = parse(filtered);
+const parseNumber = (data: StringFieldData): number => {
+    return parse(data.value ?? '', props.allowDecimals, props.allowNegative);
 };
 
 const created = (data: StringFieldData): void => {
-    parseNumber(data);
-    emit('created', { ...state });
+    state.value = parseNumber(data);
+    emit('created', rawClone(state));
 };
 
 const updated = (data: StringFieldData): void => {
-    parseNumber(data);
-    emit('updated', { ...state });
+    state.value = parseNumber(data);
+    emit('updated', rawClone(state));
 };
 </script>
 

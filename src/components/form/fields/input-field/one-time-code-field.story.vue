@@ -1,5 +1,9 @@
 <template>
-    <Story title="Form/Fields/One time code field" :layout="{ type: 'grid', width: 400 }" auto-props-disabled>
+    <Story
+        title="Form/Fields/One time code field"
+        :layout="{ type: 'grid', width: 400 }"
+        auto-props-disabled
+    >
         <Variant title="Simple">
             <one-time-code-field
                 name="histoire-one-time-code-field-simple"
@@ -28,7 +32,7 @@
         <Variant title="With outer icons">
             <prepend-append>
                 <one-time-code-field
-                    name="histoire-one-time-code-field-labels"
+                    name="histoire-one-time-code-field-icons"
                     :focus="state.focus"
                     :type="state.type"
                     :length="state.length"
@@ -36,11 +40,30 @@
                     @updated="logEvent('updated', $event)"
                 >
                     <template #label>Field label</template>
-                    <template #information><i>Helpful text on how to fill in the field</i></template>
+                    <template #information
+                        ><i>Helpful text on how to fill in the field</i></template
+                    >
                 </one-time-code-field>
                 <template #prepend><icon icon="mdi:airballoon" /></template>
                 <template #append><icon icon="mdi:airplane" /></template>
             </prepend-append>
+        </Variant>
+
+        <Variant title="With validations">
+            <one-time-code-field
+                name="histoire-one-time-code-field-required"
+                :focus="state.focus"
+                :type="state.type"
+                :length="3"
+                :permanent-information="state.permanentInformation"
+                required
+                @created="logEvent('created', $event)"
+                @updated="logEvent('updated', $event)"
+            >
+                <template #label>Field label</template>
+                <template #information><i>Helpful text on how to fill in the field</i></template>
+                <template #required>This field is required</template>
+            </one-time-code-field>
         </Variant>
 
         <template #controls>
@@ -48,7 +71,12 @@
 
             <hst-checkbox v-model="state.focus" title="Focus" />
             <hst-slider v-model="state.length" :step="1" :min="1" :max="10" title="Length" />
-            <hst-button-group v-model="state.type" title="Input type" :options="['alpha', 'numeric', 'alphanumeric']" />
+            <hst-button-group
+                v-model="state.type"
+                title="Input type"
+                :options="['alpha', 'numeric', 'alphanumeric']"
+            />
+            <hst-checkbox v-model="state.permanentInformation" title="Show information on error" />
         </template>
     </Story>
 </template>
@@ -64,7 +92,8 @@ import { reactive } from 'vue';
 const state = reactive({
     focus: false,
     type: 'alphanumeric' as 'alpha' | 'numeric' | 'alphanumeric',
-    length: 6
+    length: 6,
+    permanentInformation: false
 });
 </script>
 

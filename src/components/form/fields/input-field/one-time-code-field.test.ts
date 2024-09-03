@@ -1,7 +1,7 @@
 import OneTimeCodeField from '@/components/form/fields/input-field/one-time-code-field.vue';
 import { FieldData, ValidatedFieldData, ValidationMethod } from '@/composables/types';
 import { emitted } from '@test/emits';
-import { DOMWrapper, mount, VueWrapper } from '@vue/test-utils';
+import { DOMWrapper, VueWrapper, mount } from '@vue/test-utils';
 import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
 /**
@@ -28,9 +28,7 @@ describe('Mounting components', () => {
     it('should mount the component', async () => {
         const { inputs, wrapper } = mountComponent();
         expect(inputs.length).toBe(6);
-        expect(
-            inputs.every((input) => input.attributes().name.startsWith(props.name))
-        ).toBeTruthy();
+        expect(inputs.every((input) => input.attributes().name.startsWith(props.name))).toBeTruthy();
 
         const emits = emitted(wrapper, 'created');
         expect(emits[0]).toEqual(createdEmit);
@@ -348,12 +346,10 @@ describe('Pasting data', () => {
 
 describe('Validating field', () => {
     beforeEach(() => {
-        vi.spyOn(window, 'requestAnimationFrame').mockImplementation(
-            (callback: FrameRequestCallback): number => {
-                callback(100);
-                return 0;
-            }
-        );
+        vi.spyOn(window, 'requestAnimationFrame').mockImplementation((callback: FrameRequestCallback): number => {
+            callback(100);
+            return 0;
+        });
     });
 
     it('should show a validation error', async () => {
@@ -394,6 +390,37 @@ describe('Validating field', () => {
         expect(wrapper.find('strong.validation-error').exists()).toBeFalsy();
     });
 
+    it('should not show a validation error after filling the last field', async () => {
+        const wrapper = mount(OneTimeCodeField, {
+            props: Object.assign({}, props, { required: true }),
+            slots: { required: 'required error' },
+            attachTo: document.body
+        });
+
+        const inputs = wrapper.findAll('input');
+
+        await inputs[0].setValue('a');
+        await inputs[1].setValue('a');
+        await inputs[2].setValue('a');
+        await inputs[3].setValue('a');
+        await inputs[4].setValue('a');
+        await inputs[5].setValue('a');
+
+        const emits = emitted(wrapper, 'updated', 6);
+        expect(emits[4]).toEqual({
+            name: props.name,
+            value: 'AAAAA',
+            valid: false,
+            failed: ['required']
+        });
+        expect(emits[5]).toEqual({
+            name: props.name,
+            value: 'AAAAAA',
+            valid: true,
+            failed: []
+        });
+    });
+
     it('should trigger validation via props', async () => {
         const wrapper = mount(OneTimeCodeField, {
             props: Object.assign({}, props, { required: true }),
@@ -411,8 +438,7 @@ describe('Validating field', () => {
         const validations: ValidationMethod[] = [
             {
                 name: 'custom',
-                validator: (data: FieldData) =>
-                    JSON.stringify(data.value) === JSON.stringify(['F', 'O', 'O', 'B', 'A', 'R']),
+                validator: (data: FieldData) => JSON.stringify(data.value) === JSON.stringify(['F', 'O', 'O', 'B', 'A', 'R']),
                 parameters: null
             }
         ];
