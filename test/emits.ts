@@ -4,7 +4,11 @@ import { expect } from 'vitest';
 
 type EmittedFieldData = (FieldData | CheckableFieldData | ValidatedFieldData)[];
 
-export function emitted(wrapper: VueWrapper<any>, event: string = null, count: number = 1): FieldData[] | CheckableFieldData[] | ValidatedFieldData[] {
+export function emitted(
+    wrapper: VueWrapper<any>,
+    event: string = null,
+    count: number = 1
+): FieldData[] | CheckableFieldData[] | ValidatedFieldData[] {
     if (!event || !count) {
         return null;
     }
@@ -18,8 +22,25 @@ export function emitted(wrapper: VueWrapper<any>, event: string = null, count: n
         (events: EmittedFieldData, event: EmittedFieldData) => {
             events.push(event[0]);
             return events;
-        }, [] as (FieldData[] | CheckableFieldData[] | ValidatedFieldData[])
+        },
+        [] as FieldData[] | CheckableFieldData[] | ValidatedFieldData[]
     );
 
     return events as FieldData[] | CheckableFieldData[] | ValidatedFieldData[];
+}
+
+export function emittedV2<T extends Event>(
+    wrapper: VueWrapper<any>,
+    event: string = null,
+    count: number = 1
+): T[] {
+    if (!event || !count) {
+        return null;
+    }
+
+    const emitted = wrapper.emitted(event)?.flatMap((evt) => evt) as T[];
+    expect(emitted).toBeTruthy();
+    expect(emitted.length).toBe(count);
+
+    return emitted;
 }

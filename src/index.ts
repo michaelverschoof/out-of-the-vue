@@ -1,4 +1,3 @@
-import { InputTransformType } from '@/util/strings';
 import { App } from 'vue';
 
 /**
@@ -27,7 +26,20 @@ import Modal from './components/modal.vue';
 /**
  * Types
  */
-import { BaseValidationType, CheckableFieldData, FieldData, NumberFieldData, StringFieldData, ValidatedFieldData, ValidatedFormData, ValidatedNumberFieldData, ValidatedStringArrayFieldData, ValidatedStringFieldData, ValidationMethod, ValidationMethodParameters } from './composables/types';
+import {
+    BaseValidationType,
+    CheckableFieldData,
+    FieldData,
+    NumberFieldData,
+    StringFieldData,
+    ValidatedFieldData,
+    ValidatedFormData,
+    ValidatedNumberFieldData,
+    ValidatedStringArrayFieldData,
+    ValidatedStringFieldData,
+    ValidationMethod,
+    ValidationMethodParameters
+} from './composables/types';
 
 /**
  * Functional components
@@ -38,9 +50,19 @@ import Validator from './functionals/validator.vue';
 /**
  * Component exports
  */
-export { CheckableField, Modal, NumberField, OneTimeCodeField, TextField };
-export { CheckableInput, NumericInput, TextInput };
-export { Counter, PrependAppend, TextCounter };
+export {
+    CheckableField,
+    CheckableInput,
+    Counter,
+    Modal,
+    NumberField,
+    NumericInput,
+    OneTimeCodeField,
+    PrependAppend,
+    TextCounter,
+    TextField,
+    TextInput
+};
 
 /**
  * Functional component exports
@@ -58,16 +80,15 @@ export { predefinedValidations, useValidate } from './composables/validate';
  */
 export type {
     BaseValidationType,
-    InputTransformType,
-    FieldData,
-    StringFieldData,
-    NumberFieldData,
     CheckableFieldData,
+    FieldData,
+    NumberFieldData,
+    StringFieldData,
     ValidatedFieldData,
     ValidatedFormData,
     ValidatedNumberFieldData,
-    ValidatedStringFieldData,
     ValidatedStringArrayFieldData,
+    ValidatedStringFieldData,
     ValidationMethod,
     ValidationMethodParameters
 };

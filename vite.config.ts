@@ -44,9 +44,14 @@ export default defineConfig({
             rollupTypes: true
         })
     ],
+    server: {
+        port: 5252
+    },
 
     // Vitest Configuration
     test: {
+        globals: true,
+        environment: 'jsdom',
         coverage: {
             provider: 'v8',
             reporter: ['text', 'lcov']
