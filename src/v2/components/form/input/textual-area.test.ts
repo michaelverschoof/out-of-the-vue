@@ -1,4 +1,4 @@
-import TextualInput from '@/v2/components/form/input/textual-input.vue';
+import TextualArea from '@/v2/components/form/input/textual-area.vue';
 import { emittedV2 } from '@test/emits';
 import { mount } from '@vue/test-utils';
 import { beforeAll, describe, expect, it } from 'vitest';
@@ -13,13 +13,13 @@ const defaultProps = {
 };
 
 beforeAll(() => {
-    expect(TextualInput).toBeTruthy();
+    expect(TextualArea).toBeTruthy();
 });
 
 describe('Mounting components', () => {
     it('should mount the input component', async () => {
-        const wrapper = mount(TextualInput, { props: defaultProps });
-        expect(wrapper.find('input').exists()).toBeTruthy();
+        const wrapper = mount(TextualArea, { props: defaultProps });
+        expect(wrapper.find('textarea').exists()).toBeTruthy();
     });
 
     // TODO: Check if we can filter/modify the value on mount
@@ -41,13 +41,13 @@ describe('Focusing/blurring components', () => {
         it('should focus using function', async () => {
             const wrapper = mount(
                 defineComponent({
-                    components: { TextualInput },
-                    template: `<textual-input ref="element" name="testing-textual-input" />`
+                    components: { TextualArea },
+                    template: `<textual-area ref="element" name="testing-textual-area" />`
                 }),
                 { attachTo: document.body }
             );
 
-            const input = wrapper.find('input');
+            const input = wrapper.find('textarea');
             expect(input.exists()).toBeTruthy();
             expect(input.element).not.toBe(document.activeElement);
 
@@ -88,13 +88,13 @@ describe('Focusing/blurring components', () => {
         it('should blur using function', async () => {
             const wrapper = mount(
                 defineComponent({
-                    components: { TextualInput },
-                    template: `<textual-input ref="element" name="testing-textual-input" />`
+                    components: { TextualArea },
+                    template: `<textual-area ref="element" name="testing-textual-area" />`
                 }),
                 { attachTo: document.body }
             );
 
-            const input = wrapper.find('input');
+            const input = wrapper.find('textarea');
             expect(input.exists()).toBeTruthy();
             expect(input.element).not.toBe(document.activeElement);
 
@@ -256,7 +256,7 @@ describe('Updating model value', () => {
 });
 
 function mountComponent(customProps?: Record<string, any> | null, args?: Record<string, any>) {
-    const wrapper = mount(TextualInput, {
+    const wrapper = mount(TextualArea, {
         props: {
             ...defaultProps,
             modelValue: 'initial',
@@ -267,7 +267,7 @@ function mountComponent(customProps?: Record<string, any> | null, args?: Record<
     });
 
     // Get the input
-    const input = wrapper.find('input');
+    const input = wrapper.find('textarea');
 
     // Perform base tests
     expect(input.exists()).toBeTruthy();
