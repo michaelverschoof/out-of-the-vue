@@ -1,7 +1,8 @@
 import TextualInput from '@/v2/components/form/input/textual-input.vue';
+import * as ModelFunctions from '@/v2/functions/model';
 import { emittedV2 } from '@test/emits';
 import { mount } from '@vue/test-utils';
-import { beforeAll, describe, expect, it } from 'vitest';
+import { beforeAll, describe, expect, it, MockInstance } from 'vitest';
 import { defineComponent } from 'vue';
 
 /**
@@ -22,7 +23,8 @@ describe('Mounting components', () => {
         expect(wrapper.find('input').exists()).toBeTruthy();
     });
 
-    // TODO: Check if we can filter/modify the value on mount
+    // TODO: Check if we can filter/modify the initial value on mount
+    // It now just accepts the initial value and does not filter/modify it
 });
 
 describe('Focusing/blurring components', () => {
@@ -114,13 +116,28 @@ describe('Focusing/blurring components', () => {
     });
 });
 
-// FIXME: Add spies to the util functions
 describe('Updating model value', () => {
+    let createFiltersSpy: MockInstance<typeof ModelFunctions.createFilters>;
+    let createModifiersSpy: MockInstance<typeof ModelFunctions.createModifiers>;
+    let transformSpy: MockInstance<typeof ModelFunctions.transform>;
+
+    beforeEach(() => {
+        createFiltersSpy = vi.spyOn(ModelFunctions, 'createFilters');
+        createModifiersSpy = vi.spyOn(ModelFunctions, 'createModifiers');
+        transformSpy = vi.spyOn(ModelFunctions, 'transform');
+    });
+
+    afterEach(() => vi.restoreAllMocks());
+
     it('should update the model value', async () => {
         const { wrapper, input } = mountComponent();
 
         await input.setValue('updated value');
         expect(wrapper.props('modelValue')).toBe('updated value');
+
+        expect(createFiltersSpy).not.toHaveBeenCalled();
+        expect(createModifiersSpy).not.toHaveBeenCalled();
+        expect(transformSpy).not.toHaveBeenCalled();
     });
 
     describe('Using filters', () => {
@@ -141,6 +158,10 @@ describe('Updating model value', () => {
             await wrapper.setProps({ filters: ['numbers', 'letters'] });
             await input.setValue('$updated-12345_');
             expect(wrapper.props('modelValue')).toBe('$-_');
+
+            expect(createFiltersSpy).toHaveBeenCalledTimes(3);
+            expect(createModifiersSpy).not.toHaveBeenCalled();
+            expect(transformSpy).toHaveBeenCalledTimes(3);
         });
 
         it('should filter the value using regexes', async () => {
@@ -160,6 +181,10 @@ describe('Updating model value', () => {
             await wrapper.setProps({ filters: [/[^0-9]/g, /[^A-Z]/g] });
             await input.setValue('UPDATED with 12345');
             expect(wrapper.props('modelValue')).toBe(' with ');
+
+            expect(createFiltersSpy).toHaveBeenCalledTimes(3);
+            expect(createModifiersSpy).not.toHaveBeenCalled();
+            expect(transformSpy).toHaveBeenCalledTimes(3);
         });
 
         it('should filter the value using functions', async () => {
@@ -188,6 +213,10 @@ describe('Updating model value', () => {
             });
             await input.setValue('UPDATED-with 12345');
             expect(wrapper.props('modelValue')).toBe('UPDATEDwith12345');
+
+            expect(createFiltersSpy).toHaveBeenCalledTimes(3);
+            expect(createModifiersSpy).not.toHaveBeenCalled();
+            expect(transformSpy).toHaveBeenCalledTimes(3);
         });
     });
 
@@ -209,20 +238,46 @@ describe('Updating model value', () => {
             await wrapper.setProps({ modifiers: ['lowercase', 'uppercase'] });
             await input.setValue('updated 12345');
             expect(wrapper.props('modelValue')).toBe('UPDATED 12345');
+
+            expect(createFiltersSpy).toHaveBeenCalledTimes(3);
+            for (let i = 1; i < 4; i++) {
+                expect(createFiltersSpy).toHaveBeenNthCalledWith(i, undefined);
+            }
+            // Three times for the model modifiers (which are empty) and three times for the props
+            expect(createModifiersSpy).toHaveBeenCalledTimes(6);
+            expect(transformSpy).toHaveBeenCalledTimes(3);
         });
 
         it('should modify the value using functions', async () => {
             const { wrapper, input } = mountComponent();
 
-            // Filter letters only
+            // Get the first 7 characters
             await wrapper.setProps({ modifiers: (value: string) => value.substring(0, 7) });
             await input.setValue('updated 12345');
             expect(wrapper.props('modelValue')).toBe('updated');
 
-            // Filter letters only
-            await wrapper.setProps({ modifiers: (value: string) => value.substring(8) });
+            // Get the last 5 characters
+            await wrapper.setProps({ modifiers: (value: string) => value.slice(-5) });
             await input.setValue('updated 12345');
             expect(wrapper.props('modelValue')).toBe('12345');
+
+            // Remove the first 3 and then the last 3 characters
+            await wrapper.setProps({
+                modifiers: [
+                    (value: string) => value.substring(3),
+                    (value: string) => value.substring(0, value.length - 3)
+                ]
+            });
+            await input.setValue('updated 12345');
+            expect(wrapper.props('modelValue')).toBe('ated 12');
+
+            expect(createFiltersSpy).toHaveBeenCalledTimes(3);
+            for (let i = 1; i < 4; i++) {
+                expect(createFiltersSpy).toHaveBeenNthCalledWith(i, undefined);
+            }
+            // Three times for the model modifiers (which are empty) and three times for the props
+            expect(createModifiersSpy).toHaveBeenCalledTimes(6);
+            expect(transformSpy).toHaveBeenCalledTimes(3);
         });
     });
 
@@ -233,14 +288,22 @@ describe('Updating model value', () => {
             // Convert to lowercase
             await input.setValue('UPDATED 12345');
             expect(wrapper.props('modelValue')).toBe('updated 12345');
+
+            expect(createFiltersSpy).toHaveBeenCalledOnce();
+            expect(createModifiersSpy).toHaveBeenCalledOnce();
+            expect(transformSpy).toHaveBeenCalledOnce();
         });
 
         it('should uppercase the value', async () => {
             const { wrapper, input } = mountComponent({ modelModifiers: { uppercase: true } });
 
-            // Convert to lowercase
+            // Convert to uppercase
             await input.setValue('updated 12345');
             expect(wrapper.props('modelValue')).toBe('UPDATED 12345');
+
+            expect(createFiltersSpy).toHaveBeenCalledOnce();
+            expect(createModifiersSpy).toHaveBeenCalledOnce();
+            expect(transformSpy).toHaveBeenCalledOnce();
         });
 
         it('should lowercase then uppercase the value', async () => {
@@ -248,9 +311,13 @@ describe('Updating model value', () => {
                 modelModifiers: { lowercase: true, uppercase: true }
             });
 
-            // Convert to lowercase
+            // Convert to lowercase and then to uppercase
             await input.setValue('UPDATED 12345');
             expect(wrapper.props('modelValue')).toBe('UPDATED 12345');
+
+            expect(createFiltersSpy).toHaveBeenCalledOnce();
+            expect(createModifiersSpy).toHaveBeenCalledOnce();
+            expect(transformSpy).toHaveBeenCalledOnce();
         });
     });
 });

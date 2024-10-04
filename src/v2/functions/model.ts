@@ -76,9 +76,6 @@ export function createModifiers(
     }
 
     const modifierArray = Array.isArray(modifiers) ? modifiers : [modifiers];
-    if (!modifierArray.length) {
-        return [];
-    }
 
     const modifierFunctions = [];
 
