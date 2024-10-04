@@ -113,6 +113,44 @@ describe('Focusing/blurring components', () => {
             emitted = emittedV2<FocusEvent>(wrapper, 'blur', 1);
             expect(emitted[0].type).toEqual('blur');
         });
+
+        it('should keep focus when focusing quickly after blurring', async () => {
+            vi.useFakeTimers();
+
+            const { wrapper, input } = mountComponent(null, { attachTo: document.body });
+            expect(input.element).not.toBe(document.activeElement);
+
+            input.element.focus();
+            expect(input.element).toBe(document.activeElement);
+
+            // Timers are needed as onFocus() in the component uses debounce
+            vi.runAllTimers();
+
+            const emittedFocus = emittedV2<FocusEvent>(wrapper, 'focus', 1);
+            expect(emittedFocus[0].type).toEqual('focus');
+
+            // Blur the element
+            input.element.blur();
+            expect(input.element).not.toBe(document.activeElement);
+
+            // Advance time to before the blur emit would happen
+            vi.advanceTimersByTime(50);
+            expect(input.element).not.toBe(document.activeElement);
+            emittedV2<FocusEvent>(wrapper, 'blur', 0);
+
+            // Re-focus before the blur emit
+            input.element.focus();
+            expect(input.element).toBe(document.activeElement);
+            emittedV2<FocusEvent>(wrapper, 'blur', 0);
+
+            // Timers are needed as onBlur() in the component uses debounce
+            vi.runAllTimers();
+
+            emittedV2<FocusEvent>(wrapper, 'blur', 0);
+            emittedV2<FocusEvent>(wrapper, 'focus', 2);
+
+            vi.useRealTimers();
+        });
     });
 });
 
