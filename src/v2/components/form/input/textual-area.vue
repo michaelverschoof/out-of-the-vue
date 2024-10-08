@@ -16,9 +16,9 @@ import { createFilters, createModifiers, transform } from '@/v2/functions/model'
 import { useDebounceFn } from '@vueuse/core';
 import { ref } from 'vue';
 
-const props = defineProps<TextualInputProps>();
-
 const emit = defineEmits<InputEmits>();
+
+const props = defineProps<TextualInputProps>();
 
 const [model, modifiers] = defineModel<string>({
     set: (value: string): string => {

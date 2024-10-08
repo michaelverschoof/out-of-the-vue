@@ -29,7 +29,7 @@ export function emitted(
     return events as FieldData[] | CheckableFieldData[] | ValidatedFieldData[];
 }
 
-export function emittedV2<T extends Event>(
+export function emittedNativeEvents<T extends Event>(
     wrapper: VueWrapper<any>,
     event: string = null,
     count: number = 1
@@ -38,9 +38,39 @@ export function emittedV2<T extends Event>(
         return null;
     }
 
-    const emitted = wrapper.emitted(event)?.flatMap((evt) => evt) as T[];
-    expect(emitted).toBeTruthy();
-    expect(emitted.length).toBe(count);
+    const emitted: T[][] = wrapper.emitted(event);
+    if (!emitted || !emitted.length) {
+        return null;
+    }
 
-    return emitted;
+    const emittedValues = emitted.flatMap((emits) => emits);
+    expect(emittedValues).toBeTruthy();
+    expect(emittedValues.length).toBe(count);
+
+    return emittedValues;
+}
+
+type CustomEventValue = string | boolean | [];
+
+export function emittedCustomEvents(
+    wrapper: VueWrapper<any>,
+    event: string = null,
+    count: number = 1
+): CustomEventValue[] {
+    if (!event || !count) {
+        return null;
+    }
+
+    const emitted: CustomEventValue[][] = wrapper.emitted(event);
+    if (!emitted || !emitted.length) {
+        return null;
+    }
+
+    const emittedValues = emitted.flatMap((emits) =>
+        Array.isArray(emits) && emits.length === 0 ? true : emits
+    );
+    expect(emittedValues).toBeTruthy();
+    expect(emittedValues.length).toBe(count);
+
+    return emittedValues;
 }

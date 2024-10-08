@@ -1,6 +1,6 @@
 import TextualArea from '@/v2/components/form/input/textual-area.vue';
 import * as ModelFunctions from '@/v2/functions/model';
-import { emittedV2 } from '@test/emits';
+import { emittedNativeEvents } from '@test/emits';
 import { mount } from '@vue/test-utils';
 import { beforeAll, describe, expect, it, MockInstance } from 'vitest';
 import { defineComponent } from 'vue';
@@ -36,7 +36,7 @@ describe('Focusing/blurring components', () => {
             input.element.focus();
             expect(input.element).toBe(document.activeElement);
 
-            const emitted = emittedV2<FocusEvent>(wrapper, 'focus', 1);
+            const emitted = emittedNativeEvents<FocusEvent>(wrapper, 'focus', 1);
             expect(emitted[0].type).toEqual('focus');
         });
 
@@ -57,7 +57,7 @@ describe('Focusing/blurring components', () => {
             component.focus();
             expect(input.element).toBe(document.activeElement);
 
-            const emitted = emittedV2<FocusEvent>(wrapper, 'focus', 1);
+            const emitted = emittedNativeEvents<FocusEvent>(wrapper, 'focus', 1);
             expect(emitted[0].type).toEqual('focus');
         });
     });
@@ -72,7 +72,7 @@ describe('Focusing/blurring components', () => {
             input.element.focus();
             expect(input.element).toBe(document.activeElement);
 
-            let emitted = emittedV2<FocusEvent>(wrapper, 'focus', 1);
+            let emitted = emittedNativeEvents<FocusEvent>(wrapper, 'focus', 1);
             expect(emitted[0].type).toEqual('focus');
 
             input.element.blur();
@@ -81,7 +81,7 @@ describe('Focusing/blurring components', () => {
             // Timers are needed as onBlur() in the component uses debounce
             vi.runAllTimers();
 
-            emitted = emittedV2<FocusEvent>(wrapper, 'blur', 1);
+            emitted = emittedNativeEvents<FocusEvent>(wrapper, 'blur', 1);
             expect(emitted[0].type).toEqual('blur');
 
             vi.useRealTimers();
@@ -104,13 +104,13 @@ describe('Focusing/blurring components', () => {
             component.focus();
             expect(input.element).toBe(document.activeElement);
 
-            let emitted = emittedV2<FocusEvent>(wrapper, 'focus', 1);
+            let emitted = emittedNativeEvents<FocusEvent>(wrapper, 'focus', 1);
             expect(emitted[0].type).toEqual('focus');
 
             component.blur();
             expect(input.element).not.toBe(document.activeElement);
 
-            emitted = emittedV2<FocusEvent>(wrapper, 'blur', 1);
+            emitted = emittedNativeEvents<FocusEvent>(wrapper, 'blur', 1);
             expect(emitted[0].type).toEqual('blur');
         });
 
@@ -126,7 +126,7 @@ describe('Focusing/blurring components', () => {
             // Timers are needed as onFocus() in the component uses debounce
             vi.runAllTimers();
 
-            const emittedFocus = emittedV2<FocusEvent>(wrapper, 'focus', 1);
+            const emittedFocus = emittedNativeEvents<FocusEvent>(wrapper, 'focus', 1);
             expect(emittedFocus[0].type).toEqual('focus');
 
             // Blur the element
@@ -136,18 +136,18 @@ describe('Focusing/blurring components', () => {
             // Advance time to before the blur emit would happen
             vi.advanceTimersByTime(50);
             expect(input.element).not.toBe(document.activeElement);
-            emittedV2<FocusEvent>(wrapper, 'blur', 0);
+            emittedNativeEvents<FocusEvent>(wrapper, 'blur', 0);
 
             // Re-focus before the blur emit
             input.element.focus();
             expect(input.element).toBe(document.activeElement);
-            emittedV2<FocusEvent>(wrapper, 'blur', 0);
+            emittedNativeEvents<FocusEvent>(wrapper, 'blur', 0);
 
             // Timers are needed as onBlur() in the component uses debounce
             vi.runAllTimers();
 
-            emittedV2<FocusEvent>(wrapper, 'blur', 0);
-            emittedV2<FocusEvent>(wrapper, 'focus', 2);
+            emittedNativeEvents<FocusEvent>(wrapper, 'blur', 0);
+            emittedNativeEvents<FocusEvent>(wrapper, 'focus', 2);
 
             vi.useRealTimers();
         });
