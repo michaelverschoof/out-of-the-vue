@@ -62,9 +62,11 @@ export function emittedCustomEvents(
     }
 
     const emitted: CustomEventValue[][] = wrapper.emitted(event);
-    if (!emitted || !emitted.length) {
+    if (count === 0 && (!emitted || !emitted.length)) {
         return null;
     }
+
+    expect(emitted).toBeTruthy();
 
     const emittedValues = emitted.flatMap((emits) =>
         Array.isArray(emits) && emits.length === 0 ? true : emits
