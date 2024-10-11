@@ -70,7 +70,7 @@ describe('Mounting components', () => {
         expect(main.isVisible()).toBeTruthy();
         expect(main.text()).toEqual('Content');
 
-        emittedCustomEvents(wrapper, 'opened');
+        emittedCustomEvents(wrapper, 'opened', 1);
     });
 
     it('should mount the component in opened state with all templates', async () => {
@@ -91,31 +91,7 @@ describe('Mounting components', () => {
         expect(footer.isVisible()).toBeTruthy();
         expect(footer.text()).toEqual('Footer');
 
-        emittedCustomEvents(wrapper, 'opened');
-    });
-
-    it('should mount the component in opened state using model', async () => {
-        const wrapper = mount(Modal, {
-            props: { modelValue: true },
-            attachTo: document.body,
-            global: { ...globals }
-        });
-
-        expect(wrapper.find('.modal').isVisible()).toBeTruthy();
-
-        emittedCustomEvents(wrapper, 'opened', 0);
-    });
-
-    it('should not open using prop after mounting', async () => {
-        const wrapper = await mountComponent(templates);
-
-        expect(wrapper.find('.modal').exists()).toBeFalsy();
-
-        await wrapper.setProps({ open: true });
-
-        expect(wrapper.find('.modal').exists()).toBeFalsy();
-
-        emittedCustomEvents(wrapper, 'opened', 0);
+        emittedCustomEvents(wrapper, 'opened', 1);
     });
 });
 
@@ -134,7 +110,22 @@ describe('Opening modal', async () => {
         expect(modal.exists()).toBeTruthy();
         expect(modal.isVisible()).toBeTruthy();
 
-        emittedCustomEvents(wrapper, 'opened');
+        emittedCustomEvents(wrapper, 'opened', 1);
+    });
+
+    it('should open using model value', async () => {
+        const wrapper = await mountComponent(templates);
+
+        expect(wrapper.find('.modal').exists()).toBeFalsy();
+
+        await wrapper.setProps({ modelValue: true });
+
+        const modal = wrapper.find('.modal');
+        expect(modal.exists()).toBeTruthy();
+        expect(modal.isVisible()).toBeTruthy();
+
+        // As we open the modal via the model, the openModal function is not triggered
+        emittedCustomEvents(wrapper, 'opened', 0);
     });
 
     it('should open using function', async () => {
@@ -160,30 +151,8 @@ describe('Opening modal', async () => {
         expect(modal.exists()).toBeTruthy();
         expect(modal.isVisible()).toBeTruthy();
 
-        // Test against the custom component as the emit isn't propagated to the wrapper
-        emittedCustomEvents(component, 'opened');
-    });
-
-    it('should open using model value', async () => {
-        const wrapper = mount(Modal, {
-            props: {
-                modelValue: undefined,
-                'onUpdate:modelValue': (value: boolean) => wrapper.setProps({ modelValue: value })
-            },
-            attachTo: document.body,
-            global: { ...globals }
-        });
-
-        expect(wrapper.find('.modal').exists()).toBeFalsy();
-
-        await wrapper.setProps({ modelValue: true });
-
-        const modal = wrapper.find('.modal');
-        expect(modal.exists()).toBeTruthy();
-        expect(modal.isVisible()).toBeTruthy();
-
-        // As we open the modal via the model, the openModal function is not triggered
-        emittedCustomEvents(wrapper, 'opened', 0);
+        // Test against the custom component as the emit isn't propagated to the main wrapper
+        emittedCustomEvents(component, 'opened', 1);
     });
 
     it('should not open if already opened', async () => {
@@ -216,55 +185,72 @@ describe('Closing modal', async () => {
         const wrapper = await mountComponent({ header: templates.header }, true);
 
         expect(wrapper.find('.modal').isVisible()).toBeTruthy();
+        emittedCustomEvents(wrapper, 'opened', 1);
 
         await wrapper.find('#header').trigger('click');
         expect(wrapper.find('.modal').exists()).toBeFalsy();
 
-        emittedCustomEvents(wrapper, 'closed');
+        emittedCustomEvents(wrapper, 'closed', 1);
     });
 
     it('should close using content', async () => {
         const wrapper = await mountComponent({ default: templates.default }, true);
 
         expect(wrapper.find('.modal').isVisible()).toBeTruthy();
+        emittedCustomEvents(wrapper, 'opened', 1);
 
         await wrapper.find('#content').trigger('click');
         expect(wrapper.find('.modal').exists()).toBeFalsy();
 
-        emittedCustomEvents(wrapper, 'closed');
+        emittedCustomEvents(wrapper, 'closed', 1);
     });
 
     it('should close using footer', async () => {
         const wrapper = await mountComponent({ footer: templates.footer }, true);
 
         expect(wrapper.find('.modal').isVisible()).toBeTruthy();
+        emittedCustomEvents(wrapper, 'opened', 1);
 
         await wrapper.find('#footer').trigger('click');
         expect(wrapper.find('.modal').exists()).toBeFalsy();
 
-        emittedCustomEvents(wrapper, 'closed');
+        emittedCustomEvents(wrapper, 'closed', 1);
     });
 
     it('should close using backdrop', async () => {
         const wrapper = await mountComponent({ default: templates.default }, true);
 
         expect(wrapper.find('.modal').isVisible()).toBeTruthy();
+        emittedCustomEvents(wrapper, 'opened', 1);
 
         await wrapper.find('.backdrop').trigger('click');
         expect(wrapper.find('.modal').exists()).toBeFalsy();
 
-        emittedCustomEvents(wrapper, 'closed');
+        emittedCustomEvents(wrapper, 'closed', 1);
     });
 
     it('should close using escape button', async () => {
         const wrapper = await mountComponent({ default: templates.default }, true);
 
         expect(wrapper.find('.modal').isVisible()).toBeTruthy();
+        emittedCustomEvents(wrapper, 'opened', 1);
 
         const keyPress = new KeyboardEvent('keydown', { key: 'esc' });
         await wrapper.find('.backdrop').element.dispatchEvent(keyPress);
 
-        emittedCustomEvents(wrapper, 'closed');
+        emittedCustomEvents(wrapper, 'closed', 1);
+    });
+
+    it('should close using model value', async () => {
+        const wrapper = await mountComponent({ default: templates.default }, true);
+
+        expect(wrapper.find('.modal').isVisible()).toBeTruthy();
+        emittedCustomEvents(wrapper, 'opened', 1);
+
+        await wrapper.setProps({ modelValue: false });
+
+        expect(wrapper.find('.modal').exists()).toBeFalsy();
+        emittedCustomEvents(wrapper, 'closed', 1);
     });
 
     it('should close using function', async () => {
@@ -274,7 +260,7 @@ describe('Closing modal', async () => {
                 template: `<modal ref="element">Testing modal</modal>`
             }),
             {
-                props: { open: true },
+                props: { modelValue: true },
                 attachTo: document.body,
                 global: { ...globals }
             }
@@ -295,23 +281,7 @@ describe('Closing modal', async () => {
         expect(wrapper.find('.modal').exists()).toBeFalsy();
 
         // Test against the custom component as the emit isn't propagated to the wrapper
-        emittedCustomEvents(component, 'closed');
-    });
-
-    it('should close using model value', async () => {
-        const wrapper = mount(Modal, {
-            props: { modelValue: true },
-            attachTo: document.body,
-            global: { ...globals }
-        });
-
-        expect(wrapper.find('.modal').isVisible()).toBeTruthy();
-        emittedCustomEvents(wrapper, 'opened', 0);
-
-        await wrapper.setProps({ modelValue: false });
-
-        expect(wrapper.find('.modal').exists()).toBeFalsy();
-        emittedCustomEvents(wrapper, 'closed', 0);
+        emittedCustomEvents(component, 'closed', 1);
     });
 
     it('should not close if already closed', async () => {
@@ -321,7 +291,7 @@ describe('Closing modal', async () => {
                 template: `<modal ref="element">Testing modal</modal>`
             }),
             {
-                props: { open: true },
+                props: { modelValue: true },
                 attachTo: document.body,
                 global: { ...globals }
             }
@@ -353,10 +323,16 @@ describe('Closing modal', async () => {
 });
 
 async function mountComponent(slots?: ProvidedSlots, open: boolean = false) {
-    return mount(Modal, {
-        props: { parent: '#parent', open: open },
+    const wrapper = mount(Modal, {
+        props: {
+            parent: '#parent',
+            modelValue: open ? true : undefined,
+            'onUpdate:modelValue': (value: boolean) => wrapper.setProps({ modelValue: value })
+        },
         slots: slots,
         attachTo: document.body,
         global: { ...globals }
     });
+
+    return wrapper;
 }

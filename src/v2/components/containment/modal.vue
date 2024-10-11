@@ -28,42 +28,39 @@
 </template>
 
 <script lang="ts" setup>
-import { nextTick, onMounted, ref } from 'vue';
+import { nextTick, ref, watch } from 'vue';
 
 const emit = defineEmits<{ (event: 'opened' | 'closed'): void }>();
 
-const props = defineProps<{ parent?: string; open?: boolean }>();
+defineProps<{ parent?: string }>();
 
-const open = defineModel<boolean>();
+const open = defineModel<boolean>({ default: false });
 
 const element = ref<HTMLDivElement>(null);
 
-const openModal = async (): Promise<void> => {
-    if (open.value === true) {
-        return;
-    }
-
+const openModal = (): void => {
     open.value = true;
-    emit('opened');
-
-    await nextTick();
-    element.value?.focus();
 };
 
 const closeModal = (): void => {
-    if (open.value === false) {
-        return;
-    }
-
     open.value = false;
-    emit('closed');
 };
 
-onMounted(() => {
-    if (props.open || open.value) {
-        openModal();
-    }
-});
+watch(
+    open,
+    async (): Promise<void> => {
+        if (!open.value) {
+            emit('closed');
+            return;
+        }
+
+        emit('opened');
+
+        await nextTick();
+        element.value.focus();
+    },
+    { immediate: true }
+);
 
 defineExpose({
     open: openModal,
