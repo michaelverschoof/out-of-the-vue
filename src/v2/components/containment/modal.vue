@@ -34,7 +34,7 @@ const emit = defineEmits<{ (event: 'opened' | 'closed'): void }>();
 
 defineProps<{ parent?: string }>();
 
-const open = defineModel<boolean>({ default: false });
+const open = defineModel<boolean>();
 
 const element = ref<HTMLDivElement>(null);
 
